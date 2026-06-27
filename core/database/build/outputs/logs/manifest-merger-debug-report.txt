@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml:2:13-83
+INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml:2:13-83
+	package
+		INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml
+	xmlns:android
+		ADDED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml:2:23-81
+uses-sdk
+INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml reason: use-sdk injection requested
+INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml
+INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml
+	android:targetSdkVersion
+		INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml
+	android:minSdkVersion
+		INJECTED from /Users/faruk/Documents/Faruk/near aid/near_aid_app/core/database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12728285192623601115.xml
