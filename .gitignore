@@ -1,15 +1,44 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# ───────────────────────── Gradle ─────────────────────────
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ───────────────────────── Kotlin ─────────────────────────
+.kotlin/
+
+# ──────────────────── Android / local config ──────────────
 local.properties
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Generated Room schemas can be committed if you track migrations; ignore by default.
+# core/database/schemas/
+
+# ───────────────────────── Build outputs ──────────────────
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+release/
+
+# ──────────────────── Signing / secrets ───────────────────
+# Never commit keystores or the Firebase config.
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+
+# ─────────────────────── IDE (Android Studio / IntelliJ) ──
+.idea/
+!.idea/icon.png
+
+# ─────────────────────────── OS ───────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────── Logs ─────────────────────────
+*.log
+*.hprof
