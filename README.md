@@ -33,9 +33,10 @@ UI follows `near_aid_documents/nearaid_ui.html`; behaviour and data follow the
 9. [Build & run](#build--run)
 10. [Configuration](#configuration)
 11. [Conventions](#conventions)
-12. [Implementation status](#implementation-status)
-13. [Contributing](#contributing)
-14. [License](#license)
+12. [Testing](#testing)
+13. [Implementation status](#implementation-status)
+14. [Contributing](#contributing)
+15. [License](#license)
 
 ---
 
@@ -340,6 +341,44 @@ Type‑safe Navigation‑Compose. Destinations are `@Serializable` types in `:co
 - **Mappers** live in `:core:data`; DTOs (`:core:network`) and Room entities (`:core:database`)
   never leak past the data layer — the rest of the app speaks `:core:model` only.
 - **Errors are values** (`DataResult` / `AppError`), not exceptions, above the data layer.
+
+---
+
+## Testing
+
+Fast **JVM unit tests** (no device/emulator) cover the presentation and non‑UI layers:
+every ViewModel and the pure logic in `:core`. They run as `testDebugUnitTest` — ~150 tests
+across the modules below.
+
+- **Frameworks:** JUnit4, **MockK** (use‑case doubles), **Turbine** (effect/flow assertions),
+  **kotlinx‑coroutines‑test**. These come wired to every module through the convention plugins,
+  so no per‑module test setup is needed.
+- **ViewModel pattern:** a `MainDispatcherRule` swaps `Dispatchers.Main` for an
+  `UnconfinedTestDispatcher`, use cases are mocked, the VM is driven through `onIntent(...)`, and
+  assertions are made on `state.value` and the one‑shot `effect` flow (via Turbine). Both the
+  success and failure (`AppError`) branches of each intent are exercised, plus MVI reducers,
+  `init{}` loads, validation/submit gating and navigation effects.
+
+| Module            | What's covered                                                                 |
+|-------------------|--------------------------------------------------------------------------------|
+| `:app`            | `MainViewModel` (login‑state → start destination), `TopLevelDestination` tabs  |
+| `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
+| `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
+| `:core:network`   | `safeApiCall` + `HttpException` → `AppError` mapping (status codes + error envelope) |
+| `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
+| `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
+| `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |
+| `:feature:activity` | Activity ViewModel (claims/listings load, sorting, deliver/confirm/withdraw)  |
+| `:feature:messages` | Conversations + realtime Chat ViewModels (history, streamed messages, send)   |
+| `:feature:profile` | Profile, public profile, settings and verification ViewModels                 |
+
+```bash
+./gradlew test                                    # all unit tests, every module
+./gradlew :feature:discovery:testDebugUnitTest    # a single module
+```
+
+> UI (Compose), DI wiring, Room DAOs and repository implementations are not yet unit‑tested —
+> those need instrumented / Robolectric setup, which is not configured in v1.
 
 ---
 
