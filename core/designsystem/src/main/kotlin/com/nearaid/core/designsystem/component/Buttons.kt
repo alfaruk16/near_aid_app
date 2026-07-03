@@ -16,13 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.OnMarigold
-import com.nearaid.core.designsystem.theme.Rust
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 enum class NearAidButtonVariant { Primary, Teal, Ink, Rust, Ghost }
 
@@ -42,9 +36,9 @@ fun NearAidButton(
                 modifier = Modifier.size(18.dp),
                 strokeWidth = 2.dp,
                 color = when (variant) {
-                    NearAidButtonVariant.Primary -> OnMarigold
-                    NearAidButtonVariant.Ghost -> Ink
-                    else -> Surface
+                    NearAidButtonVariant.Primary -> NearAidTheme.colors.onMarigold
+                    NearAidButtonVariant.Ghost -> NearAidTheme.colors.ink
+                    else -> NearAidTheme.colors.surface
                 },
             )
         } else {
@@ -61,16 +55,16 @@ fun NearAidButton(
             enabled = enabled && !loading,
             modifier = modifier.heightIn(min = 50.dp),
             shape = androidx.compose.material3.MaterialTheme.shapes.medium,
-            border = androidx.compose.foundation.BorderStroke(1.dp, Line),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Ink),
+            border = androidx.compose.foundation.BorderStroke(1.dp, NearAidTheme.colors.line),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = NearAidTheme.colors.ink),
         ) { content() }
     } else {
         val (bg, fg) = when (variant) {
-            NearAidButtonVariant.Primary -> Marigold to OnMarigold
-            NearAidButtonVariant.Teal -> Teal to Surface
-            NearAidButtonVariant.Ink -> Ink to Surface
-            NearAidButtonVariant.Rust -> Rust to Surface
-            NearAidButtonVariant.Ghost -> Surface to Ink
+            NearAidButtonVariant.Primary -> NearAidTheme.colors.marigold to NearAidTheme.colors.onMarigold
+            NearAidButtonVariant.Teal -> NearAidTheme.colors.teal to NearAidTheme.colors.surface
+            NearAidButtonVariant.Ink -> NearAidTheme.colors.ink to NearAidTheme.colors.surface
+            NearAidButtonVariant.Rust -> NearAidTheme.colors.rust to NearAidTheme.colors.surface
+            NearAidButtonVariant.Ghost -> NearAidTheme.colors.surface to NearAidTheme.colors.ink
         }
         Button(
             onClick = onClick,

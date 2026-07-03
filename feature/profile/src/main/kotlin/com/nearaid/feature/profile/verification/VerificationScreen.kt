@@ -41,11 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTopBar
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Rust
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import java.io.File
 
 @Composable
@@ -104,7 +100,7 @@ fun VerificationScreen(
             Text(
                 text = "A verified badge raises your trust score and gets your requests seen faster.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
             )
 
             // National ID upload
@@ -127,7 +123,7 @@ fun VerificationScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .border(1.dp, Teal, RoundedCornerShape(14.dp))
+                        .border(1.dp, NearAidTheme.colors.teal, RoundedCornerShape(14.dp))
                         .padding(14.dp),
                 ) {
                     Row(
@@ -137,13 +133,13 @@ fun VerificationScreen(
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = null,
-                            tint = Teal,
+                            tint = NearAidTheme.colors.teal,
                             modifier = Modifier.size(20.dp),
                         )
                         Text(
                             text = "Submitted — status: pending",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Teal,
+                            color = NearAidTheme.colors.teal,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -155,7 +151,7 @@ fun VerificationScreen(
                 Text(
                     text = errorMsg,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Rust,
+                    color = NearAidTheme.colors.rust,
                 )
             }
 
@@ -172,7 +168,7 @@ fun VerificationScreen(
             Text(
                 text = "Documents are encrypted and never shown to other users.",
                 style = MaterialTheme.typography.bodySmall,
-                color = Ink3,
+                color = NearAidTheme.colors.ink3,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -195,7 +191,7 @@ private fun UploadRow(
             .clip(RoundedCornerShape(14.dp))
             .border(
                 width = 1.5.dp,
-                color = if (isUploaded) Teal else Line,
+                color = if (isUploaded) NearAidTheme.colors.teal else NearAidTheme.colors.line,
                 shape = RoundedCornerShape(14.dp),
             )
             .clickable(onClick = onClick)
@@ -208,13 +204,13 @@ private fun UploadRow(
             Icon(
                 imageVector = if (isUploaded) Icons.Filled.CheckCircle else Icons.Filled.Upload,
                 contentDescription = null,
-                tint = if (isUploaded) Teal else Ink3,
+                tint = if (isUploaded) NearAidTheme.colors.teal else NearAidTheme.colors.ink3,
                 modifier = Modifier.size(24.dp),
             )
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isUploaded) Teal else Ink2,
+                color = if (isUploaded) NearAidTheme.colors.teal else NearAidTheme.colors.ink2,
                 fontWeight = if (isUploaded) FontWeight.SemiBold else FontWeight.Normal,
             )
         }

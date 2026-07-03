@@ -20,8 +20,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.NearAidTopBar
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun PhoneScreen(
@@ -48,7 +47,7 @@ fun PhoneScreen(
             Text(
                 "We'll text a 6-digit code to verify it. Your number stays private.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
             )
             NearAidTextField(
                 value = state.phone,
@@ -68,7 +67,7 @@ fun PhoneScreen(
             Text(
                 "By continuing you agree to our Community Guidelines & Safety Pledge",
                 style = MaterialTheme.typography.bodySmall,
-                color = Ink3,
+                color = NearAidTheme.colors.ink3,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp),
             )

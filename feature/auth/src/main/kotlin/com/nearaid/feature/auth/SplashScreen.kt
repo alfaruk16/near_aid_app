@@ -21,15 +21,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldDeep
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Brush.linearGradient(listOf(Marigold, MarigoldDeep))),
+            .background(Brush.linearGradient(listOf(NearAidTheme.colors.marigold, NearAidTheme.colors.marigoldDeep))),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {

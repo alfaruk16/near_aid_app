@@ -17,7 +17,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.NearAidTopBar
-import com.nearaid.core.designsystem.theme.Ink2
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.domain.usecase.PhoneNumber
 
 @Composable
@@ -47,7 +47,7 @@ fun OtpScreen(
             Text(
                 "Sent to ${PhoneNumber.formatForDisplay(phoneE164)}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
             )
             NearAidTextField(
                 value = state.code,

@@ -40,13 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.VerifiedBadge
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldDeep
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun ProfileScreen(
@@ -68,7 +62,7 @@ fun ProfileScreen(
 
     if (state.loading && state.me == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = Marigold)
+            CircularProgressIndicator(color = NearAidTheme.colors.marigold)
         }
         return
     }
@@ -86,7 +80,7 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(Marigold, MarigoldDeep),
+                        colors = listOf(NearAidTheme.colors.marigold, NearAidTheme.colors.marigoldDeep),
                     )
                 )
                 .padding(horizontal = 24.dp, vertical = 32.dp),
@@ -142,7 +136,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(Line),
+                .background(NearAidTheme.colors.line),
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -152,7 +146,7 @@ fun ProfileScreen(
             icon = Icons.Filled.Badge,
             label = "Verification",
             trailingLabel = if (me.isIdVerified) "Verified" else null,
-            trailingColor = Teal,
+            trailingColor = NearAidTheme.colors.teal,
             onClick = { viewModel.onIntent(ProfileIntent.VerificationClicked) },
         )
         ProfileMenuItem(
@@ -207,13 +201,13 @@ private fun ProfileStatCell(
         Text(
             text = value,
             style = MaterialTheme.typography.titleLarge,
-            color = Ink,
+            color = NearAidTheme.colors.ink,
             fontWeight = FontWeight.Bold,
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Ink3,
+            color = NearAidTheme.colors.ink3,
         )
     }
 }
@@ -224,7 +218,7 @@ private fun ProfileMenuItem(
     label: String,
     onClick: () -> Unit,
     trailingLabel: String? = null,
-    trailingColor: Color = Ink2,
+    trailingColor: Color = NearAidTheme.colors.ink2,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -239,20 +233,20 @@ private fun ProfileMenuItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Line),
+                .background(NearAidTheme.colors.line),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Ink2,
+                tint = NearAidTheme.colors.ink2,
                 modifier = Modifier.size(20.dp),
             )
         }
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = Ink,
+            color = NearAidTheme.colors.ink,
             modifier = Modifier.weight(1f),
         )
         if (trailingLabel != null) {
@@ -267,7 +261,7 @@ private fun ProfileMenuItem(
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = Ink3,
+            tint = NearAidTheme.colors.ink3,
             modifier = Modifier.size(20.dp),
         )
     }

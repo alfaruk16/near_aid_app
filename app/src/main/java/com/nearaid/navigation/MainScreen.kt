@@ -37,11 +37,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldDeep
-import com.nearaid.core.designsystem.theme.Surface as SurfaceColor
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.navigation.HomeRoute
 import com.nearaid.core.navigation.PostChooserRoute
 import com.nearaid.feature.activity.navigation.activityGraph
@@ -100,9 +96,9 @@ private fun NearAidBottomBar(
     onPost: () -> Unit,
 ) {
     val tabs = TopLevelDestination.entries
-    Surface(color = SurfaceColor) {
+    Surface(color = NearAidTheme.colors.surface) {
         Column {
-            HorizontalDivider(color = Line)
+            HorizontalDivider(color = NearAidTheme.colors.line)
             Row(
                 modifier = Modifier.fillMaxWidth().height(66.dp).padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -116,11 +112,11 @@ private fun NearAidBottomBar(
                             .offset(y = (-10).dp)
                             .size(54.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(Brush.linearGradient(listOf(Marigold, MarigoldDeep)))
+                            .background(Brush.linearGradient(listOf(NearAidTheme.colors.marigold, NearAidTheme.colors.marigoldDeep)))
                             .noRippleClickable(onPost),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(Icons.Filled.Add, contentDescription = "Post", tint = SurfaceColor, modifier = Modifier.size(26.dp))
+                        Icon(Icons.Filled.Add, contentDescription = "Post", tint = NearAidTheme.colors.surface, modifier = Modifier.size(26.dp))
                     }
                 }
                 BottomItem(tabs[2], isSelected, onTabSelected, Modifier.weight(1f))
@@ -138,7 +134,7 @@ private fun BottomItem(
     modifier: Modifier = Modifier,
 ) {
     val selected = isSelected(tab)
-    val color = if (selected) MarigoldDeep else Ink3
+    val color = if (selected) NearAidTheme.colors.marigoldDeep else NearAidTheme.colors.ink3
     Column(
         modifier = modifier.noRippleClickable { onTabSelected(tab) },
         horizontalAlignment = Alignment.CenterHorizontally,

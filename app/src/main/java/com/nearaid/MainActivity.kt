@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.theme.NearAidTheme
-import com.nearaid.core.designsystem.theme.Paper
 import com.nearaid.feature.auth.SplashScreen
 import com.nearaid.navigation.NearAidNavHost
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 NotificationPermissionRequester()
                 val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
                 when (val loggedIn = isLoggedIn) {
-                    null -> SplashScreen(modifier = Modifier.fillMaxSize().background(Paper))
+                    null -> SplashScreen(modifier = Modifier.fillMaxSize().background(NearAidTheme.colors.paper))
                     else -> NearAidNavHost(startLoggedIn = loggedIn)
                 }
             }

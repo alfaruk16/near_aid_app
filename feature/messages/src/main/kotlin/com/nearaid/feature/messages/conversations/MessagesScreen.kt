@@ -37,15 +37,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.VerifiedBadge
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldSoft
-import com.nearaid.core.designsystem.theme.OnMarigold
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Conversation
 
 @Composable
@@ -68,7 +60,7 @@ fun MessagesScreen(
         when {
             state.loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Marigold)
+                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
                 }
             }
 
@@ -99,7 +91,7 @@ fun MessagesScreen(
                                 )
                             },
                         )
-                        HorizontalDivider(color = Line, thickness = 0.5.dp)
+                        HorizontalDivider(color = NearAidTheme.colors.line, thickness = 0.5.dp)
                     }
                 }
             }
@@ -116,7 +108,7 @@ private fun ConversationRow(
     modifier: Modifier = Modifier,
 ) {
     val isUnread = conversation.unreadCount > 0
-    val rowBg = if (isUnread) MarigoldSoft else Surface
+    val rowBg = if (isUnread) NearAidTheme.colors.marigoldSoft else NearAidTheme.colors.surface
 
     Row(
         modifier = modifier
@@ -144,7 +136,7 @@ private fun ConversationRow(
                 Text(
                     text = conversation.counterpart.displayName ?: "Unknown",
                     style = MaterialTheme.typography.titleSmall,
-                    color = Ink,
+                    color = NearAidTheme.colors.ink,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
@@ -158,7 +150,7 @@ private fun ConversationRow(
             Text(
                 text = "${conversation.listingTitle} · ${conversation.role.name.lowercase().replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.bodySmall,
-                color = Teal,
+                color = NearAidTheme.colors.teal,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -169,7 +161,7 @@ private fun ConversationRow(
                 Text(
                     text = lastMessage,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isUnread) Ink else Ink2,
+                    color = if (isUnread) NearAidTheme.colors.ink else NearAidTheme.colors.ink2,
                     fontWeight = if (isUnread) FontWeight.SemiBold else FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -185,7 +177,7 @@ private fun ConversationRow(
             Text(
                 text = TimeFormat.relativeFromNow(conversation.lastMessageAt),
                 style = MaterialTheme.typography.labelSmall,
-                color = Ink3,
+                color = NearAidTheme.colors.ink3,
             )
             if (isUnread) {
                 UnreadBadge(count = conversation.unreadCount)
@@ -202,7 +194,7 @@ private fun UnreadBadge(count: Int, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(Marigold)
+            .background(NearAidTheme.colors.marigold)
             .padding(horizontal = if (count > 9) 6.dp else 0.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -216,7 +208,7 @@ private fun UnreadBadge(count: Int, modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = label,
-                color = OnMarigold,
+                color = NearAidTheme.colors.onMarigold,
                 fontWeight = FontWeight.Bold,
                 fontSize = 11.sp,
                 lineHeight = 13.sp,

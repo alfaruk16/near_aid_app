@@ -19,13 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.common.util.TimeFormat
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Line2
-import com.nearaid.core.designsystem.theme.Rust
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealTint
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingCard
 import com.nearaid.core.model.ListingType
 
@@ -39,8 +33,8 @@ fun ListingCardView(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
-            .background(Surface)
-            .border(1.dp, Line, MaterialTheme.shapes.large)
+            .background(NearAidTheme.colors.surface)
+            .border(1.dp, NearAidTheme.colors.line, MaterialTheme.shapes.large)
             .clickable(onClick = onClick)
             .padding(14.dp),
     ) {
@@ -57,21 +51,21 @@ fun ListingCardView(
                     )
                     when {
                         card.type == ListingType.OFFER ->
-                            TagChip("Offering", TealTint, Teal)
+                            TagChip("Offering", NearAidTheme.colors.tealTint, NearAidTheme.colors.teal)
                         card.urgency != null -> UrgencyTag(card.urgency!!)
                     }
                 }
                 CardMeta(card)
             }
         }
-        HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 11.dp), color = Line2)
+        HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 11.dp), color = NearAidTheme.colors.line2)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Avatar(name = card.author.displayName, photoUrl = card.author.photoUrl, size = 24)
             Text(
                 text = card.author.displayName ?: "Neighbour",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.SemiBold,
-                color = com.nearaid.core.designsystem.theme.Ink2,
+                color = NearAidTheme.colors.ink2,
             )
             if (card.author.isIdVerified) {
                 VerifiedBadge()
@@ -95,10 +89,10 @@ private fun CardMeta(card: ListingCard) {
             Text(
                 text = formatDistance(it),
                 style = MaterialTheme.typography.bodySmall,
-                color = Teal,
+                color = NearAidTheme.colors.teal,
                 fontWeight = FontWeight.Bold,
             )
-            Text("·", color = Ink3, style = MaterialTheme.typography.bodySmall)
+            Text("·", color = NearAidTheme.colors.ink3, style = MaterialTheme.typography.bodySmall)
         }
         val timeText = if (card.type == ListingType.OFFER && card.availableUntil != null) {
             "until ${TimeFormat.timeOfDay(card.availableUntil)}"
@@ -108,11 +102,11 @@ private fun CardMeta(card: ListingCard) {
         Text(
             text = timeText,
             style = MaterialTheme.typography.bodySmall,
-            color = if (card.type == ListingType.OFFER) Rust else Ink3,
+            color = if (card.type == ListingType.OFFER) NearAidTheme.colors.rust else NearAidTheme.colors.ink3,
             fontWeight = if (card.type == ListingType.OFFER) FontWeight.Bold else FontWeight.Normal,
         )
         card.category?.let {
-            Text("· ${it.nameEn}", color = Ink3, style = MaterialTheme.typography.bodySmall)
+            Text("· ${it.nameEn}", color = NearAidTheme.colors.ink3, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

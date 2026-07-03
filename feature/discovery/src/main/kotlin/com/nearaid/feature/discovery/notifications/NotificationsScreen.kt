@@ -28,6 +28,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,14 +38,7 @@ import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.NearAidTopBar
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldSoft
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealSoft
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.NotificationItem
 
 @Composable
@@ -73,7 +68,7 @@ fun NotificationsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = Marigold)
+                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
                 }
             }
 
@@ -111,7 +106,10 @@ private fun NotificationRow(item: NotificationItem) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(if (item.isRead) Surface else MarigoldSoft)
+            .background(if (item.isRead) NearAidTheme.colors.surface else NearAidTheme.colors.marigoldSoft)
+            .semantics(mergeDescendants = true) {
+                stateDescription = if (item.isRead) "Read" else "Unread"
+            }
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.Top,
@@ -121,13 +119,13 @@ private fun NotificationRow(item: NotificationItem) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(TealSoft),
+                .background(NearAidTheme.colors.tealSoft),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.Filled.Notifications,
                 contentDescription = null,
-                tint = Teal,
+                tint = NearAidTheme.colors.teal,
                 modifier = Modifier.size(20.dp),
             )
         }
@@ -142,20 +140,20 @@ private fun NotificationRow(item: NotificationItem) {
                     text = item.title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = if (item.isRead) FontWeight.Normal else FontWeight.Bold,
-                    color = Ink,
+                    color = NearAidTheme.colors.ink,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
                     text = TimeFormat.relativeFromNow(item.createdAt),
                     style = MaterialTheme.typography.labelSmall,
-                    color = Ink3,
+                    color = NearAidTheme.colors.ink3,
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
             Text(
                 text = item.body,
                 style = MaterialTheme.typography.bodySmall,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
             )
         }
     }

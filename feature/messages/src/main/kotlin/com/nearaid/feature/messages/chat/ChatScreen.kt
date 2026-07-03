@@ -44,14 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.CollectEffect
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.OnMarigold
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealSoft
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ChatMessage
 
 @Composable
@@ -103,7 +96,7 @@ fun ChatScreen(
             when {
                 state.loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Marigold)
+                        CircularProgressIndicator(color = NearAidTheme.colors.marigold)
                     }
                 }
                 else -> {
@@ -133,7 +126,7 @@ fun ChatScreen(
             sending = state.sending,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Surface)
+                .background(NearAidTheme.colors.surface)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         )
     }
@@ -150,7 +143,7 @@ private fun ChatHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface)
+            .background(NearAidTheme.colors.surface)
             .padding(horizontal = 4.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -158,7 +151,7 @@ private fun ChatHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = Ink,
+                tint = NearAidTheme.colors.ink,
             )
         }
         Avatar(
@@ -171,13 +164,13 @@ private fun ChatHeader(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = Ink,
+                color = NearAidTheme.colors.ink,
                 maxLines = 1,
             )
             Text(
                 text = "Coordinating handoff",
                 style = MaterialTheme.typography.bodySmall,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
             )
         }
     }
@@ -191,13 +184,13 @@ private fun SafetyBar(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(TealSoft)
+            .background(NearAidTheme.colors.tealSoft)
             .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         Text(
             text = "Meet in public. Suggested: Mirpur 10 circle.",
             style = MaterialTheme.typography.bodySmall,
-            color = Teal,
+            color = NearAidTheme.colors.teal,
             fontWeight = FontWeight.Medium,
         )
     }
@@ -211,8 +204,8 @@ private fun ChatBubble(
     isOutgoing: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val bubbleBg = if (isOutgoing) Marigold else Surface
-    val textColor = if (isOutgoing) OnMarigold else Ink
+    val bubbleBg = if (isOutgoing) NearAidTheme.colors.marigold else NearAidTheme.colors.surface
+    val textColor = if (isOutgoing) NearAidTheme.colors.onMarigold else NearAidTheme.colors.ink
     val alignment = if (isOutgoing) Alignment.End else Alignment.Start
     val bubbleShape = if (isOutgoing) {
         RoundedCornerShape(topStart = 16.dp, topEnd = 4.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
@@ -230,7 +223,7 @@ private fun ChatBubble(
                 .clip(bubbleShape)
                 .background(bubbleBg)
                 .then(
-                    if (!isOutgoing) Modifier.border(1.dp, Line, bubbleShape)
+                    if (!isOutgoing) Modifier.border(1.dp, NearAidTheme.colors.line, bubbleShape)
                     else Modifier
                 )
                 .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -245,7 +238,7 @@ private fun ChatBubble(
         Text(
             text = TimeFormat.timeOfDay(message.createdAt),
             style = MaterialTheme.typography.labelSmall,
-            color = Ink2,
+            color = NearAidTheme.colors.ink2,
             fontSize = 10.sp,
         )
     }
@@ -273,15 +266,15 @@ private fun MessageInputRow(
                 Text(
                     text = "Type a message…",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Ink2,
+                    color = NearAidTheme.colors.ink2,
                 )
             },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(24.dp),
             maxLines = 4,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Marigold,
-                unfocusedBorderColor = Line,
+                focusedBorderColor = NearAidTheme.colors.marigold,
+                unfocusedBorderColor = NearAidTheme.colors.line,
             ),
             textStyle = MaterialTheme.typography.bodyMedium,
         )
@@ -290,7 +283,7 @@ private fun MessageInputRow(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(if (text.isBlank()) Line else Marigold),
+                .background(if (text.isBlank()) NearAidTheme.colors.line else NearAidTheme.colors.marigold),
             contentAlignment = Alignment.Center,
         ) {
             IconButton(
@@ -301,13 +294,13 @@ private fun MessageInputRow(
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = OnMarigold,
+                        color = NearAidTheme.colors.onMarigold,
                     )
                 } else {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (text.isBlank()) Ink2 else OnMarigold,
+                        tint = if (text.isBlank()) NearAidTheme.colors.ink2 else NearAidTheme.colors.onMarigold,
                         modifier = Modifier.size(20.dp),
                     )
                 }

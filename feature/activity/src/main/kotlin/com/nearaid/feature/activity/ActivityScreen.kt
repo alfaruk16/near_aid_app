@@ -44,12 +44,7 @@ import com.nearaid.core.designsystem.component.NearAidButtonVariant
 import com.nearaid.core.designsystem.component.NearAidSegmentedTabs
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.StatusPill
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealTint
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Claim
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingStatus
@@ -127,7 +122,7 @@ private fun HelpingTab(
     when {
         state.claimsLoading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Teal)
+                CircularProgressIndicator(color = NearAidTheme.colors.teal)
             }
         }
         state.claimsError != null -> {
@@ -179,8 +174,8 @@ private fun ClaimRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
-            .background(Surface)
-            .border(1.dp, Line, MaterialTheme.shapes.large)
+            .background(NearAidTheme.colors.surface)
+            .border(1.dp, NearAidTheme.colors.line, MaterialTheme.shapes.large)
             .clickable { onOpenChat(claim.id, claim.chatThreadId ?: "", "") }
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -195,13 +190,13 @@ private fun ClaimRow(
                 Text(
                     text = claimTitle(claim.status),
                     style = MaterialTheme.typography.titleSmall,
-                    color = Ink,
+                    color = NearAidTheme.colors.ink,
                 )
                 claim.claimedAt?.let { claimedAt ->
                     Text(
                         text = "Since $claimedAt",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Ink3,
+                        color = NearAidTheme.colors.ink3,
                     )
                 }
             }
@@ -211,7 +206,7 @@ private fun ClaimRow(
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
                 contentDescription = "Open chat",
-                tint = Ink3,
+                tint = NearAidTheme.colors.ink3,
                 modifier = Modifier.size(20.dp),
             )
         }
@@ -235,13 +230,13 @@ private fun ClaimRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.medium)
-                        .background(TealTint)
+                        .background(NearAidTheme.colors.tealTint)
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
                     Text(
                         text = "Completed",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Teal,
+                        color = NearAidTheme.colors.teal,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -260,7 +255,7 @@ private fun MyPostsTab(
     when {
         state.listingsLoading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Teal)
+                CircularProgressIndicator(color = NearAidTheme.colors.teal)
             }
         }
         state.listingsError != null -> {

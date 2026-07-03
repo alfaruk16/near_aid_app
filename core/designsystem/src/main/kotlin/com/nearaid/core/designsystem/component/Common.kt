@@ -3,6 +3,8 @@ package com.nearaid.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,26 +28,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldDeep
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealSoft
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text.uppercase(),
         style = MaterialTheme.typography.labelSmall,
-        color = Ink3,
+        color = NearAidTheme.colors.ink3,
         letterSpacing = 1.2.sp,
         modifier = modifier.padding(vertical = 6.dp),
     )
@@ -58,15 +55,17 @@ fun NearAidChip(
     modifier: Modifier = Modifier,
     leading: String? = null,
 ) {
-    val bg = if (selected) Ink else Surface
-    val fg = if (selected) Surface else com.nearaid.core.designsystem.theme.Ink2
+    val bg = if (selected) NearAidTheme.colors.ink else NearAidTheme.colors.surface
+    val fg = if (selected) NearAidTheme.colors.surface else NearAidTheme.colors.ink2
     Box(
         modifier = modifier
+            .minimumInteractiveComponentSize()
             .clip(RoundedCornerShape(999.dp))
             .background(bg)
-            .border(1.dp, if (selected) Ink else Line, RoundedCornerShape(999.dp))
-            .clickable(onClick = onClick)
+            .border(1.dp, if (selected) NearAidTheme.colors.ink else NearAidTheme.colors.line, RoundedCornerShape(999.dp))
+            .selectable(selected = selected, onClick = onClick, role = Role.Tab)
             .padding(horizontal = 13.dp, vertical = 7.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = if (leading != null) "$leading  $label" else label,
@@ -101,7 +100,7 @@ fun Avatar(
         ) {
             Text(
                 text = name?.trim()?.firstOrNull()?.uppercase() ?: "?",
-                color = Surface,
+                color = NearAidTheme.colors.surface,
                 fontWeight = FontWeight.Bold,
                 fontSize = (size * 0.42f).sp,
             )
@@ -123,7 +122,7 @@ fun NearAidTopBar(
     ) {
         if (onBack != null) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Ink)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = NearAidTheme.colors.ink)
             }
         }
         Text(
@@ -150,16 +149,16 @@ fun EmptyState(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(
-            modifier = Modifier.size(88.dp).clip(RoundedCornerShape(28.dp)).background(TealSoft),
+            modifier = Modifier.size(88.dp).clip(RoundedCornerShape(28.dp)).background(NearAidTheme.colors.tealSoft),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = Teal, modifier = Modifier.size(40.dp))
+            Icon(icon, contentDescription = null, tint = NearAidTheme.colors.teal, modifier = Modifier.size(40.dp))
         }
         Text(title, style = MaterialTheme.typography.titleLarge)
         Text(
             message,
             style = MaterialTheme.typography.bodyMedium,
-            color = com.nearaid.core.designsystem.theme.Ink2,
+            color = NearAidTheme.colors.ink2,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
         if (actionLabel != null && onAction != null) {
@@ -184,8 +183,9 @@ fun NearAidSegmentedTabs(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(13.dp))
-            .background(com.nearaid.core.designsystem.theme.Line2)
-            .padding(4.dp),
+            .background(NearAidTheme.colors.line2)
+            .padding(4.dp)
+            .selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         options.forEachIndexed { index, label ->
@@ -193,16 +193,17 @@ fun NearAidSegmentedTabs(
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .minimumInteractiveComponentSize()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (active) Surface else Color.Transparent)
-                    .clickable { onSelect(index) }
+                    .background(if (active) NearAidTheme.colors.surface else Color.Transparent)
+                    .selectable(selected = active, onClick = { onSelect(index) }, role = Role.Tab)
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     label,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (active) Ink else Ink3,
+                    color = if (active) NearAidTheme.colors.ink else NearAidTheme.colors.ink3,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -222,8 +223,8 @@ fun TextChooserRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
-            .border(1.5.dp, if (highlighted) Teal else Line, RoundedCornerShape(18.dp))
-            .background(if (highlighted) TealSoft else Surface)
+            .border(1.5.dp, if (highlighted) NearAidTheme.colors.teal else NearAidTheme.colors.line, RoundedCornerShape(18.dp))
+            .background(if (highlighted) NearAidTheme.colors.tealSoft else NearAidTheme.colors.surface)
             .clickable(onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -231,7 +232,7 @@ fun TextChooserRow(
     ) {
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = if (highlighted) Teal else Ink3, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = if (highlighted) NearAidTheme.colors.teal else NearAidTheme.colors.ink3, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }

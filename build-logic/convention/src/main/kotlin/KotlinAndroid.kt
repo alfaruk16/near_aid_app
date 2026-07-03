@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
+    val sharedLintConfig = rootProject.file("lint.xml")
     commonExtension.apply {
         compileSdk = NearAidBuildConfig.COMPILE_SDK
 
@@ -21,6 +22,14 @@ internal fun Project.configureKotlinAndroid(
         compileOptions {
             sourceCompatibility = JavaVersion.toVersion(NearAidBuildConfig.JAVA_VERSION)
             targetCompatibility = JavaVersion.toVersion(NearAidBuildConfig.JAVA_VERSION)
+        }
+
+        // Shared lint config — accessibility checks are promoted to errors in lint.xml.
+        lint {
+            if (sharedLintConfig.exists()) lintConfig = sharedLintConfig
+            checkDependencies = true
+            abortOnError = false
+            warningsAsErrors = false
         }
     }
 

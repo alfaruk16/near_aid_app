@@ -53,17 +53,7 @@ import com.nearaid.core.designsystem.component.TagChip
 import com.nearaid.core.designsystem.component.TrustScore
 import com.nearaid.core.designsystem.component.UrgencyTag
 import com.nearaid.core.designsystem.component.VerifiedBadge
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Line2
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.Paper
-import com.nearaid.core.designsystem.theme.Rust
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
-import com.nearaid.core.designsystem.theme.TealTint
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingType
 
 private val REPORT_REASONS = listOf(
@@ -105,7 +95,7 @@ fun ListingDetailScreen(
                 actions = {
                     if (state.listing != null) {
                         IconButton(onClick = { viewModel.onIntent(ListingDetailIntent.OpenReportSheet) }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = Ink2)
+                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = NearAidTheme.colors.ink2)
                         }
                     }
                 },
@@ -114,7 +104,7 @@ fun ListingDetailScreen(
             when {
                 state.loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Marigold)
+                        CircularProgressIndicator(color = NearAidTheme.colors.marigold)
                     }
                 }
 
@@ -123,7 +113,7 @@ fun ListingDetailScreen(
                         Text(
                             text = state.error ?: "Something went wrong.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Rust,
+                            color = NearAidTheme.colors.rust,
                             modifier = Modifier.padding(24.dp),
                         )
                     }
@@ -150,7 +140,7 @@ fun ListingDetailScreen(
                                     Text(
                                         text = it.nameEn,
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = Ink3,
+                                        color = NearAidTheme.colors.ink3,
                                     )
                                 }
                                 Row(
@@ -164,8 +154,8 @@ fun ListingDetailScreen(
                                         listing.type == ListingType.OFFER && listing.availableUntil != null ->
                                             TagChip(
                                                 label = "until ${TimeFormat.timeOfDay(listing.availableUntil)}",
-                                                container = TealTint,
-                                                content = Teal,
+                                                container = NearAidTheme.colors.tealTint,
+                                                content = NearAidTheme.colors.teal,
                                             )
                                     }
                                 }
@@ -186,7 +176,7 @@ fun ListingDetailScreen(
                         Text(
                             text = listing.description,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = Ink2,
+                            color = NearAidTheme.colors.ink2,
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -196,19 +186,19 @@ fun ListingDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(MaterialTheme.shapes.medium)
-                                .background(Line2)
+                                .background(NearAidTheme.colors.line2)
                                 .padding(12.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             listing.quantity?.let { qty ->
                                 Column {
-                                    Text("Quantity", style = MaterialTheme.typography.labelSmall, color = Ink3)
+                                    Text("Quantity", style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
                                     Text(qty, style = MaterialTheme.typography.titleSmall)
                                 }
                             }
                             listing.areaLabel?.let { area ->
                                 Column {
-                                    Text("Area", style = MaterialTheme.typography.labelSmall, color = Ink3)
+                                    Text("Area", style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
                                     Text(area, style = MaterialTheme.typography.titleSmall)
                                 }
                             }
@@ -216,7 +206,7 @@ fun ListingDetailScreen(
 
                         Spacer(Modifier.height(16.dp))
 
-                        HorizontalDivider(color = Line)
+                        HorizontalDivider(color = NearAidTheme.colors.line)
 
                         Spacer(Modifier.height(14.dp))
 
@@ -225,7 +215,7 @@ fun ListingDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(MaterialTheme.shapes.medium)
-                                .background(Surface)
+                                .background(NearAidTheme.colors.surface)
                                 .clickable { viewModel.onIntent(ListingDetailIntent.AuthorClicked) }
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -260,7 +250,7 @@ fun ListingDetailScreen(
                             Text(
                                 text = err,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Rust,
+                                color = NearAidTheme.colors.rust,
                             )
                         }
 
@@ -272,7 +262,7 @@ fun ListingDetailScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Paper)
+                            .background(NearAidTheme.colors.paper)
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                             .navigationBarsPadding(),
                     ) {
@@ -295,7 +285,7 @@ fun ListingDetailScreen(
         ModalBottomSheet(
             onDismissRequest = { viewModel.onIntent(ListingDetailIntent.DismissReportSheet) },
             sheetState = sheetState,
-            containerColor = Surface,
+            containerColor = NearAidTheme.colors.surface,
         ) {
             Column(
                 modifier = Modifier

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Shared lint configuration for NearAid.
+  Accessibility checks are promoted to errors so a11y regressions surface in lint / CI.
+  Wired in via build-logic (configureKotlinAndroid -> lint { lintConfig = rootProject/lint.xml }).
+
+  Note: Android lint's a11y coverage is strongest for View/XML UI. Jetpack Compose
+  semantics (roles, selected/state descriptions, touch targets) are guarded by the
+  Compose UI tests in each module's androidTest source set instead.
+-->
+<lint>
+    <!-- Images / icons that convey meaning must have a contentDescription. -->
+    <issue id="ContentDescription" severity="error" />
+    <!-- A decorative contentDescription that duplicates nearby text is a smell. -->
+    <issue id="RedundantContentDescription" severity="error" />
+    <!-- Custom touch handlers must also handle accessibility (performClick). -->
+    <issue id="ClickableViewAccessibility" severity="error" />
+    <!-- Editable fields need an associated label for TalkBack. -->
+    <issue id="LabelFor" severity="error" />
+    <!-- Focusable widgets must be reachable via keyboard / switch access. -->
+    <issue id="KeyboardInaccessibleWidget" severity="error" />
+</lint>

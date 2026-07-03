@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,10 +35,7 @@ import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidSegmentedTabs
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun HomeScreen(
@@ -61,19 +59,20 @@ fun HomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .semantics(mergeDescendants = true) {},
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = Icons.Filled.LocationOn,
                 contentDescription = null,
-                tint = Teal,
+                tint = NearAidTheme.colors.teal,
                 modifier = Modifier.size(18.dp),
             )
             Text(
                 text = "Mirpur, Dhaka · ${state.radiusKm.toInt()} km",
                 style = MaterialTheme.typography.titleSmall,
-                color = Ink,
+                color = NearAidTheme.colors.ink,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 4.dp),
@@ -82,7 +81,7 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Filled.Notifications,
                     contentDescription = "Notifications",
-                    tint = Ink2,
+                    tint = NearAidTheme.colors.ink2,
                 )
             }
         }
@@ -127,7 +126,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = Marigold)
+                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
                 }
             }
 

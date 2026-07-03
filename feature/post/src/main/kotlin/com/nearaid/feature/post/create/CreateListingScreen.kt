@@ -24,7 +24,7 @@ import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.SectionLabel
-import com.nearaid.core.designsystem.theme.Ink3
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingType
 import com.nearaid.core.model.Urgency
 
@@ -154,7 +154,7 @@ fun CreateListingScreen(
             Text(
                 text = "Mirpur, Dhaka — shown to others as an approximate area only",
                 style = MaterialTheme.typography.bodySmall,
-                color = Ink3,
+                color = NearAidTheme.colors.ink3,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
 

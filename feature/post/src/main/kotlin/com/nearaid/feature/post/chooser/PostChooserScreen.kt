@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.TextChooserRow
-import com.nearaid.core.designsystem.theme.Ink2
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 /**
  * Entry screen that lets the user choose between posting a Request or an Offer.
@@ -40,7 +40,7 @@ fun PostChooserScreen(
             Text(
                 text = "Ask for a hand, or share what you can spare.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
                 modifier = Modifier.padding(bottom = 4.dp),
             )
 

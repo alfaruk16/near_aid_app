@@ -9,10 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.Surface
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun NearAidTextField(
@@ -31,7 +28,7 @@ fun NearAidTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        placeholder = placeholder?.let { { Text(it, color = Ink3) } },
+        placeholder = placeholder?.let { { Text(it, color = NearAidTheme.colors.ink3) } },
         modifier = modifier,
         singleLine = singleLine,
         minLines = minLines,
@@ -40,10 +37,10 @@ fun NearAidTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Surface,
-            unfocusedContainerColor = Surface,
-            focusedBorderColor = Marigold,
-            unfocusedBorderColor = Line,
+            focusedContainerColor = NearAidTheme.colors.surface,
+            unfocusedContainerColor = NearAidTheme.colors.surface,
+            focusedBorderColor = NearAidTheme.colors.marigold,
+            unfocusedBorderColor = NearAidTheme.colors.line,
         ),
     )
 }

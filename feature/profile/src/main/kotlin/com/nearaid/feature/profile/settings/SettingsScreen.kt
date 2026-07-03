@@ -24,7 +24,7 @@ import com.nearaid.core.designsystem.component.NearAidButtonVariant
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.SectionLabel
-import com.nearaid.core.designsystem.theme.Rust
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.AppLanguage
 
 @Composable
@@ -72,7 +72,7 @@ fun SettingsScreen(
                 Text(
                     text = errorMsg,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Rust,
+                    color = NearAidTheme.colors.rust,
                 )
             }
 

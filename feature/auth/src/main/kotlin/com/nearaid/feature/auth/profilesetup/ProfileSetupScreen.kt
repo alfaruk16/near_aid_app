@@ -19,7 +19,7 @@ import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.SectionLabel
-import com.nearaid.core.designsystem.theme.Ink2
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.AppLanguage
 
 @Composable
@@ -41,7 +41,7 @@ fun ProfileSetupScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text("Almost there", style = MaterialTheme.typography.headlineMedium)
-        Text("A name and photo help neighbours trust you.", style = MaterialTheme.typography.bodyMedium, color = Ink2)
+        Text("A name and photo help neighbours trust you.", style = MaterialTheme.typography.bodyMedium, color = NearAidTheme.colors.ink2)
         NearAidTextField(
             value = state.name,
             onValueChange = { viewModel.onIntent(ProfileSetupIntent.NameChanged(it)) },

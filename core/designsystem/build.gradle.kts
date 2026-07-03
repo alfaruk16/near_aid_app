@@ -12,4 +12,6 @@ dependencies {
     implementation(project(":core:model"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.coil.compose)
+
+    androidTestImplementation(libs.androidx.junit)
 }

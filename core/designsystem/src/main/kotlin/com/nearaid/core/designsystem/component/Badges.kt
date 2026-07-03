@@ -21,14 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingStatus
 import com.nearaid.core.model.Urgency
 
 @Composable
-fun VerifiedBadge(modifier: Modifier = Modifier, tint: Color = Teal, size: Int = 14) {
+fun VerifiedBadge(modifier: Modifier = Modifier, tint: Color = NearAidTheme.colors.teal, size: Int = 14) {
     Icon(
         imageVector = Icons.Filled.Verified,
         contentDescription = "Verified",
@@ -41,11 +39,11 @@ fun VerifiedBadge(modifier: Modifier = Modifier, tint: Color = Teal, size: Int =
 fun TrustScore(score: Double?, ratingLabel: String? = null, modifier: Modifier = Modifier) {
     if (score == null) return
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        Icon(Icons.Filled.Star, contentDescription = null, tint = Marigold, modifier = Modifier.size(13.dp))
+        Icon(Icons.Filled.Star, contentDescription = null, tint = NearAidTheme.colors.marigold, modifier = Modifier.size(13.dp))
         Text(
             text = ratingLabel ?: trimDouble(score),
             style = MaterialTheme.typography.labelSmall,
-            color = Ink2,
+            color = NearAidTheme.colors.ink2,
             modifier = Modifier.padding(start = 4.dp),
         )
     }
@@ -87,12 +85,12 @@ fun TagChip(label: String, container: Color, content: Color, modifier: Modifier 
 @Composable
 fun StatusPill(status: ListingStatus, modifier: Modifier = Modifier) {
     val (container, content, label) = when (status) {
-        ListingStatus.OPEN -> Triple(com.nearaid.core.designsystem.theme.TealTint, Teal, "Open")
-        ListingStatus.CLAIMED -> Triple(com.nearaid.core.designsystem.theme.MarigoldTint, com.nearaid.core.designsystem.theme.MarigoldDeep, "Claimed")
-        ListingStatus.DELIVERED -> Triple(com.nearaid.core.designsystem.theme.MarigoldTint, com.nearaid.core.designsystem.theme.MarigoldDeep, "Delivered")
-        ListingStatus.COMPLETED -> Triple(com.nearaid.core.designsystem.theme.TealTint, Teal, "Completed")
-        ListingStatus.CANCELLED -> Triple(com.nearaid.core.designsystem.theme.Line2, Ink2, "Cancelled")
-        ListingStatus.EXPIRED -> Triple(com.nearaid.core.designsystem.theme.Line2, Ink2, "Expired")
+        ListingStatus.OPEN -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, "Open")
+        ListingStatus.CLAIMED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, "Claimed")
+        ListingStatus.DELIVERED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, "Delivered")
+        ListingStatus.COMPLETED -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, "Completed")
+        ListingStatus.CANCELLED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, "Cancelled")
+        ListingStatus.EXPIRED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, "Expired")
     }
     Box(
         modifier = modifier

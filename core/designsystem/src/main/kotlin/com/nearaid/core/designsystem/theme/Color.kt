@@ -1,8 +1,10 @@
 package com.nearaid.core.designsystem.theme
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-// ---- Brand palette (mirrors the :root design tokens in the UI spec) ----
+// ---- Brand palette — LIGHT (mirrors the :root design tokens in the UI spec) ----
 val Ink = Color(0xFF22202B)
 val Ink2 = Color(0xFF56525F)
 val Ink3 = Color(0xFF8A8693)
@@ -30,6 +32,112 @@ val BlueTint = Color(0xFFE1ECF6)
 val Stage = Color(0xFF2A2333)
 
 val OnMarigold = Color(0xFF3A2400)
+
+// ---- Brand palette — DARK ----
+// Warm-neutral dark surfaces (not pure grey) to keep the brand's paper-like feel.
+val InkDark = Color(0xFFF3EFE6)        // primary text/foreground on dark
+val Ink2Dark = Color(0xFFB7B2BF)       // secondary text
+val Ink3Dark = Color(0xFF948FA0)       // tertiary text / hints
+
+val PaperDark = Color(0xFF141319)      // app background
+val SurfaceDark = Color(0xFF201E28)    // cards / raised surfaces
+val LineDark = Color(0xFF34313E)       // borders
+val Line2Dark = Color(0xFF2A2833)      // subtle fills
+
+val MarigoldDark = Color(0xFFF4A835)   // primary accent (brand pops on dark)
+val MarigoldDeepDark = Color(0xFFF4B457) // marigold used as text/emphasis on dark
+val MarigoldTintDark = Color(0xFF3A2E1A) // marigold container on dark
+val MarigoldSoftDark = Color(0xFF2A2318)
+
+val TealDark = Color(0xFF5FC0AC)       // secondary accent, lightened for dark contrast
+val TealTintDark = Color(0xFF163832)
+val TealSoftDark = Color(0xFF14302B)
+
+val RustDark = Color(0xFFE0805F)       // error, lightened for dark
+val RustTintDark = Color(0xFF3E241C)
+
+val BlueAccentDark = Color(0xFF7FA8D4)
+val BlueTintDark = Color(0xFF22303F)
+
+val StageDark = Color(0xFF201E28)
+
+// onMarigold stays dark — Marigold is bright enough in both themes for dark text on it.
+
+/**
+ * Semantic color set for NearAid. Components read these via [NearAidTheme.colors] so the
+ * whole design system reacts to light/dark, instead of referencing static tokens directly.
+ */
+@Immutable
+data class NearAidColors(
+    val ink: Color,
+    val ink2: Color,
+    val ink3: Color,
+    val paper: Color,
+    val surface: Color,
+    val line: Color,
+    val line2: Color,
+    val marigold: Color,
+    val marigoldDeep: Color,
+    val marigoldTint: Color,
+    val marigoldSoft: Color,
+    val teal: Color,
+    val tealTint: Color,
+    val tealSoft: Color,
+    val rust: Color,
+    val rustTint: Color,
+    val blueAccent: Color,
+    val blueTint: Color,
+    val stage: Color,
+    val onMarigold: Color,
+)
+
+val LightNearAidColors = NearAidColors(
+    ink = Ink,
+    ink2 = Ink2,
+    ink3 = Ink3,
+    paper = Paper,
+    surface = Surface,
+    line = Line,
+    line2 = Line2,
+    marigold = Marigold,
+    marigoldDeep = MarigoldDeep,
+    marigoldTint = MarigoldTint,
+    marigoldSoft = MarigoldSoft,
+    teal = Teal,
+    tealTint = TealTint,
+    tealSoft = TealSoft,
+    rust = Rust,
+    rustTint = RustTint,
+    blueAccent = BlueAccent,
+    blueTint = BlueTint,
+    stage = Stage,
+    onMarigold = OnMarigold,
+)
+
+val DarkNearAidColors = NearAidColors(
+    ink = InkDark,
+    ink2 = Ink2Dark,
+    ink3 = Ink3Dark,
+    paper = PaperDark,
+    surface = SurfaceDark,
+    line = LineDark,
+    line2 = Line2Dark,
+    marigold = MarigoldDark,
+    marigoldDeep = MarigoldDeepDark,
+    marigoldTint = MarigoldTintDark,
+    marigoldSoft = MarigoldSoftDark,
+    teal = TealDark,
+    tealTint = TealTintDark,
+    tealSoft = TealSoftDark,
+    rust = RustDark,
+    rustTint = RustTintDark,
+    blueAccent = BlueAccentDark,
+    blueTint = BlueTintDark,
+    stage = StageDark,
+    onMarigold = OnMarigold,
+)
+
+val LocalNearAidColors = staticCompositionLocalOf { LightNearAidColors }
 
 // ---- Category accents (.c-* in the spec) ----
 data class CategoryAccent(val container: Color, val content: Color)

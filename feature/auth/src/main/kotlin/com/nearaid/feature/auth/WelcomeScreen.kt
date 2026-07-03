@@ -20,10 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidButton
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.MarigoldSoft
-import com.nearaid.core.designsystem.theme.TealSoft
+import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
 fun WelcomeScreen(
@@ -35,10 +32,10 @@ fun WelcomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(230.dp)
-                .background(Brush.linearGradient(listOf(MarigoldSoft, TealSoft))),
+                .background(Brush.linearGradient(listOf(NearAidTheme.colors.marigoldSoft, NearAidTheme.colors.tealSoft))),
             contentAlignment = Alignment.Center,
         ) {
-            Box(modifier = Modifier.size(54.dp).clip(CircleShape).background(Marigold))
+            Box(modifier = Modifier.size(54.dp).clip(CircleShape).background(NearAidTheme.colors.marigold))
         }
         Column(
             modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -53,7 +50,7 @@ fun WelcomeScreen(
             Text(
                 "Post what you need or browse nearby requests. When you match, you coordinate the handoff safely in-app.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Ink2,
+                color = NearAidTheme.colors.ink2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 14.dp),
             )

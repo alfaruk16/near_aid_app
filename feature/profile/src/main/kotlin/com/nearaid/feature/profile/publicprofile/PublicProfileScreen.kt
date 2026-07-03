@@ -34,13 +34,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.SectionLabel
 import com.nearaid.core.designsystem.component.VerifiedBadge
-import com.nearaid.core.designsystem.theme.Ink
-import com.nearaid.core.designsystem.theme.Ink2
-import com.nearaid.core.designsystem.theme.Ink3
-import com.nearaid.core.designsystem.theme.Line
-import com.nearaid.core.designsystem.theme.Marigold
-import com.nearaid.core.designsystem.theme.Surface
-import com.nearaid.core.designsystem.theme.Teal
+import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Rating
 
 @Composable
@@ -67,7 +61,7 @@ fun PublicProfileScreen(
 
         if (state.loading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Teal)
+                CircularProgressIndicator(color = NearAidTheme.colors.teal)
             }
             return@Column
         }
@@ -77,7 +71,7 @@ fun PublicProfileScreen(
                 Text(
                     text = errorMsg,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Ink2,
+                    color = NearAidTheme.colors.ink2,
                 )
             }
             return@Column
@@ -96,7 +90,7 @@ fun PublicProfileScreen(
                     .fillMaxWidth()
                     .background(
                         Brush.linearGradient(
-                            colors = listOf(Teal, Color(0xFF155C4E)),
+                            colors = listOf(NearAidTheme.colors.teal, Color(0xFF155C4E)),
                         )
                     )
                     .padding(horizontal = 24.dp, vertical = 28.dp),
@@ -159,7 +153,7 @@ fun PublicProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(Line),
+                    .background(NearAidTheme.colors.line),
             )
 
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -170,7 +164,7 @@ fun PublicProfileScreen(
                     Text(
                         text = "No ratings yet.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Ink3,
+                        color = NearAidTheme.colors.ink3,
                         modifier = Modifier.padding(vertical = 12.dp),
                     )
                 } else {
@@ -199,13 +193,13 @@ private fun PublicStatCell(
         Text(
             text = value,
             style = MaterialTheme.typography.titleLarge,
-            color = Ink,
+            color = NearAidTheme.colors.ink,
             fontWeight = FontWeight.Bold,
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Ink3,
+            color = NearAidTheme.colors.ink3,
         )
     }
 }
@@ -219,7 +213,7 @@ private fun RatingCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Surface)
+            .background(NearAidTheme.colors.surface)
             .padding(14.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -237,13 +231,13 @@ private fun RatingCard(
                 Text(
                     text = rating.raterName ?: "Anonymous",
                     style = MaterialTheme.typography.titleSmall,
-                    color = Ink,
+                    color = NearAidTheme.colors.ink,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
                     text = "★".repeat(rating.score),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Marigold,
+                    color = NearAidTheme.colors.marigold,
                 )
             }
             rating.comment?.let { comment ->
@@ -251,7 +245,7 @@ private fun RatingCard(
                 Text(
                     text = comment,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Ink2,
+                    color = NearAidTheme.colors.ink2,
                 )
             }
         }
