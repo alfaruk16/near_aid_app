@@ -8,11 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.TextChooserRow
 import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
+import com.nearaid.feature.post.R
 
 /**
  * Entry screen that lets the user choose between posting a Request or an Offer.
@@ -26,7 +28,7 @@ fun PostChooserScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Post", onBack = onDismiss)
+        NearAidTopBar(title = stringResource(R.string.post_chooser_top_bar_title), onBack = onDismiss)
 
         Column(
             modifier = Modifier
@@ -35,27 +37,27 @@ fun PostChooserScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = "What would you like to post?",
+                text = stringResource(R.string.post_chooser_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.headingSemantics(),
             )
             Text(
-                text = "Ask for a hand, or share what you can spare.",
+                text = stringResource(R.string.post_chooser_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NearAidTheme.colors.ink2,
                 modifier = Modifier.padding(bottom = 4.dp),
             )
 
             TextChooserRow(
-                title = "I need help",
-                subtitle = "Post a request for food, clothes, medicine…",
+                title = stringResource(R.string.post_chooser_request_title),
+                subtitle = stringResource(R.string.post_chooser_request_subtitle),
                 onClick = onPickRequest,
                 highlighted = false,
             )
 
             TextChooserRow(
-                title = "I have something to give",
-                subtitle = "Post an offer — surplus, spare, or extra",
+                title = stringResource(R.string.post_chooser_offer_title),
+                subtitle = stringResource(R.string.post_chooser_offer_subtitle),
                 onClick = onPickOffer,
                 highlighted = true,
             )

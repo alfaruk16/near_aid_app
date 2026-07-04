@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +39,7 @@ import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Rating
+import com.nearaid.feature.profile.R
 
 @Composable
 fun PublicProfileScreen(
@@ -59,13 +61,13 @@ fun PublicProfileScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Profile", onBack = { viewModel.onIntent(PublicProfileIntent.BackClicked) })
+        NearAidTopBar(title = stringResource(R.string.public_profile_title), onBack = { viewModel.onIntent(PublicProfileIntent.BackClicked) })
 
         if (state.loading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     color = NearAidTheme.colors.teal,
-                    modifier = Modifier.statusSemantics("Loading"),
+                    modifier = Modifier.statusSemantics(stringResource(R.string.loading)),
                 )
             }
             return@Column
@@ -127,7 +129,7 @@ fun PublicProfileScreen(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Verified neighbour",
+                        text = stringResource(R.string.public_profile_verified_neighbour),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.8f),
                     )
@@ -143,15 +145,15 @@ fun PublicProfileScreen(
             ) {
                 PublicStatCell(
                     value = user.completedHelpCount?.toString() ?: "—",
-                    label = "Helped",
+                    label = stringResource(R.string.public_profile_stat_helped),
                 )
                 PublicStatCell(
                     value = user.aggregateRating?.let { String.format("%.1f", it) } ?: "—",
-                    label = "Rating",
+                    label = stringResource(R.string.public_profile_stat_rating),
                 )
                 PublicStatCell(
                     value = String.format("%.1f", user.trustScore),
-                    label = "Trust",
+                    label = stringResource(R.string.public_profile_stat_trust),
                 )
             }
 
@@ -163,12 +165,12 @@ fun PublicProfileScreen(
             )
 
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                SectionLabel("Recent ratings")
+                SectionLabel(stringResource(R.string.public_profile_recent_ratings))
                 Spacer(modifier = Modifier.height(4.dp))
 
                 if (state.ratings.isEmpty()) {
                     Text(
-                        text = "No ratings yet.",
+                        text = stringResource(R.string.public_profile_no_ratings),
                         style = MaterialTheme.typography.bodyMedium,
                         color = NearAidTheme.colors.ink3,
                         modifier = Modifier.padding(vertical = 12.dp),
@@ -235,7 +237,7 @@ private fun RatingCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = rating.raterName ?: "Anonymous",
+                    text = rating.raterName ?: stringResource(R.string.public_profile_anonymous),
                     style = MaterialTheme.typography.titleSmall,
                     color = NearAidTheme.colors.ink,
                     fontWeight = FontWeight.SemiBold,

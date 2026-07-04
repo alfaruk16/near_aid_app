@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +50,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ChatMessage
+import com.nearaid.feature.messages.R
 
 @Composable
 fun ChatScreen(
@@ -100,7 +102,7 @@ fun ChatScreen(
                 state.loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
-                            modifier = Modifier.statusSemantics("Loading"),
+                            modifier = Modifier.statusSemantics(stringResource(R.string.status_loading)),
                             color = NearAidTheme.colors.marigold,
                         )
                     }
@@ -156,7 +158,7 @@ private fun ChatHeader(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 tint = NearAidTheme.colors.ink,
             )
         }
@@ -174,7 +176,7 @@ private fun ChatHeader(
                 maxLines = 1,
             )
             Text(
-                text = "Coordinating handoff",
+                text = stringResource(R.string.chat_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = NearAidTheme.colors.ink2,
             )
@@ -194,7 +196,7 @@ private fun SafetyBar(modifier: Modifier = Modifier) {
             .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         Text(
-            text = "Meet in public. Suggested: Mirpur 10 circle.",
+            text = stringResource(R.string.chat_safety_bar),
             style = MaterialTheme.typography.bodySmall,
             color = NearAidTheme.colors.teal,
             fontWeight = FontWeight.Medium,
@@ -219,7 +221,8 @@ private fun ChatBubble(
         RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
     }
 
-    val spokenSender = if (isOutgoing) "You sent" else "Received"
+    val spokenSender =
+        if (isOutgoing) stringResource(R.string.chat_sender_you) else stringResource(R.string.chat_sender_received)
     val spokenMessage = buildString {
         append(spokenSender)
         message.body?.takeIf { it.isNotBlank() }?.let { append(": $it") }
@@ -279,7 +282,7 @@ private fun MessageInputRow(
             onValueChange = onTextChange,
             placeholder = {
                 Text(
-                    text = "Type a message…",
+                    text = stringResource(R.string.chat_hint),
                     style = MaterialTheme.typography.bodyMedium,
                     color = NearAidTheme.colors.ink2,
                 )
@@ -314,7 +317,7 @@ private fun MessageInputRow(
                 } else {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
+                        contentDescription = stringResource(R.string.cd_send),
                         tint = if (text.isBlank()) NearAidTheme.colors.ink2 else NearAidTheme.colors.onMarigold,
                         modifier = Modifier.size(20.dp),
                     )

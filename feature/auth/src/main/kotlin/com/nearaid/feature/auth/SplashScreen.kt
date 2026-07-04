@@ -19,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.theme.NearAidTheme
+import com.nearaid.feature.auth.R
 
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier) {
@@ -38,10 +40,10 @@ fun SplashScreen(modifier: Modifier = Modifier) {
             ) {
                 Icon(Icons.Filled.VolunteerActivism, contentDescription = null, tint = Color.White, modifier = Modifier.size(46.dp))
             }
-            Text("NearAid", style = MaterialTheme.typography.displaySmall, color = Color.White, modifier = Modifier.padding(top = 18.dp))
-            Text("পাশের মানুষ", style = MaterialTheme.typography.titleMedium, color = Color.White.copy(alpha = 0.92f))
+            Text(stringResource(R.string.splash_app_name), style = MaterialTheme.typography.displaySmall, color = Color.White, modifier = Modifier.padding(top = 18.dp))
+            Text(stringResource(R.string.splash_tagline_bn), style = MaterialTheme.typography.titleMedium, color = Color.White.copy(alpha = 0.92f))
             Text(
-                "Help is closer than you think",
+                stringResource(R.string.splash_tagline),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.85f),
                 textAlign = TextAlign.Center,

@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nearaid.core.designsystem.R
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingStatus
 import com.nearaid.core.model.Urgency
@@ -29,7 +31,7 @@ import com.nearaid.core.model.Urgency
 fun VerifiedBadge(modifier: Modifier = Modifier, tint: Color = NearAidTheme.colors.teal, size: Int = 14) {
     Icon(
         imageVector = Icons.Filled.Verified,
-        contentDescription = "Verified",
+        contentDescription = stringResource(R.string.badge_verified),
         tint = tint,
         modifier = modifier.size(size.dp),
     )
@@ -56,10 +58,10 @@ private fun trimDouble(value: Double): String =
 fun UrgencyTag(urgency: Urgency, modifier: Modifier = Modifier) {
     val accent = com.nearaid.core.designsystem.theme.urgencyAccentFor(urgency)
     val label = when (urgency) {
-        Urgency.LOW -> "Low"
-        Urgency.MEDIUM -> "Medium"
-        Urgency.HIGH -> "High"
-        Urgency.CRITICAL -> "Critical"
+        Urgency.LOW -> stringResource(R.string.urgency_low)
+        Urgency.MEDIUM -> stringResource(R.string.urgency_medium)
+        Urgency.HIGH -> stringResource(R.string.urgency_high)
+        Urgency.CRITICAL -> stringResource(R.string.urgency_critical)
     }
     TagChip(label = label, container = accent.container, content = accent.content, modifier = modifier)
 }
@@ -86,12 +88,12 @@ fun TagChip(label: String, container: Color, content: Color, modifier: Modifier 
 @Composable
 fun StatusPill(status: ListingStatus, modifier: Modifier = Modifier) {
     val (container, content, label) = when (status) {
-        ListingStatus.OPEN -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, "Open")
-        ListingStatus.CLAIMED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, "Claimed")
-        ListingStatus.DELIVERED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, "Delivered")
-        ListingStatus.COMPLETED -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, "Completed")
-        ListingStatus.CANCELLED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, "Cancelled")
-        ListingStatus.EXPIRED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, "Expired")
+        ListingStatus.OPEN -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, stringResource(R.string.status_open))
+        ListingStatus.CLAIMED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, stringResource(R.string.status_claimed))
+        ListingStatus.DELIVERED -> Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, stringResource(R.string.status_delivered))
+        ListingStatus.COMPLETED -> Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, stringResource(R.string.status_completed))
+        ListingStatus.CANCELLED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, stringResource(R.string.status_cancelled))
+        ListingStatus.EXPIRED -> Triple(NearAidTheme.colors.line2, NearAidTheme.colors.ink2, stringResource(R.string.status_expired))
     }
     Box(
         modifier = modifier
@@ -99,6 +101,6 @@ fun StatusPill(status: ListingStatus, modifier: Modifier = Modifier) {
             .background(container)
             .padding(horizontal = 11.dp, vertical = 5.dp),
     ) {
-        Text("● $label", color = content, style = MaterialTheme.typography.labelSmall)
+        Text(stringResource(R.string.status_pill_label, label), color = content, style = MaterialTheme.typography.labelSmall)
     }
 }

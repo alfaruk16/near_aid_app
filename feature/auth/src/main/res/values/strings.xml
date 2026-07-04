@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash -->
+    <string name="splash_app_name">NearAid</string>
+    <string name="splash_tagline_bn">পাশের মানুষ</string>
+    <string name="splash_tagline">Help is closer than you think</string>
+
+    <!-- Welcome -->
+    <string name="welcome_title">Real help, right around you</string>
+    <string name="welcome_subtitle">Post what you need or browse nearby requests. When you match, you coordinate the handoff safely in-app.</string>
+    <string name="welcome_get_started">Get started</string>
+
+    <!-- Phone -->
+    <string name="phone_title">What\'s your number?</string>
+    <string name="phone_subtitle">We\'ll text a 6-digit code to verify it. Your number stays private.</string>
+    <string name="phone_label">Phone (+880)</string>
+    <string name="phone_placeholder">1712 345 678</string>
+    <string name="phone_send_code">Send code</string>
+    <string name="phone_terms">By continuing you agree to our Community Guidelines &amp; Safety Pledge</string>
+
+    <!-- OTP -->
+    <string name="otp_title">Enter the code</string>
+    <string name="otp_sent_to">Sent to %1$s</string>
+    <string name="otp_code_label">6-digit code</string>
+    <string name="otp_verify">Verify</string>
+
+    <!-- Profile setup -->
+    <string name="profile_title">Almost there</string>
+    <string name="profile_subtitle">A name and photo help neighbours trust you.</string>
+    <string name="profile_display_name_label">Display name</string>
+    <string name="profile_language_label">Language · ভাষা</string>
+    <string name="profile_language_bn">বাংলা</string>
+    <string name="profile_language_en">English</string>
+    <string name="profile_finish_setup">Finish setup</string>
+</resources>

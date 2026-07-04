@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Home -->
+    <string name="home_location_radius">%1$s · %2$d km</string>
+    <string name="home_location_placeholder">Mirpur, Dhaka</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="home_tab_needs">Needs</string>
+    <string name="home_tab_offers">Offers</string>
+    <string name="home_category_all">All</string>
+    <string name="home_empty_title">All quiet nearby</string>
+    <string name="home_empty_message">No listings within %1$d km right now. Try widening your radius or check back soon.</string>
+
+    <!-- Common -->
+    <string name="loading">Loading</string>
+
+    <!-- Listing detail -->
+    <string name="cd_more_options">More options</string>
+    <string name="detail_error_generic">Something went wrong.</string>
+    <string name="detail_offer_available_until">until %1$s</string>
+    <string name="detail_label_quantity">Quantity</string>
+    <string name="detail_label_area">Area</string>
+    <string name="cd_view_profile">View profile</string>
+    <string name="detail_author_fallback_name">Neighbour</string>
+    <string name="detail_action_offer_help">Offer to help</string>
+    <string name="detail_action_request_this">Request this</string>
+
+    <!-- Report sheet -->
+    <string name="report_reason_scam">Looks like a scam or fake</string>
+    <string name="report_reason_money">Asking for money or payment</string>
+    <string name="report_reason_offensive">Offensive or unsafe</string>
+    <string name="report_reason_spam">Spam or duplicate</string>
+    <string name="report_title">Report listing</string>
+    <string name="report_submit">Submit report</string>
+    <string name="report_block_user">Block this user</string>
+    <string name="report_cancel">Cancel</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty_title">No notifications yet</string>
+    <string name="notifications_empty_message">You\'ll be notified when someone responds to your listings or claims.</string>
+    <string name="notifications_state_read">Read</string>
+    <string name="notifications_state_unread">Unread</string>
+
+</resources>

@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.nearaid.core.designsystem.R
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
@@ -122,7 +124,7 @@ fun NearAidTopBar(
     ) {
         if (onBack != null) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = NearAidTheme.colors.ink)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = NearAidTheme.colors.ink)
             }
         }
         Text(
@@ -229,7 +231,7 @@ fun TextChooserRow(
             .clip(RoundedCornerShape(18.dp))
             .border(1.5.dp, if (highlighted) NearAidTheme.colors.teal else NearAidTheme.colors.line, RoundedCornerShape(18.dp))
             .background(if (highlighted) NearAidTheme.colors.tealSoft else NearAidTheme.colors.surface)
-            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
+            .accessibleClickable(onClickLabel = stringResource(R.string.action_open), onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(13.dp),

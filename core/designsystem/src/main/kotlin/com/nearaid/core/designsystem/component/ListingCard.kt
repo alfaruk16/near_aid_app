@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.common.util.TimeFormat
+import com.nearaid.core.designsystem.R
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingCard
 import com.nearaid.core.model.ListingType
@@ -34,7 +36,7 @@ fun ListingCardView(
             .clip(MaterialTheme.shapes.large)
             .background(NearAidTheme.colors.surface)
             .border(1.dp, NearAidTheme.colors.line, MaterialTheme.shapes.large)
-            .accessibleClickable(onClickLabel = "Open listing", onClick = onClick)
+            .accessibleClickable(onClickLabel = stringResource(R.string.action_open_listing), onClick = onClick)
             .padding(14.dp),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -50,7 +52,7 @@ fun ListingCardView(
                     )
                     when {
                         card.type == ListingType.OFFER ->
-                            TagChip("Offering", NearAidTheme.colors.tealTint, NearAidTheme.colors.teal)
+                            TagChip(stringResource(R.string.tag_offering), NearAidTheme.colors.tealTint, NearAidTheme.colors.teal)
                         card.urgency != null -> UrgencyTag(card.urgency!!)
                     }
                 }
@@ -61,7 +63,7 @@ fun ListingCardView(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Avatar(name = card.author.displayName, photoUrl = card.author.photoUrl, size = 24)
             Text(
-                text = card.author.displayName ?: "Neighbour",
+                text = card.author.displayName ?: stringResource(R.string.author_fallback_neighbour),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.SemiBold,
                 color = NearAidTheme.colors.ink2,
@@ -94,7 +96,7 @@ private fun CardMeta(card: ListingCard) {
             Text("·", color = NearAidTheme.colors.ink3, style = MaterialTheme.typography.bodySmall)
         }
         val timeText = if (card.type == ListingType.OFFER && card.availableUntil != null) {
-            "until ${TimeFormat.timeOfDay(card.availableUntil)}"
+            stringResource(R.string.listing_available_until, TimeFormat.timeOfDay(card.availableUntil))
         } else {
             TimeFormat.relativeFromNow(card.createdAt)
         }

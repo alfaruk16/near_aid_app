@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +44,7 @@ import com.nearaid.core.designsystem.component.accessibleClickable
 import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
+import com.nearaid.feature.profile.R
 
 @Composable
 fun ProfileScreen(
@@ -66,7 +68,7 @@ fun ProfileScreen(
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(
                 color = NearAidTheme.colors.marigold,
-                modifier = Modifier.statusSemantics("Loading"),
+                modifier = Modifier.statusSemantics(stringResource(R.string.loading)),
             )
         }
         return
@@ -117,9 +119,9 @@ fun ProfileScreen(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 val subtitleParts = buildList {
-                    if (me.isIdVerified) add("Verified")
+                    if (me.isIdVerified) add(stringResource(R.string.profile_subtitle_verified))
                     me.defaultArea?.let { add(it) }
-                    add("Trust score ${String.format("%.1f", me.trustScore)}")
+                    add(stringResource(R.string.profile_subtitle_trust_score, String.format("%.1f", me.trustScore)))
                 }
                 Text(
                     text = subtitleParts.joinToString(" · "),
@@ -150,19 +152,19 @@ fun ProfileScreen(
         // Menu items
         ProfileMenuItem(
             icon = Icons.Filled.Badge,
-            label = "Verification",
-            trailingLabel = if (me.isIdVerified) "Verified" else null,
+            label = stringResource(R.string.profile_menu_verification),
+            trailingLabel = if (me.isIdVerified) stringResource(R.string.profile_menu_verified) else null,
             trailingColor = NearAidTheme.colors.teal,
             onClick = { viewModel.onIntent(ProfileIntent.VerificationClicked) },
         )
         ProfileMenuItem(
             icon = Icons.Filled.Star,
-            label = "My ratings",
+            label = stringResource(R.string.profile_menu_my_ratings),
             onClick = { viewModel.onIntent(ProfileIntent.RatingsClicked) },
         )
         ProfileMenuItem(
             icon = Icons.Filled.Settings,
-            label = "Settings & language",
+            label = stringResource(R.string.profile_menu_settings),
             onClick = { viewModel.onIntent(ProfileIntent.SettingsClicked) },
         )
 
@@ -181,15 +183,15 @@ private fun ProfileStatsRow(
     ) {
         ProfileStatCell(
             value = String.format("%.1f", trustScore),
-            label = "Trust",
+            label = stringResource(R.string.profile_stat_trust),
         )
         ProfileStatCell(
             value = "—",
-            label = "Helped",
+            label = stringResource(R.string.profile_stat_helped),
         )
         ProfileStatCell(
             value = "—",
-            label = "Rating",
+            label = stringResource(R.string.profile_stat_rating),
         )
     }
 }
@@ -230,7 +232,7 @@ private fun ProfileMenuItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
+            .accessibleClickable(onClickLabel = stringResource(R.string.action_open), onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

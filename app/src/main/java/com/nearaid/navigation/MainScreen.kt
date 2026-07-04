@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.nearaid.R
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.navigation.HomeRoute
 import com.nearaid.core.navigation.PostChooserRoute
@@ -119,12 +121,12 @@ private fun NearAidBottomBar(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 role = Role.Button,
-                                onClickLabel = "Create a post",
+                                onClickLabel = stringResource(R.string.action_create_post),
                                 onClick = onPost,
                             ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(Icons.Filled.Add, contentDescription = "Post", tint = NearAidTheme.colors.surface, modifier = Modifier.size(26.dp))
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_post), tint = NearAidTheme.colors.surface, modifier = Modifier.size(26.dp))
                     }
                 }
                 BottomItem(tabs[2], isSelected, onTabSelected, Modifier.weight(1f))
@@ -156,6 +158,6 @@ private fun BottomItem(
     ) {
         // Decorative: the tab's text label below conveys the name, and the row merges.
         Icon(tab.icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
-        Text(tab.label, color = color, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(tab.labelRes), color = color, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
     }
 }

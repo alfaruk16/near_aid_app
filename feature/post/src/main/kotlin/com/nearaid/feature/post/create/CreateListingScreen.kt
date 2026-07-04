@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,6 +28,7 @@ import com.nearaid.core.designsystem.component.SectionLabel
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingType
 import com.nearaid.core.model.Urgency
+import com.nearaid.feature.post.R
 
 // ---------------------------------------------------------------------------
 // Category emoji map
@@ -67,7 +69,7 @@ fun CreateListingScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         NearAidTopBar(
-            title = if (type == ListingType.REQUEST) "New request" else "New offer",
+            title = if (type == ListingType.REQUEST) stringResource(R.string.create_title_request) else stringResource(R.string.create_title_offer),
             onBack = onBack,
         )
 
@@ -81,7 +83,7 @@ fun CreateListingScreen(
         ) {
 
             // ---- Category chips ----
-            SectionLabel("Category")
+            SectionLabel(stringResource(R.string.field_category_label))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,7 +102,7 @@ fun CreateListingScreen(
             NearAidTextField(
                 value = state.title,
                 onValueChange = { viewModel.onIntent(CreateListingIntent.TitleChanged(it)) },
-                label = if (type == ListingType.REQUEST) "What do you need?" else "What are you giving?",
+                label = if (type == ListingType.REQUEST) stringResource(R.string.field_title_label_request) else stringResource(R.string.field_title_label_offer),
                 isError = state.error != null && state.title.isBlank(),
                 supportingText = if (state.error != null && state.title.isBlank()) state.error else null,
             )
@@ -109,7 +111,7 @@ fun CreateListingScreen(
             NearAidTextField(
                 value = state.description,
                 onValueChange = { viewModel.onIntent(CreateListingIntent.DescriptionChanged(it)) },
-                label = "Description",
+                label = stringResource(R.string.field_description_label),
                 singleLine = false,
                 minLines = 3,
             )
@@ -118,13 +120,13 @@ fun CreateListingScreen(
             NearAidTextField(
                 value = state.quantity,
                 onValueChange = { viewModel.onIntent(CreateListingIntent.QuantityChanged(it)) },
-                label = "Quantity (optional)",
-                placeholder = "e.g. 2 kg, 1 bag",
+                label = stringResource(R.string.field_quantity_label),
+                placeholder = stringResource(R.string.field_quantity_placeholder),
             )
 
             // ---- REQUEST-only: Urgency chips ----
             if (type == ListingType.REQUEST) {
-                SectionLabel("Urgency")
+                SectionLabel(stringResource(R.string.field_urgency_label))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -145,14 +147,14 @@ fun CreateListingScreen(
                 NearAidTextField(
                     value = state.availableUntil,
                     onValueChange = { viewModel.onIntent(CreateListingIntent.AvailableUntilChanged(it)) },
-                    label = "Available until (optional)",
-                    placeholder = "e.g. 8:00 PM",
+                    label = stringResource(R.string.field_available_until_label),
+                    placeholder = stringResource(R.string.field_available_until_placeholder),
                 )
             }
 
             // ---- Location note ----
             Text(
-                text = "Mirpur, Dhaka — shown to others as an approximate area only",
+                text = stringResource(R.string.create_location_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = NearAidTheme.colors.ink3,
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -169,7 +171,7 @@ fun CreateListingScreen(
 
             // ---- Submit button ----
             NearAidButton(
-                text = if (type == ListingType.REQUEST) "Post request" else "Post offer",
+                text = if (type == ListingType.REQUEST) stringResource(R.string.create_submit_request) else stringResource(R.string.create_submit_offer),
                 onClick = { viewModel.onIntent(CreateListingIntent.Submit(type)) },
                 variant = if (type == ListingType.REQUEST) NearAidButtonVariant.Primary else NearAidButtonVariant.Teal,
                 enabled = state.canSubmit,

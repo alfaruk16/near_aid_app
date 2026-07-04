@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.accessibleClickable
 import com.nearaid.core.designsystem.theme.NearAidTheme
+import com.nearaid.feature.profile.R
 import java.io.File
 
 @Composable
@@ -88,7 +90,7 @@ fun VerificationScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Get verified", onBack = { viewModel.onIntent(VerificationIntent.BackClicked) })
+        NearAidTopBar(title = stringResource(R.string.verification_title), onBack = { viewModel.onIntent(VerificationIntent.BackClicked) })
 
         Column(
             modifier = Modifier
@@ -98,21 +100,21 @@ fun VerificationScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = "A verified badge raises your trust score and gets your requests seen faster.",
+                text = stringResource(R.string.verification_intro),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NearAidTheme.colors.ink2,
             )
 
             // National ID upload
             UploadRow(
-                label = "National ID — front",
+                label = stringResource(R.string.verification_national_id_front),
                 isUploaded = idFrontPath != null,
                 onClick = { idFrontLauncher.launch("image/*") },
             )
 
             // Selfie upload
             UploadRow(
-                label = "Selfie",
+                label = stringResource(R.string.verification_selfie),
                 isUploaded = selfieImagePath != null,
                 onClick = { selfieLauncher.launch("image/*") },
             )
@@ -137,7 +139,7 @@ fun VerificationScreen(
                             modifier = Modifier.size(20.dp),
                         )
                         Text(
-                            text = "Submitted — status: pending",
+                            text = stringResource(R.string.verification_submitted),
                             style = MaterialTheme.typography.bodyMedium,
                             color = NearAidTheme.colors.teal,
                             fontWeight = FontWeight.SemiBold,
@@ -156,7 +158,7 @@ fun VerificationScreen(
             }
 
             NearAidButton(
-                text = "Submit for review",
+                text = stringResource(R.string.verification_submit),
                 onClick = { viewModel.onIntent(VerificationIntent.Submit) },
                 enabled = state.documentPath != null && !state.loading && !state.success,
                 loading = state.loading,
@@ -166,7 +168,7 @@ fun VerificationScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Documents are encrypted and never shown to other users.",
+                text = stringResource(R.string.verification_privacy_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = NearAidTheme.colors.ink3,
                 textAlign = TextAlign.Center,
@@ -194,7 +196,7 @@ private fun UploadRow(
                 color = if (isUploaded) NearAidTheme.colors.teal else NearAidTheme.colors.line,
                 shape = RoundedCornerShape(14.dp),
             )
-            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
+            .accessibleClickable(onClickLabel = stringResource(R.string.action_open), onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 20.dp),
     ) {
         Row(

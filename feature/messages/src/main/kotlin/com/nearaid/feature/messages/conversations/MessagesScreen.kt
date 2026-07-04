@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,7 @@ import com.nearaid.core.designsystem.component.accessibleClickable
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Conversation
+import com.nearaid.feature.messages.R
 
 @Composable
 fun MessagesScreen(
@@ -58,13 +60,13 @@ fun MessagesScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Messages")
+        NearAidTopBar(title = stringResource(R.string.messages_title))
 
         when {
             state.loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
-                        modifier = Modifier.statusSemantics("Loading"),
+                        modifier = Modifier.statusSemantics(stringResource(R.string.status_loading)),
                         color = NearAidTheme.colors.marigold,
                     )
                 }
@@ -74,9 +76,9 @@ fun MessagesScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     EmptyState(
                         icon = Icons.AutoMirrored.Filled.Chat,
-                        title = "No messages yet",
-                        message = "When you claim or share something, your coordination chats will appear here.",
-                        actionLabel = "Refresh",
+                        title = stringResource(R.string.messages_empty_title),
+                        message = stringResource(R.string.messages_empty_message),
+                        actionLabel = stringResource(R.string.messages_empty_action),
                         onAction = { viewModel.onIntent(ConversationsIntent.Load) },
                     )
                 }
@@ -115,13 +117,16 @@ private fun ConversationRow(
 ) {
     val isUnread = conversation.unreadCount > 0
     val rowBg = if (isUnread) NearAidTheme.colors.marigoldSoft else NearAidTheme.colors.surface
+    val openConversationLabel = stringResource(R.string.cd_open_conversation)
+    val readStateDescription =
+        if (isUnread) stringResource(R.string.state_unread) else stringResource(R.string.state_read)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(rowBg)
-            .accessibleClickable(onClickLabel = "Open conversation", onClick = onClick)
-            .semantics { stateDescription = if (isUnread) "Unread" else "Read" }
+            .accessibleClickable(onClickLabel = openConversationLabel, onClick = onClick)
+            .semantics { stateDescription = readStateDescription }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

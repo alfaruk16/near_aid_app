@@ -35,11 +35,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nearaid.feature.discovery.R
 import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.accessibleClickable
@@ -57,13 +59,6 @@ import com.nearaid.core.designsystem.component.UrgencyTag
 import com.nearaid.core.designsystem.component.VerifiedBadge
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ListingType
-
-private val REPORT_REASONS = listOf(
-    "Looks like a scam or fake",
-    "Asking for money or payment",
-    "Offensive or unsafe",
-    "Spam or duplicate",
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +92,7 @@ fun ListingDetailScreen(
                 actions = {
                     if (state.listing != null) {
                         IconButton(onClick = { viewModel.onIntent(ListingDetailIntent.OpenReportSheet) }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = NearAidTheme.colors.ink2)
+                            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.cd_more_options), tint = NearAidTheme.colors.ink2)
                         }
                     }
                 },
@@ -108,7 +103,7 @@ fun ListingDetailScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
                             color = NearAidTheme.colors.marigold,
-                            modifier = Modifier.statusSemantics("Loading"),
+                            modifier = Modifier.statusSemantics(stringResource(R.string.loading)),
                         )
                     }
                 }
@@ -116,7 +111,7 @@ fun ListingDetailScreen(
                 state.error != null -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = state.error ?: "Something went wrong.",
+                            text = state.error ?: stringResource(R.string.detail_error_generic),
                             style = MaterialTheme.typography.bodyMedium,
                             color = NearAidTheme.colors.rust,
                             modifier = Modifier.padding(24.dp),
@@ -158,7 +153,7 @@ fun ListingDetailScreen(
                                             UrgencyTag(urgency = listing.urgency!!)
                                         listing.type == ListingType.OFFER && listing.availableUntil != null ->
                                             TagChip(
-                                                label = "until ${TimeFormat.timeOfDay(listing.availableUntil)}",
+                                                label = stringResource(R.string.detail_offer_available_until, TimeFormat.timeOfDay(listing.availableUntil)),
                                                 container = NearAidTheme.colors.tealTint,
                                                 content = NearAidTheme.colors.teal,
                                             )
@@ -198,13 +193,13 @@ fun ListingDetailScreen(
                         ) {
                             listing.quantity?.let { qty ->
                                 Column {
-                                    Text("Quantity", style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
+                                    Text(stringResource(R.string.detail_label_quantity), style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
                                     Text(qty, style = MaterialTheme.typography.titleSmall)
                                 }
                             }
                             listing.areaLabel?.let { area ->
                                 Column {
-                                    Text("Area", style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
+                                    Text(stringResource(R.string.detail_label_area), style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)
                                     Text(area, style = MaterialTheme.typography.titleSmall)
                                 }
                             }
@@ -222,7 +217,7 @@ fun ListingDetailScreen(
                                 .fillMaxWidth()
                                 .clip(MaterialTheme.shapes.medium)
                                 .background(NearAidTheme.colors.surface)
-                                .accessibleClickable(onClickLabel = "View profile") { viewModel.onIntent(ListingDetailIntent.AuthorClicked) }
+                                .accessibleClickable(onClickLabel = stringResource(R.string.cd_view_profile)) { viewModel.onIntent(ListingDetailIntent.AuthorClicked) }
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -238,7 +233,7 @@ fun ListingDetailScreen(
                                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 ) {
                                     Text(
-                                        text = listing.author.displayName ?: "Neighbour",
+                                        text = listing.author.displayName ?: stringResource(R.string.detail_author_fallback_name),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -272,7 +267,7 @@ fun ListingDetailScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                             .navigationBarsPadding(),
                     ) {
-                        val actionLabel = if (listing.type == ListingType.REQUEST) "Offer to help" else "Request this"
+                        val actionLabel = if (listing.type == ListingType.REQUEST) stringResource(R.string.detail_action_offer_help) else stringResource(R.string.detail_action_request_this)
                         NearAidButton(
                             text = actionLabel,
                             onClick = { viewModel.onIntent(ListingDetailIntent.ClaimClicked) },
@@ -301,12 +296,18 @@ fun ListingDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    "Report listing",
+                    stringResource(R.string.report_title),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 8.dp).headingSemantics(),
                 )
+                val reportReasons = listOf(
+                    stringResource(R.string.report_reason_scam),
+                    stringResource(R.string.report_reason_money),
+                    stringResource(R.string.report_reason_offensive),
+                    stringResource(R.string.report_reason_spam),
+                )
                 Column(Modifier.selectableGroup()) {
-                    REPORT_REASONS.forEach { reason ->
+                    reportReasons.forEach { reason ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -329,7 +330,7 @@ fun ListingDetailScreen(
                 }
                 Spacer(Modifier.height(12.dp))
                 NearAidButton(
-                    text = "Submit report",
+                    text = stringResource(R.string.report_submit),
                     onClick = { viewModel.onIntent(ListingDetailIntent.SubmitReport) },
                     variant = NearAidButtonVariant.Rust,
                     enabled = state.selectedReportReason != null && !state.submittingReport,
@@ -337,14 +338,14 @@ fun ListingDetailScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 NearAidButton(
-                    text = "Block this user",
+                    text = stringResource(R.string.report_block_user),
                     onClick = { viewModel.onIntent(ListingDetailIntent.BlockAuthor) },
                     variant = NearAidButtonVariant.Ghost,
                     enabled = !state.submittingReport,
                 )
                 Spacer(Modifier.height(8.dp))
                 NearAidButton(
-                    text = "Cancel",
+                    text = stringResource(R.string.report_cancel),
                     onClick = { viewModel.onIntent(ListingDetailIntent.DismissReportSheet) },
                     variant = NearAidButtonVariant.Ghost,
                     enabled = !state.submittingReport,

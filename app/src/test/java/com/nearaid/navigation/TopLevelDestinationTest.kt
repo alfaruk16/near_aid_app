@@ -38,11 +38,11 @@ class TopLevelDestinationTest {
     }
 
     @Test
-    fun `every tab has a non-blank label`() {
+    fun `every tab has a label resource`() {
         TopLevelDestination.entries.forEach { destination ->
             assertTrue(
-                "Expected a non-blank label for $destination",
-                destination.label.isNotBlank(),
+                "Expected a valid label resource for $destination",
+                destination.labelRes != 0,
             )
         }
     }

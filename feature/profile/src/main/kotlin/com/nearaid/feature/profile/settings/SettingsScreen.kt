@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +27,7 @@ import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.SectionLabel
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.AppLanguage
+import com.nearaid.feature.profile.R
 
 @Composable
 fun SettingsScreen(
@@ -44,7 +46,7 @@ fun SettingsScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Settings & language", onBack = { viewModel.onIntent(SettingsIntent.BackClicked) })
+        NearAidTopBar(title = stringResource(R.string.settings_title), onBack = { viewModel.onIntent(SettingsIntent.BackClicked) })
 
         Column(
             modifier = Modifier
@@ -53,16 +55,16 @@ fun SettingsScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            SectionLabel("Language · ভাষা")
+            SectionLabel(stringResource(R.string.settings_language_label))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 NearAidChip(
-                    label = "বাংলা",
+                    label = stringResource(R.string.settings_language_bn),
                     selected = state.language == AppLanguage.BN,
                     onClick = { viewModel.onIntent(SettingsIntent.SelectLanguage(AppLanguage.BN)) },
                 )
                 NearAidChip(
-                    label = "English",
+                    label = stringResource(R.string.settings_language_en),
                     selected = state.language == AppLanguage.EN,
                     onClick = { viewModel.onIntent(SettingsIntent.SelectLanguage(AppLanguage.EN)) },
                 )
@@ -79,7 +81,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             NearAidButton(
-                text = "Log out",
+                text = stringResource(R.string.settings_log_out),
                 onClick = { viewModel.onIntent(SettingsIntent.LogOut) },
                 variant = NearAidButtonVariant.Rust,
                 loading = state.loading,

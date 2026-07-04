@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Post chooser -->
+    <string name="post_chooser_top_bar_title">Post</string>
+    <string name="post_chooser_title">What would you like to post?</string>
+    <string name="post_chooser_subtitle">Ask for a hand, or share what you can spare.</string>
+    <string name="post_chooser_request_title">I need help</string>
+    <string name="post_chooser_request_subtitle">Post a request for food, clothes, medicine…</string>
+    <string name="post_chooser_offer_title">I have something to give</string>
+    <string name="post_chooser_offer_subtitle">Post an offer — surplus, spare, or extra</string>
+
+    <!-- Create listing -->
+    <string name="create_title_request">New request</string>
+    <string name="create_title_offer">New offer</string>
+    <string name="field_category_label">Category</string>
+    <string name="field_title_label_request">What do you need?</string>
+    <string name="field_title_label_offer">What are you giving?</string>
+    <string name="field_description_label">Description</string>
+    <string name="field_quantity_label">Quantity (optional)</string>
+    <string name="field_quantity_placeholder">e.g. 2 kg, 1 bag</string>
+    <string name="field_urgency_label">Urgency</string>
+    <string name="field_available_until_label">Available until (optional)</string>
+    <string name="field_available_until_placeholder">e.g. 8:00 PM</string>
+    <string name="create_location_note">Mirpur, Dhaka — shown to others as an approximate area only</string>
+    <string name="create_submit_request">Post request</string>
+    <string name="create_submit_offer">Post offer</string>
+
+</resources>

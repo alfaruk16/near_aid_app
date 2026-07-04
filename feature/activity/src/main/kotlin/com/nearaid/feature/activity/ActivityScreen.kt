@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,6 +50,7 @@ import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Claim
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingStatus
+import com.nearaid.feature.activity.R
 
 @Composable
 fun ActivityScreen(
@@ -78,10 +80,13 @@ fun ActivityScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            NearAidTopBar(title = "Activity")
+            NearAidTopBar(title = stringResource(R.string.activity_title))
 
             NearAidSegmentedTabs(
-                options = listOf("Helping", "My posts"),
+                options = listOf(
+                    stringResource(R.string.tab_helping),
+                    stringResource(R.string.tab_my_posts),
+                ),
                 selectedIndex = state.selectedTab,
                 onSelect = { viewModel.onIntent(ActivityIntent.SelectTab(it)) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -125,16 +130,16 @@ private fun HelpingTab(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     color = NearAidTheme.colors.teal,
-                    modifier = Modifier.statusSemantics("Loading"),
+                    modifier = Modifier.statusSemantics(stringResource(R.string.status_loading)),
                 )
             }
         }
         state.claimsError != null -> {
             EmptyState(
                 icon = Icons.Filled.Inbox,
-                title = "Couldn't load",
+                title = stringResource(R.string.empty_couldnt_load_title),
                 message = state.claimsError,
-                actionLabel = "Retry",
+                actionLabel = stringResource(R.string.action_retry),
                 onAction = onRefresh,
                 modifier = Modifier.fillMaxSize(),
             )
@@ -142,8 +147,8 @@ private fun HelpingTab(
         state.claims.isEmpty() -> {
             EmptyState(
                 icon = Icons.Filled.Inbox,
-                title = "No activity yet",
-                message = "When you help someone, your active claims will appear here.",
+                title = stringResource(R.string.empty_no_activity_title),
+                message = stringResource(R.string.empty_no_activity_message),
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -180,7 +185,7 @@ private fun ClaimRow(
             .clip(MaterialTheme.shapes.large)
             .background(NearAidTheme.colors.surface)
             .border(1.dp, NearAidTheme.colors.line, MaterialTheme.shapes.large)
-            .accessibleClickable(onClickLabel = "Open chat") { onOpenChat(claim.id, claim.chatThreadId ?: "", "") }
+            .accessibleClickable(onClickLabel = stringResource(R.string.action_open_chat)) { onOpenChat(claim.id, claim.chatThreadId ?: "", "") }
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -198,7 +203,7 @@ private fun ClaimRow(
                 )
                 claim.claimedAt?.let { claimedAt ->
                     Text(
-                        text = "Since $claimedAt",
+                        text = stringResource(R.string.claim_since, claimedAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = NearAidTheme.colors.ink3,
                     )
@@ -219,7 +224,7 @@ private fun ClaimRow(
             ClaimStatus.ACTIVE -> {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     NearAidButton(
-                        text = "Mark delivered",
+                        text = stringResource(R.string.action_mark_delivered),
                         onClick = { onMarkDelivered(claim.id) },
                         enabled = !actionLoading,
                         loading = actionLoading,
@@ -238,7 +243,7 @@ private fun ClaimRow(
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
                     Text(
-                        text = "Completed",
+                        text = stringResource(R.string.claim_completed),
                         style = MaterialTheme.typography.labelMedium,
                         color = NearAidTheme.colors.teal,
                         fontWeight = FontWeight.Bold,
@@ -261,16 +266,16 @@ private fun MyPostsTab(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     color = NearAidTheme.colors.teal,
-                    modifier = Modifier.statusSemantics("Loading"),
+                    modifier = Modifier.statusSemantics(stringResource(R.string.status_loading)),
                 )
             }
         }
         state.listingsError != null -> {
             EmptyState(
                 icon = Icons.Filled.Inbox,
-                title = "Couldn't load",
+                title = stringResource(R.string.empty_couldnt_load_title),
                 message = state.listingsError,
-                actionLabel = "Retry",
+                actionLabel = stringResource(R.string.action_retry),
                 onAction = onRefresh,
                 modifier = Modifier.fillMaxSize(),
             )
@@ -278,8 +283,8 @@ private fun MyPostsTab(
         state.myListings.isEmpty() -> {
             EmptyState(
                 icon = Icons.Filled.Inbox,
-                title = "No posts yet",
-                message = "Your requests and offers will appear here once you post them.",
+                title = stringResource(R.string.empty_no_posts_title),
+                message = stringResource(R.string.empty_no_posts_message),
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -299,11 +304,12 @@ private fun MyPostsTab(
     }
 }
 
+@Composable
 private fun claimTitle(status: ClaimStatus): String = when (status) {
-    ClaimStatus.ACTIVE -> "You're helping"
-    ClaimStatus.COMPLETED -> "You helped"
-    ClaimStatus.WITHDRAWN -> "Withdrawn"
-    ClaimStatus.CANCELLED -> "Cancelled"
+    ClaimStatus.ACTIVE -> stringResource(R.string.claim_status_active)
+    ClaimStatus.COMPLETED -> stringResource(R.string.claim_status_completed)
+    ClaimStatus.WITHDRAWN -> stringResource(R.string.claim_status_withdrawn)
+    ClaimStatus.CANCELLED -> stringResource(R.string.claim_status_cancelled)
 }
 
 private fun ClaimStatus.toListingStatus(): ListingStatus = when (this) {

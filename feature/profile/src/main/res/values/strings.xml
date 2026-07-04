@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="loading">Loading</string>
+    <string name="action_open">Open</string>
+
+    <!-- Profile screen -->
+    <string name="profile_subtitle_verified">Verified</string>
+    <string name="profile_subtitle_trust_score">Trust score %1$s</string>
+    <string name="profile_stat_trust">Trust</string>
+    <string name="profile_stat_helped">Helped</string>
+    <string name="profile_stat_rating">Rating</string>
+    <string name="profile_menu_verification">Verification</string>
+    <string name="profile_menu_verified">Verified</string>
+    <string name="profile_menu_my_ratings">My ratings</string>
+    <string name="profile_menu_settings">Settings &amp; language</string>
+
+    <!-- Public profile screen -->
+    <string name="public_profile_title">Profile</string>
+    <string name="public_profile_verified_neighbour">Verified neighbour</string>
+    <string name="public_profile_stat_helped">Helped</string>
+    <string name="public_profile_stat_rating">Rating</string>
+    <string name="public_profile_stat_trust">Trust</string>
+    <string name="public_profile_recent_ratings">Recent ratings</string>
+    <string name="public_profile_no_ratings">No ratings yet.</string>
+    <string name="public_profile_anonymous">Anonymous</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings &amp; language</string>
+    <string name="settings_language_label">Language · ভাষা</string>
+    <string name="settings_language_bn">বাংলা</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_log_out">Log out</string>
+
+    <!-- Verification screen -->
+    <string name="verification_title">Get verified</string>
+    <string name="verification_intro">A verified badge raises your trust score and gets your requests seen faster.</string>
+    <string name="verification_national_id_front">National ID — front</string>
+    <string name="verification_selfie">Selfie</string>
+    <string name="verification_submitted">Submitted — status: pending</string>
+    <string name="verification_submit">Submit for review</string>
+    <string name="verification_privacy_note">Documents are encrypted and never shown to other users.</string>
+</resources>

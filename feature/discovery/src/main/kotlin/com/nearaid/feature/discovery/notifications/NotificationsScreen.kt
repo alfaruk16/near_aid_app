@@ -28,12 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nearaid.feature.discovery.R
 import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
@@ -61,7 +63,7 @@ fun NotificationsScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        NearAidTopBar(title = "Notifications", onBack = onBack)
+        NearAidTopBar(title = stringResource(R.string.notifications_title), onBack = onBack)
 
         when {
             state.loading -> {
@@ -71,7 +73,7 @@ fun NotificationsScreen(
                 ) {
                     CircularProgressIndicator(
                         color = NearAidTheme.colors.marigold,
-                        modifier = Modifier.statusSemantics("Loading"),
+                        modifier = Modifier.statusSemantics(stringResource(R.string.loading)),
                     )
                 }
             }
@@ -83,8 +85,8 @@ fun NotificationsScreen(
                 ) {
                     EmptyState(
                         icon = Icons.Filled.NotificationsNone,
-                        title = "No notifications yet",
-                        message = "You'll be notified when someone responds to your listings or claims.",
+                        title = stringResource(R.string.notifications_empty_title),
+                        message = stringResource(R.string.notifications_empty_message),
                     )
                 }
             }
@@ -106,13 +108,15 @@ fun NotificationsScreen(
 
 @Composable
 private fun NotificationRow(item: NotificationItem) {
+    val readDescription = stringResource(R.string.notifications_state_read)
+    val unreadDescription = stringResource(R.string.notifications_state_unread)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(if (item.isRead) NearAidTheme.colors.surface else NearAidTheme.colors.marigoldSoft)
             .semantics(mergeDescendants = true) {
-                stateDescription = if (item.isRead) "Read" else "Unread"
+                stateDescription = if (item.isRead) readDescription else unreadDescription
             }
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen -->
+    <string name="messages_title">Messages</string>
+
+    <!-- Empty / loading states -->
+    <string name="status_loading">Loading</string>
+    <string name="messages_empty_title">No messages yet</string>
+    <string name="messages_empty_message">When you claim or share something, your coordination chats will appear here.</string>
+    <string name="messages_empty_action">Refresh</string>
+
+    <!-- Conversation row -->
+    <string name="cd_open_conversation">Open conversation</string>
+    <string name="state_unread">Unread</string>
+    <string name="state_read">Read</string>
+
+    <!-- Chat header -->
+    <string name="cd_back">Back</string>
+    <string name="chat_subtitle">Coordinating handoff</string>
+
+    <!-- Safety bar -->
+    <string name="chat_safety_bar">Meet in public. Suggested: Mirpur 10 circle.</string>
+
+    <!-- Chat bubble attribution -->
+    <string name="chat_sender_you">You sent</string>
+    <string name="chat_sender_received">Received</string>
+
+    <!-- Input row -->
+    <string name="chat_hint">Type a message…</string>
+    <string name="cd_send">Send</string>
+</resources>

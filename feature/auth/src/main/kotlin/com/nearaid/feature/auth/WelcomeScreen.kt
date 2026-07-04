@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
+import com.nearaid.feature.auth.R
 
 @Composable
 fun WelcomeScreen(
@@ -44,19 +46,19 @@ fun WelcomeScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                "Real help, right around you",
+                stringResource(R.string.welcome_title),
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.headingSemantics(),
             )
             Text(
-                "Post what you need or browse nearby requests. When you match, you coordinate the handoff safely in-app.",
+                stringResource(R.string.welcome_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NearAidTheme.colors.ink2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 14.dp),
             )
-            NearAidButton(text = "Get started", onClick = onGetStarted)
+            NearAidButton(text = stringResource(R.string.welcome_get_started), onClick = onGetStarted)
         }
     }
 }

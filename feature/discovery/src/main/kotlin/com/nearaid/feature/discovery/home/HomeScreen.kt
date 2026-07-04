@@ -26,11 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nearaid.feature.discovery.R
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
@@ -72,7 +74,11 @@ fun HomeScreen(
                 modifier = Modifier.size(18.dp),
             )
             Text(
-                text = "Mirpur, Dhaka · ${state.radiusKm.toInt()} km",
+                text = stringResource(
+                    R.string.home_location_radius,
+                    stringResource(R.string.home_location_placeholder),
+                    state.radiusKm.toInt(),
+                ),
                 style = MaterialTheme.typography.titleSmall,
                 color = NearAidTheme.colors.ink,
                 modifier = Modifier
@@ -82,7 +88,7 @@ fun HomeScreen(
             IconButton(onClick = { viewModel.onIntent(HomeIntent.OpenNotificationsClicked) }) {
                 Icon(
                     imageVector = Icons.Filled.Notifications,
-                    contentDescription = "Notifications",
+                    contentDescription = stringResource(R.string.cd_notifications),
                     tint = NearAidTheme.colors.ink2,
                 )
             }
@@ -90,7 +96,10 @@ fun HomeScreen(
 
         // Needs / Offers toggle
         NearAidSegmentedTabs(
-            options = listOf("Needs", "Offers"),
+            options = listOf(
+                stringResource(R.string.home_tab_needs),
+                stringResource(R.string.home_tab_offers),
+            ),
             selectedIndex = state.selectedTabIndex,
             onSelect = { viewModel.onIntent(HomeIntent.SelectTab(it)) },
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -105,7 +114,7 @@ fun HomeScreen(
         ) {
             item {
                 NearAidChip(
-                    label = "All",
+                    label = stringResource(R.string.home_category_all),
                     selected = state.selectedCategoryKey == null,
                     onClick = { viewModel.onIntent(HomeIntent.SelectCategory(null)) },
                 )
@@ -130,7 +139,7 @@ fun HomeScreen(
                 ) {
                     CircularProgressIndicator(
                         color = NearAidTheme.colors.marigold,
-                        modifier = Modifier.statusSemantics("Loading"),
+                        modifier = Modifier.statusSemantics(stringResource(R.string.loading)),
                     )
                 }
             }
@@ -142,8 +151,8 @@ fun HomeScreen(
                 ) {
                     EmptyState(
                         icon = Icons.Filled.LocationOn,
-                        title = "All quiet nearby",
-                        message = "No listings within ${state.radiusKm.toInt()} km right now. Try widening your radius or check back soon.",
+                        title = stringResource(R.string.home_empty_title),
+                        message = stringResource(R.string.home_empty_message, state.radiusKm.toInt()),
                     )
                 }
             }
