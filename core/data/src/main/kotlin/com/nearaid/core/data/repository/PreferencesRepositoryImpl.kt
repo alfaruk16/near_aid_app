@@ -4,11 +4,8 @@ import com.nearaid.core.datastore.UserPreferencesDataSource
 import com.nearaid.core.domain.repository.PreferencesRepository
 import com.nearaid.core.model.AppLanguage
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PreferencesRepositoryImpl @Inject constructor(
+class PreferencesRepositoryImpl(
     private val userPrefs: UserPreferencesDataSource,
 ) : PreferencesRepository {
 

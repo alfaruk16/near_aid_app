@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.CollectEffect
@@ -46,7 +46,7 @@ fun PublicProfileScreen(
     userId: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PublicProfileViewModel = hiltViewModel(),
+    viewModel: PublicProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

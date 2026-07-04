@@ -10,18 +10,13 @@ import com.nearaid.core.model.Claim
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.domain.repository.ClaimRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ClaimRepositoryImpl @Inject constructor(
+class ClaimRepositoryImpl(
     private val listingApi: ListingApi,
     private val claimApi: ClaimApi,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ClaimRepository {
 
     override suspend fun claim(listingId: String): DataResult<Claim> =

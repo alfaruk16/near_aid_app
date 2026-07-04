@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.nearaid.android.library)
-    alias(libs.plugins.nearaid.android.hilt)
 }
 
 android {
@@ -17,4 +16,5 @@ dependencies {
 
     implementation(libs.okhttp.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.koin.core)
 }

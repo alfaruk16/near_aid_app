@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
@@ -57,7 +57,7 @@ fun CreateListingScreen(
     onBack: () -> Unit,
     onPosted: (listingId: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CreateListingViewModel = hiltViewModel(),
+    viewModel: CreateListingViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

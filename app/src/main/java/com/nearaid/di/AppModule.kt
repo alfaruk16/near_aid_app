@@ -1,26 +1,13 @@
 package com.nearaid.di
 
 import com.nearaid.BuildConfig
-import com.nearaid.core.network.di.BaseUrl
-import com.nearaid.core.network.di.WsUrl
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import com.nearaid.MainViewModel
+import com.nearaid.core.network.di.NetworkConfig
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 
 /** App-level bindings — supplies values the core modules need but can't know themselves. */
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModule {
-
-    @Provides
-    @Singleton
-    @BaseUrl
-    fun provideBaseUrl(): String = BuildConfig.BASE_URL
-
-    @Provides
-    @Singleton
-    @WsUrl
-    fun provideWsUrl(): String = BuildConfig.WS_URL
+val appModule = module {
+    single { NetworkConfig(baseUrl = BuildConfig.BASE_URL, wsUrl = BuildConfig.WS_URL) }
+    viewModelOf(::MainViewModel)
 }

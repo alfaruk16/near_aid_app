@@ -7,12 +7,9 @@ import com.nearaid.core.domain.usecase.ObserveLanguageUseCase
 import com.nearaid.core.domain.usecase.SetLanguageUseCase
 import com.nearaid.core.domain.usecase.UpdateProfileUseCase
 import com.nearaid.core.model.AppLanguage
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val logout: LogoutUseCase,
     private val observeLanguage: ObserveLanguageUseCase,
     private val setLanguage: SetLanguageUseCase,

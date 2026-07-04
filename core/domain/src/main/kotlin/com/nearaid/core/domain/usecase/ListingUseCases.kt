@@ -9,36 +9,35 @@ import com.nearaid.core.model.ListingStatus
 import com.nearaid.core.model.ListingType
 import com.nearaid.core.model.NewListing
 import com.nearaid.core.model.Page
-import javax.inject.Inject
 
-class GetNearbyListingsUseCase @Inject constructor(
+class GetNearbyListingsUseCase(
     private val repository: ListingRepository,
 ) {
     suspend operator fun invoke(query: DiscoveryQuery, cursor: String? = null): DataResult<Page<ListingCard>> =
         repository.getNearby(query, cursor)
 }
 
-class GetListingUseCase @Inject constructor(
+class GetListingUseCase(
     private val repository: ListingRepository,
 ) {
     suspend operator fun invoke(id: String): DataResult<ListingDetail> = repository.getListing(id)
 }
 
-class CreateListingUseCase @Inject constructor(
+class CreateListingUseCase(
     private val repository: ListingRepository,
 ) {
     suspend operator fun invoke(input: NewListing): DataResult<ListingDetail> =
         repository.createListing(input)
 }
 
-class CancelListingUseCase @Inject constructor(
+class CancelListingUseCase(
     private val repository: ListingRepository,
 ) {
     suspend operator fun invoke(id: String, reason: String): DataResult<Unit> =
         repository.cancelListing(id, reason)
 }
 
-class GetMyListingsUseCase @Inject constructor(
+class GetMyListingsUseCase(
     private val repository: ListingRepository,
 ) {
     suspend operator fun invoke(type: ListingType, status: ListingStatus? = null): DataResult<List<ListingCard>> =

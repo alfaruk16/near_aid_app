@@ -3,24 +3,20 @@ package com.nearaid.core.network.interceptor
 import com.nearaid.core.datastore.AuthPreferencesDataSource
 import com.nearaid.core.network.api.AuthApi
 import com.nearaid.core.network.dto.TokenRefreshRequestDto
-import dagger.Lazy
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * On a 401, refreshes the access token once via POST /auth/refresh (§9.2) and
  * retries. If refresh fails the session is cleared, forcing re-login. [AuthApi] is
- * injected lazily to break the Retrofit ⇄ Authenticator cycle.
+ * supplied lazily (a provider lambda) to break the Retrofit ⇄ Authenticator cycle.
  */
-@Singleton
-class TokenAuthenticator @Inject constructor(
+class TokenAuthenticator(
     private val authPrefs: AuthPreferencesDataSource,
-    private val authApi: Lazy<AuthApi>,
+    private val authApiProvider: () -> AuthApi,
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
@@ -35,7 +31,7 @@ class TokenAuthenticator @Inject constructor(
             }
 
             val refreshed = runBlocking {
-                runCatching { authApi.get().refresh(TokenRefreshRequestDto(tokens.refreshToken)) }.getOrNull()
+                runCatching { authApiProvider().refresh(TokenRefreshRequestDto(tokens.refreshToken)) }.getOrNull()
             }
 
             return if (refreshed != null) {

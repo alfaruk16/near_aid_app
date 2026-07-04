@@ -9,17 +9,12 @@ import com.nearaid.core.model.PublicUser
 import com.nearaid.core.model.ReportTargetType
 import com.nearaid.core.domain.repository.SafetyRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SafetyRepositoryImpl @Inject constructor(
+class SafetyRepositoryImpl(
     private val safetyApi: SafetyApi,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : SafetyRepository {
 
     override suspend fun report(targetType: ReportTargetType, targetId: String, reason: String): DataResult<Unit> =

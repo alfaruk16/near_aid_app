@@ -1,7 +1,5 @@
 package com.nearaid.core.data.repository
 
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.common.result.map
 import com.nearaid.core.data.mapper.toDomain
@@ -24,13 +22,10 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class UserRepositoryImpl @Inject constructor(
+class UserRepositoryImpl(
     private val userApi: UserApi,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
 
     private val me = MutableStateFlow<Me?>(null)

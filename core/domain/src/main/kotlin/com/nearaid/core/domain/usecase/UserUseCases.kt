@@ -8,21 +8,20 @@ import com.nearaid.core.model.Page
 import com.nearaid.core.model.PublicUser
 import com.nearaid.core.model.Rating
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class ObserveCurrentUserUseCase @Inject constructor(
+class ObserveCurrentUserUseCase(
     private val repository: UserRepository,
 ) {
     operator fun invoke(): Flow<Me?> = repository.observeMe()
 }
 
-class RefreshCurrentUserUseCase @Inject constructor(
+class RefreshCurrentUserUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(): DataResult<Me> = repository.refreshMe()
 }
 
-class UpdateProfileUseCase @Inject constructor(
+class UpdateProfileUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(
@@ -40,27 +39,27 @@ class UpdateProfileUseCase @Inject constructor(
     )
 }
 
-class GetPublicUserUseCase @Inject constructor(
+class GetPublicUserUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(id: String): DataResult<PublicUser> = repository.getPublicUser(id)
 }
 
-class GetUserRatingsUseCase @Inject constructor(
+class GetUserRatingsUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(id: String, cursor: String? = null): DataResult<Page<Rating>> =
         repository.getUserRatings(id, cursor)
 }
 
-class SubmitVerificationUseCase @Inject constructor(
+class SubmitVerificationUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(documentPath: String): DataResult<Unit> =
         repository.submitVerification(documentPath)
 }
 
-class RegisterDeviceUseCase @Inject constructor(
+class RegisterDeviceUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(fcmToken: String): DataResult<Unit> =

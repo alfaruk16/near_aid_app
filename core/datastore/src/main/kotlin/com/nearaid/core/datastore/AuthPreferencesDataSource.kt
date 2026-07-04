@@ -8,16 +8,13 @@ import com.nearaid.core.model.AuthTokens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Persists the JWT pair in DataStore Preferences and exposes session state as a
  * [Flow]. The network layer reads tokens from here to attach the `Authorization`
  * header and to refresh (§9.2).
  */
-@Singleton
-class AuthPreferencesDataSource @Inject constructor(
+class AuthPreferencesDataSource(
     private val dataStore: DataStore<Preferences>,
 ) {
     private object Keys {

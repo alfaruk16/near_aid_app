@@ -4,12 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.nearaid.core.common.mvi.MviViewModel
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.domain.usecase.GetConversationsUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ConversationsViewModel @Inject constructor(
+class ConversationsViewModel constructor(
     private val getConversations: GetConversationsUseCase,
 ) : MviViewModel<ConversationsState, ConversationsIntent, ConversationsEffect>() {
 

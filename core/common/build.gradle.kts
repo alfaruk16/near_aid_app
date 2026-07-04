@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.nearaid.android.library)
-    alias(libs.plugins.nearaid.android.hilt)
 }
 
 android {
@@ -12,4 +11,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.koin.core)
 }

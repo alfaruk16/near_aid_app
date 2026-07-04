@@ -18,18 +18,13 @@ import com.nearaid.core.model.NewListing
 import com.nearaid.core.model.Page
 import com.nearaid.core.domain.repository.ListingRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ListingRepositoryImpl @Inject constructor(
+class ListingRepositoryImpl(
     private val listingApi: ListingApi,
     private val cacheDao: ListingCacheDao,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ListingRepository {
 
     override suspend fun getNearby(query: DiscoveryQuery, cursor: String?): DataResult<Page<ListingCard>> =

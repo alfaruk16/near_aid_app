@@ -3,7 +3,6 @@ package com.nearaid.core.network.socket
 import com.nearaid.core.datastore.AuthPreferencesDataSource
 import com.nearaid.core.model.ChatMessage
 import com.nearaid.core.model.MessageType
-import com.nearaid.core.network.di.WsUrl
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,19 +17,16 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Realtime chat transport (§10). Connects to wss://.../ws?token=…, subscribes to a
  * claim thread, and emits incoming `message.new` events as domain [ChatMessage]s.
  */
-@Singleton
-class ChatSocket @Inject constructor(
+class ChatSocket(
     private val client: OkHttpClient,
     private val json: Json,
     private val authPrefs: AuthPreferencesDataSource,
-    @WsUrl private val wsUrl: String,
+    private val wsUrl: String,
 ) {
     fun observe(threadId: String): Flow<ChatMessage> = callbackFlow {
         val token = runBlocking { authPrefs.currentTokens()?.accessToken }

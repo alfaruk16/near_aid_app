@@ -18,22 +18,19 @@ import com.nearaid.core.domain.repository.NotificationRepository
 import com.nearaid.core.domain.repository.PreferencesRepository
 import com.nearaid.core.domain.repository.SafetyRepository
 import com.nearaid.core.domain.repository.UserRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class DataModule {
-    @Binds @Singleton abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
-    @Binds @Singleton abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
-    @Binds @Singleton abstract fun bindCategoryRepository(impl: CategoryRepositoryImpl): CategoryRepository
-    @Binds @Singleton abstract fun bindListingRepository(impl: ListingRepositoryImpl): ListingRepository
-    @Binds @Singleton abstract fun bindClaimRepository(impl: ClaimRepositoryImpl): ClaimRepository
-    @Binds @Singleton abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
-    @Binds @Singleton abstract fun bindSafetyRepository(impl: SafetyRepositoryImpl): SafetyRepository
-    @Binds @Singleton abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
-    @Binds @Singleton abstract fun bindPreferencesRepository(impl: PreferencesRepositoryImpl): PreferencesRepository
+val dataModule = module {
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(named("io"))) }
+    single<UserRepository> { UserRepositoryImpl(get(), get(named("io"))) }
+    single<CategoryRepository> { CategoryRepositoryImpl(get(), get(named("io"))) }
+    single<ListingRepository> { ListingRepositoryImpl(get(), get(), get(named("io"))) }
+    single<ClaimRepository> { ClaimRepositoryImpl(get(), get(), get(named("io"))) }
+    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get(), get(), get(named("io"))) }
+    single<SafetyRepository> { SafetyRepositoryImpl(get(), get(named("io"))) }
+    single<NotificationRepository> { NotificationRepositoryImpl(get(), get(named("io"))) }
+    singleOf(::PreferencesRepositoryImpl) { bind<PreferencesRepository>() }
 }

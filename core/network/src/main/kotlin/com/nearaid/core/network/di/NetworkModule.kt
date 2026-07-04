@@ -12,74 +12,68 @@ import com.nearaid.core.network.api.SafetyApi
 import com.nearaid.core.network.api.UserApi
 import com.nearaid.core.network.interceptor.AuthInterceptor
 import com.nearaid.core.network.interceptor.TokenAuthenticator
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import com.nearaid.core.network.socket.ChatSocket
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.create
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+val networkModule = module {
 
-    @Provides
-    @Singleton
-    fun provideJson(): Json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-        explicitNulls = false
-        isLenient = true
+    single {
+        Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+            explicitNulls = false
+            isLenient = true
+        }
     }
 
-    @Provides
-    @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+    single {
         HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
             else HttpLoggingInterceptor.Level.NONE
             redactHeader("Authorization")
             redactHeader("Cookie")
         }
+    }
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
-        logging: HttpLoggingInterceptor,
-    ): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(logging)
-        .authenticator(tokenAuthenticator)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
+    singleOf(::AuthInterceptor)
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(
-        @BaseUrl baseUrl: String,
-        okHttpClient: OkHttpClient,
-        json: Json,
-    ): Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .client(okHttpClient)
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .build()
+    // AuthApi is resolved lazily to break the OkHttp ⇄ Retrofit ⇄ AuthApi cycle.
+    single { TokenAuthenticator(get()) { get<AuthApi>() } }
 
-    @Provides @Singleton fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create()
-    @Provides @Singleton fun provideUserApi(retrofit: Retrofit): UserApi = retrofit.create()
-    @Provides @Singleton fun provideCategoryApi(retrofit: Retrofit): CategoryApi = retrofit.create()
-    @Provides @Singleton fun provideListingApi(retrofit: Retrofit): ListingApi = retrofit.create()
-    @Provides @Singleton fun provideClaimApi(retrofit: Retrofit): ClaimApi = retrofit.create()
-    @Provides @Singleton fun provideChatApi(retrofit: Retrofit): ChatApi = retrofit.create()
-    @Provides @Singleton fun provideSafetyApi(retrofit: Retrofit): SafetyApi = retrofit.create()
-    @Provides @Singleton fun provideNotificationApi(retrofit: Retrofit): NotificationApi = retrofit.create()
+    single {
+        OkHttpClient.Builder()
+            .addInterceptor(get<AuthInterceptor>())
+            .addInterceptor(get<HttpLoggingInterceptor>())
+            .authenticator(get<TokenAuthenticator>())
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    single {
+        Retrofit.Builder()
+            .baseUrl(get<NetworkConfig>().baseUrl)
+            .client(get())
+            .addConverterFactory(get<Json>().asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    single<AuthApi> { get<Retrofit>().create() }
+    single<UserApi> { get<Retrofit>().create() }
+    single<CategoryApi> { get<Retrofit>().create() }
+    single<ListingApi> { get<Retrofit>().create() }
+    single<ClaimApi> { get<Retrofit>().create() }
+    single<ChatApi> { get<Retrofit>().create() }
+    single<SafetyApi> { get<Retrofit>().create() }
+    single<NotificationApi> { get<Retrofit>().create() }
+
+    single { ChatSocket(get(), get(), get(), get<NetworkConfig>().wsUrl) }
 }

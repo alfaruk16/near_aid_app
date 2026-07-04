@@ -33,7 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CategoryIconBox
 import com.nearaid.core.designsystem.component.CollectEffect
@@ -57,7 +57,7 @@ fun ActivityScreen(
     onListingClick: (id: String) -> Unit,
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ActivityViewModel = hiltViewModel(),
+    viewModel: ActivityViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

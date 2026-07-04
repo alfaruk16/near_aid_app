@@ -38,10 +38,6 @@ gradlePlugin {
             id = "nearaid.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
-        register("androidHilt") {
-            id = "nearaid.android.hilt"
-            implementationClass = "AndroidHiltConventionPlugin"
-        }
         register("androidRoom") {
             id = "nearaid.android.room"
             implementationClass = "AndroidRoomConventionPlugin"

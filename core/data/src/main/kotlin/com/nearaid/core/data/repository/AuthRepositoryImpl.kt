@@ -1,7 +1,5 @@
 package com.nearaid.core.data.repository
 
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.datastore.AuthPreferencesDataSource
 import com.nearaid.core.model.AuthSession
@@ -15,14 +13,11 @@ import com.nearaid.core.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AuthRepositoryImpl @Inject constructor(
+class AuthRepositoryImpl(
     private val authApi: AuthApi,
     private val authPrefs: AuthPreferencesDataSource,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : AuthRepository {
 
     override val isLoggedIn: Flow<Boolean> = authPrefs.isLoggedIn

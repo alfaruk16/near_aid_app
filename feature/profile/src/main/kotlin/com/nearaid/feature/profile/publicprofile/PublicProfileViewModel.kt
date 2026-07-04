@@ -5,12 +5,9 @@ import com.nearaid.core.common.mvi.MviViewModel
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.domain.usecase.GetPublicUserUseCase
 import com.nearaid.core.domain.usecase.GetUserRatingsUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PublicProfileViewModel @Inject constructor(
+class PublicProfileViewModel(
     private val getPublicUser: GetPublicUserUseCase,
     private val getUserRatings: GetUserRatingsUseCase,
 ) : MviViewModel<PublicProfileState, PublicProfileIntent, PublicProfileEffect>() {

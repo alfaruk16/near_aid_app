@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.nearaid.android.library)
-    alias(libs.plugins.nearaid.android.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 
@@ -23,4 +22,5 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.koin.core)
 }

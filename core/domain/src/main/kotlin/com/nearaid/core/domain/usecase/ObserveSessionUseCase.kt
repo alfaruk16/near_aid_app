@@ -5,7 +5,6 @@ import com.nearaid.core.domain.repository.AuthRepository
 import com.nearaid.core.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import javax.inject.Inject
 
 /** High-level auth/session state that drives the root navigation graph. */
 sealed interface SessionState {
@@ -16,7 +15,7 @@ sealed interface SessionState {
     data object Loading : SessionState
 }
 
-class ObserveSessionUseCase @Inject constructor(
+class ObserveSessionUseCase(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
 ) {

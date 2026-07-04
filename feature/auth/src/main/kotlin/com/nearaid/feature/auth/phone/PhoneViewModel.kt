@@ -5,12 +5,9 @@ import com.nearaid.core.common.mvi.MviViewModel
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.domain.usecase.PhoneNumber
 import com.nearaid.core.domain.usecase.RequestOtpUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PhoneViewModel @Inject constructor(
+class PhoneViewModel(
     private val requestOtp: RequestOtpUseCase,
 ) : MviViewModel<PhoneState, PhoneIntent, PhoneEffect>() {
 

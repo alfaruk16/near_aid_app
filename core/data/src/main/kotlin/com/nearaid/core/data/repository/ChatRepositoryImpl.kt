@@ -14,21 +14,16 @@ import com.nearaid.core.model.Conversation
 import com.nearaid.core.model.Page
 import com.nearaid.core.domain.repository.ChatRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ChatRepositoryImpl @Inject constructor(
+class ChatRepositoryImpl(
     private val chatApi: ChatApi,
     private val claimApi: ClaimApi,
     private val chatSocket: ChatSocket,
     private val cacheDao: ConversationCacheDao,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ChatRepository {
 
     override suspend fun getConversations(cursor: String?): DataResult<Page<Conversation>> =

@@ -15,9 +15,8 @@ splashscreen = "1.0.1"
 composeBom = "2024.12.01"
 navigationCompose = "2.8.5"
 
-# Hilt
-hilt = "2.52"
-hiltNavigationCompose = "1.2.0"
+# DI
+koin = "4.0.3"
 
 # Networking
 retrofit = "2.11.0"
@@ -68,10 +67,10 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
-# Hilt
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+# DI (Koin)
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 
 # Networking
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -120,7 +119,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 # Convention plugins (defined in build-logic)
 nearaid-android-application = { id = "nearaid.android.application" }
@@ -128,7 +126,6 @@ nearaid-android-application-compose = { id = "nearaid.android.application.compos
 nearaid-android-library = { id = "nearaid.android.library" }
 nearaid-android-library-compose = { id = "nearaid.android.library.compose" }
 nearaid-android-feature = { id = "nearaid.android.feature" }
-nearaid-android-hilt = { id = "nearaid.android.hilt" }
 nearaid-android-room = { id = "nearaid.android.room" }
 nearaid-jvm-library = { id = "nearaid.jvm.library" }
 nearaid-kmp-library = { id = "nearaid.kmp.library" }

@@ -8,12 +8,9 @@ import com.nearaid.core.domain.usecase.ClaimListingUseCase
 import com.nearaid.core.domain.usecase.GetListingUseCase
 import com.nearaid.core.domain.usecase.ReportUseCase
 import com.nearaid.core.model.ReportTargetType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ListingDetailViewModel @Inject constructor(
+class ListingDetailViewModel(
     private val getListing: GetListingUseCase,
     private val claimListing: ClaimListingUseCase,
     private val report: ReportUseCase,

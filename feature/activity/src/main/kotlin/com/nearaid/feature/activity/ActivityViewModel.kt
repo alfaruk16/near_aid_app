@@ -10,13 +10,10 @@ import com.nearaid.core.domain.usecase.MarkDeliveredUseCase
 import com.nearaid.core.domain.usecase.WithdrawClaimUseCase
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ActivityViewModel @Inject constructor(
+class ActivityViewModel(
     private val getMyClaims: GetMyClaimsUseCase,
     private val getMyListings: GetMyListingsUseCase,
     private val markDelivered: MarkDeliveredUseCase,

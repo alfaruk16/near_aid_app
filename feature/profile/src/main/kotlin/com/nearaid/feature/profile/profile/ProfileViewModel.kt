@@ -5,12 +5,9 @@ import com.nearaid.core.common.mvi.MviViewModel
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.domain.usecase.ObserveCurrentUserUseCase
 import com.nearaid.core.domain.usecase.RefreshCurrentUserUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProfileViewModel @Inject constructor(
+class ProfileViewModel(
     private val observeCurrentUser: ObserveCurrentUserUseCase,
     private val refreshCurrentUser: RefreshCurrentUserUseCase,
 ) : MviViewModel<ProfileState, ProfileIntent, ProfileEffect>() {

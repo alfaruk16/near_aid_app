@@ -8,14 +8,11 @@ import com.nearaid.core.domain.usecase.ObserveCategoriesUseCase
 import com.nearaid.core.domain.usecase.RefreshCategoriesUseCase
 import com.nearaid.core.model.ListingType
 import com.nearaid.core.model.NewListing
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CreateListingViewModel @Inject constructor(
+class CreateListingViewModel(
     private val observeCategories: ObserveCategoriesUseCase,
     private val refreshCategories: RefreshCategoriesUseCase,
     private val createListing: CreateListingUseCase,

@@ -10,22 +10,20 @@ import com.nearaid.MainActivity
 import com.nearaid.NearAidApplication
 import com.nearaid.R
 import com.nearaid.core.domain.usecase.RegisterDeviceUseCase
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 /**
  * Receives FCM pushes (§11) — nearby requests/offers, claims, chat messages, ratings,
  * moderation — and registers the device token with the backend (POST /me/devices).
  */
-@AndroidEntryPoint
 class NearAidMessagingService : FirebaseMessagingService() {
 
-    @Inject lateinit var registerDevice: RegisterDeviceUseCase
+    private val registerDevice: RegisterDeviceUseCase by inject()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

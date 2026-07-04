@@ -8,13 +8,10 @@ import com.nearaid.core.domain.usecase.MarkThreadReadUseCase
 import com.nearaid.core.domain.usecase.ObserveCurrentUserUseCase
 import com.nearaid.core.domain.usecase.ObserveThreadUseCase
 import com.nearaid.core.domain.usecase.SendMessageUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChatViewModel @Inject constructor(
+class ChatViewModel constructor(
     private val getMessages: GetMessagesUseCase,
     private val sendMessage: SendMessageUseCase,
     private val markThreadRead: MarkThreadReadUseCase,

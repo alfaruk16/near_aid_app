@@ -33,7 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.feature.discovery.R
 import com.nearaid.core.common.util.TimeFormat
@@ -48,7 +48,7 @@ import com.nearaid.core.model.NotificationItem
 fun NotificationsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: NotificationsViewModel = hiltViewModel(),
+    viewModel: NotificationsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

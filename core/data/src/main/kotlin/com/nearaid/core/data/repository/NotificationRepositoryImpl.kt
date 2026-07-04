@@ -6,17 +6,12 @@ import com.nearaid.core.data.mapper.toDomain
 import com.nearaid.core.model.NotificationItem
 import com.nearaid.core.domain.repository.NotificationRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class NotificationRepositoryImpl @Inject constructor(
+class NotificationRepositoryImpl(
     private val notificationApi: NotificationApi,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : NotificationRepository {
 
     override suspend fun getNotifications(): DataResult<List<NotificationItem>> =

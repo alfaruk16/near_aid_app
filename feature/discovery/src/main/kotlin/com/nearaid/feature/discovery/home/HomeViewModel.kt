@@ -8,17 +8,14 @@ import com.nearaid.core.domain.usecase.ObserveCategoriesUseCase
 import com.nearaid.core.domain.usecase.ObserveSearchRadiusUseCase
 import com.nearaid.core.domain.usecase.RefreshCategoriesUseCase
 import com.nearaid.core.model.DiscoveryQuery
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 // TODO: Wire fused location provider when GPS is enabled in v2.
 private const val DHAKA_LAT = 23.8103
 private const val DHAKA_LNG = 90.4125
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val getNearbyListings: GetNearbyListingsUseCase,
     private val observeCategories: ObserveCategoriesUseCase,
     private val refreshCategories: RefreshCategoriesUseCase,

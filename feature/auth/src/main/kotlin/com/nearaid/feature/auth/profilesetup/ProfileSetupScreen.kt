@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
@@ -29,7 +29,7 @@ import com.nearaid.feature.auth.R
 fun ProfileSetupScreen(
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProfileSetupViewModel = hiltViewModel(),
+    viewModel: ProfileSetupViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

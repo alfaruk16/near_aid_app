@@ -5,7 +5,7 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.project
 
 /**
- * Convention for a feature module: an Android library + Compose + Hilt, with the standard
+ * Convention for a feature module: an Android library + Compose + Koin, with the standard
  * navigation / lifecycle deps and the core modules every feature needs already wired.
  */
 class AndroidFeatureConventionPlugin : Plugin<Project> {
@@ -14,7 +14,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("nearaid.android.library")
                 apply("nearaid.android.library.compose")
-                apply("nearaid.android.hilt")
             }
 
             dependencies {
@@ -27,7 +26,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("androidx-core-ktx").get())
                 add("implementation", libs.findLibrary("androidx-lifecycle-runtime-ktx").get())
                 add("implementation", libs.findLibrary("androidx-navigation-compose").get())
-                add("implementation", libs.findLibrary("androidx-hilt-navigation-compose").get())
+                add("implementation", libs.findLibrary("koin-androidx-compose").get())
                 add("implementation", libs.findLibrary("kotlinx-serialization-json").get())
                 add("implementation", libs.findLibrary("coil-compose").get())
             }

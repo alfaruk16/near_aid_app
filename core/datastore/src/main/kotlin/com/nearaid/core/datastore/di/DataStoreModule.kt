@@ -1,26 +1,21 @@
 package com.nearaid.core.datastore.di
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import com.nearaid.core.datastore.AuthPreferencesDataSource
+import com.nearaid.core.datastore.UserPreferencesDataSource
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DataStoreModule {
-
-    @Provides
-    @Singleton
-    fun providePreferencesDataStore(
-        @ApplicationContext context: Context,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create {
-        context.preferencesDataStoreFile("nearaid_prefs")
+val dataStoreModule = module {
+    single<DataStore<Preferences>> {
+        PreferenceDataStoreFactory.create {
+            androidContext().preferencesDataStoreFile("nearaid_prefs")
+        }
     }
+    singleOf(::AuthPreferencesDataSource)
+    singleOf(::UserPreferencesDataSource)
 }

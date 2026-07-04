@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -20,12 +19,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.feature.auth.SplashScreen
 import com.nearaid.navigation.NearAidNavHost
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.compose.KoinAndroidContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
@@ -34,12 +33,14 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { viewModel.isLoggedIn.value == null }
         enableEdgeToEdge()
         setContent {
-            NearAidTheme {
-                NotificationPermissionRequester()
-                val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
-                when (val loggedIn = isLoggedIn) {
-                    null -> SplashScreen(modifier = Modifier.fillMaxSize().background(NearAidTheme.colors.paper))
-                    else -> NearAidNavHost(startLoggedIn = loggedIn)
+            KoinAndroidContext {
+                NearAidTheme {
+                    NotificationPermissionRequester()
+                    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+                    when (val loggedIn = isLoggedIn) {
+                        null -> SplashScreen(modifier = Modifier.fillMaxSize().background(NearAidTheme.colors.paper))
+                        else -> NearAidNavHost(startLoggedIn = loggedIn)
+                    }
                 }
             }
         }

@@ -6,20 +6,15 @@ import com.nearaid.core.data.mapper.toDomain
 import com.nearaid.core.model.Category
 import com.nearaid.core.domain.repository.CategoryRepository
 import com.nearaid.core.common.result.DataResult
-import com.nearaid.core.common.dispatcher.Dispatcher
-import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class CategoryRepositoryImpl @Inject constructor(
+class CategoryRepositoryImpl(
     private val categoryApi: CategoryApi,
-    @Dispatcher(NearAidDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : CategoryRepository {
 
     private val categories = MutableStateFlow<List<Category>>(emptyList())

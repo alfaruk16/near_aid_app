@@ -5,12 +5,9 @@ import com.nearaid.core.common.mvi.MviViewModel
 import com.nearaid.core.common.result.DataResult
 import com.nearaid.core.domain.usecase.GetNotificationsUseCase
 import com.nearaid.core.domain.usecase.MarkNotificationsReadUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class NotificationsViewModel @Inject constructor(
+class NotificationsViewModel(
     private val getNotifications: GetNotificationsUseCase,
     private val markNotificationsRead: MarkNotificationsReadUseCase,
 ) : MviViewModel<NotificationsState, NotificationsIntent, NotificationsEffect>() {

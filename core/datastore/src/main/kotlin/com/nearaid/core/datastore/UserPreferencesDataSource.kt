@@ -8,12 +8,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nearaid.core.model.AppLanguage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Non-auth user preferences: language (§NFR localization) and search radius (FR-10). */
-@Singleton
-class UserPreferencesDataSource @Inject constructor(
+class UserPreferencesDataSource(
     private val dataStore: DataStore<Preferences>,
 ) {
     private object Keys {
