@@ -35,6 +35,12 @@ google-services.json
 .idea/
 !.idea/icon.png
 
+# ─────────────────────── Xcode / iOS (KMM) ────────────────
+xcuserdata/
+*.xcuserstate
+DerivedData/
+iosApp/build/
+
 # ─────────────────────────── OS ───────────────────────────
 .DS_Store
 Thumbs.db

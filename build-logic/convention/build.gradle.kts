@@ -50,5 +50,9 @@ gradlePlugin {
             id = "nearaid.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("kmpLibrary") {
+            id = "nearaid.kmp.library"
+            implementationClass = "KmpLibraryConventionPlugin"
+        }
     }
 }
