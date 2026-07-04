@@ -8,6 +8,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
@@ -29,7 +31,11 @@ fun NearAidTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         placeholder = placeholder?.let { { Text(it, color = NearAidTheme.colors.ink3) } },
-        modifier = modifier,
+        modifier = if (isError && supportingText != null) {
+            modifier.semantics { error(supportingText) }
+        } else {
+            modifier
+        },
         singleLine = singleLine,
         minLines = minLines,
         isError = isError,

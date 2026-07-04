@@ -11,18 +11,24 @@ import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 /**
  * Accessibility guardrails for the shared interactive components. These assert the
  * semantics that screen readers (TalkBack) rely on — role, selected state, and the
  * 48dp minimum touch target — so a11y regressions fail the test suite.
+ *
+ * Runs on the JVM via Robolectric (no emulator needed).
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [34])
 class AccessibilityTest {
 
     @get:Rule

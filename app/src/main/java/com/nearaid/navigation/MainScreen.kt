@@ -3,6 +3,7 @@ package com.nearaid.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,7 +115,13 @@ private fun NearAidBottomBar(
                             .size(54.dp)
                             .clip(RoundedCornerShape(18.dp))
                             .background(Brush.linearGradient(listOf(NearAidTheme.colors.marigold, NearAidTheme.colors.marigoldDeep)))
-                            .noRippleClickable(onPost),
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                role = Role.Button,
+                                onClickLabel = "Create a post",
+                                onClick = onPost,
+                            ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = "Post", tint = NearAidTheme.colors.surface, modifier = Modifier.size(26.dp))
@@ -136,17 +144,18 @@ private fun BottomItem(
     val selected = isSelected(tab)
     val color = if (selected) NearAidTheme.colors.marigoldDeep else NearAidTheme.colors.ink3
     Column(
-        modifier = modifier.noRippleClickable { onTabSelected(tab) },
+        modifier = modifier.selectable(
+            selected = selected,
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            role = Role.Tab,
+            onClick = { onTabSelected(tab) },
+        ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(3.dp),
     ) {
-        Icon(tab.icon, contentDescription = tab.label, tint = color, modifier = Modifier.size(22.dp))
+        // Decorative: the tab's text label below conveys the name, and the row merges.
+        Icon(tab.icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
         Text(tab.label, color = color, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
     }
-}
-
-@Composable
-private fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier {
-    val interactionSource = remember { MutableInteractionSource() }
-    return this.clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
 }

@@ -87,7 +87,10 @@ fun NearAidTheme(
     val nearAidColors = if (darkTheme) DarkNearAidColors else LightNearAidColors
     val colorScheme = if (darkTheme) NearAidDarkColorScheme else NearAidLightColorScheme
 
-    CompositionLocalProvider(LocalNearAidColors provides nearAidColors) {
+    CompositionLocalProvider(
+        LocalNearAidColors provides nearAidColors,
+        LocalIsDarkTheme provides darkTheme,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = NearAidTypography,

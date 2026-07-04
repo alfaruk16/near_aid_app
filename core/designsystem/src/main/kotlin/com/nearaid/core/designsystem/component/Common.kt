@@ -2,13 +2,13 @@ package com.nearaid.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,7 +43,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.labelSmall,
         color = NearAidTheme.colors.ink3,
         letterSpacing = 1.2.sp,
-        modifier = modifier.padding(vertical = 6.dp),
+        modifier = modifier.padding(vertical = 6.dp).headingSemantics(),
     )
 }
 
@@ -59,7 +59,7 @@ fun NearAidChip(
     val fg = if (selected) NearAidTheme.colors.surface else NearAidTheme.colors.ink2
     Box(
         modifier = modifier
-            .minimumInteractiveComponentSize()
+            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
             .clip(RoundedCornerShape(999.dp))
             .background(bg)
             .border(1.dp, if (selected) NearAidTheme.colors.ink else NearAidTheme.colors.line, RoundedCornerShape(999.dp))
@@ -128,7 +128,7 @@ fun NearAidTopBar(
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).headingSemantics(),
         )
         actions()
     }
@@ -144,7 +144,11 @@ fun EmptyState(
     onAction: (() -> Unit)? = null,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(30.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(30.dp)
+            .semantics(mergeDescendants = true) {}
+            .politeLiveRegion(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -193,7 +197,7 @@ fun NearAidSegmentedTabs(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .minimumInteractiveComponentSize()
+                    .defaultMinSize(minHeight = 48.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(if (active) NearAidTheme.colors.surface else Color.Transparent)
                     .selectable(selected = active, onClick = { onSelect(index) }, role = Role.Tab)
@@ -225,7 +229,7 @@ fun TextChooserRow(
             .clip(RoundedCornerShape(18.dp))
             .border(1.5.dp, if (highlighted) NearAidTheme.colors.teal else NearAidTheme.colors.line, RoundedCornerShape(18.dp))
             .background(if (highlighted) NearAidTheme.colors.tealSoft else NearAidTheme.colors.surface)
-            .clickable(onClick = onClick)
+            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(13.dp),

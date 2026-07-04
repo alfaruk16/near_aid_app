@@ -20,6 +20,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.NearAidTopBar
+import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
@@ -43,7 +44,7 @@ fun PhoneScreen(
             modifier = Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("What's your number?", style = MaterialTheme.typography.headlineMedium)
+            Text("What's your number?", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.headingSemantics())
             Text(
                 "We'll text a 6-digit code to verify it. Your number stays private.",
                 style = MaterialTheme.typography.bodyMedium,

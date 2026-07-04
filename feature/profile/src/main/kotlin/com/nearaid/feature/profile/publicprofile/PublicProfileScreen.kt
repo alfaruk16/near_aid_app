@@ -34,6 +34,8 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.SectionLabel
 import com.nearaid.core.designsystem.component.VerifiedBadge
+import com.nearaid.core.designsystem.component.headingSemantics
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Rating
 
@@ -61,7 +63,10 @@ fun PublicProfileScreen(
 
         if (state.loading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = NearAidTheme.colors.teal)
+                CircularProgressIndicator(
+                    color = NearAidTheme.colors.teal,
+                    modifier = Modifier.statusSemantics("Loading"),
+                )
             }
             return@Column
         }
@@ -114,6 +119,7 @@ fun PublicProfileScreen(
                             style = MaterialTheme.typography.headlineSmall,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
+                            modifier = Modifier.headingSemantics(),
                         )
                         if (user.isIdVerified) {
                             VerifiedBadge(tint = Color.White, size = 20)

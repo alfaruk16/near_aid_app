@@ -1,8 +1,11 @@
 package com.nearaid.core.designsystem.theme
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.nearaid.core.model.Urgency
 
 // ---- Brand palette — LIGHT (mirrors the :root design tokens in the UI spec) ----
 val Ink = Color(0xFF22202B)
@@ -143,12 +146,21 @@ val LocalNearAidColors = staticCompositionLocalOf { LightNearAidColors }
 data class CategoryAccent(val container: Color, val content: Color)
 
 object CategoryColors {
+    // Light: pale container + saturated content.
     val Food = CategoryAccent(MarigoldTint, MarigoldDeep)
     val Clothes = CategoryAccent(BlueTint, BlueAccent)
     val Medicine = CategoryAccent(RustTint, Rust)
     val Goods = CategoryAccent(TealTint, Teal)
     val Shelter = CategoryAccent(Color(0xFFEAE4F3), Color(0xFF6A4DA3))
     val Other = CategoryAccent(Color(0xFFEEEEEE), Color(0xFF777777))
+
+    // Dark: muted deep container + bright content (each pair ≥4.5:1).
+    val FoodDark = CategoryAccent(Color(0xFF3A2E1A), Color(0xFFF4B457))
+    val ClothesDark = CategoryAccent(Color(0xFF1E2A38), Color(0xFF7FA8D4))
+    val MedicineDark = CategoryAccent(Color(0xFF3A241C), Color(0xFFE0805F))
+    val GoodsDark = CategoryAccent(Color(0xFF16302B), Color(0xFF5FC0AC))
+    val ShelterDark = CategoryAccent(Color(0xFF241E33), Color(0xFFB9A5E0))
+    val OtherDark = CategoryAccent(Color(0xFF2A2833), Color(0xFFA8A2B0))
 
     fun forKey(key: String?): CategoryAccent = when (key) {
         "food" -> Food
@@ -158,9 +170,20 @@ object CategoryColors {
         "shelter" -> Shelter
         else -> Other
     }
+
+    fun forKeyDark(key: String?): CategoryAccent = when (key) {
+        "food" -> FoodDark
+        "clothes" -> ClothesDark
+        "medicine" -> MedicineDark
+        "goods" -> GoodsDark
+        "shelter" -> ShelterDark
+        else -> OtherDark
+    }
 }
 
 // ---- Urgency tags (.t-* in the spec) ----
+data class UrgencyAccent(val container: Color, val content: Color)
+
 object UrgencyColors {
     val LowContainer = Color(0xFFEAEFEA)
     val LowContent = Color(0xFF5C7A5C)
@@ -170,4 +193,43 @@ object UrgencyColors {
     val HighContent = Color(0xFFB8651F)
     val CriticalContainer = RustTint
     val CriticalContent = Rust
+
+    val Low = UrgencyAccent(LowContainer, LowContent)
+    val Medium = UrgencyAccent(MediumContainer, MediumContent)
+    val High = UrgencyAccent(HighContainer, HighContent)
+    val Critical = UrgencyAccent(CriticalContainer, CriticalContent)
+
+    // Dark variants (container deep-muted, content bright, ≥4.5:1).
+    val LowDark = UrgencyAccent(Color(0xFF1C2A1C), Color(0xFF8FBF8F))
+    val MediumDark = UrgencyAccent(Color(0xFF3A2E1A), Color(0xFFF4B457))
+    val HighDark = UrgencyAccent(Color(0xFF3A2A1A), Color(0xFFE8A055))
+    val CriticalDark = UrgencyAccent(Color(0xFF3A241C), Color(0xFFE0805F))
+}
+
+/** True when the dark theme is active; used to pick dark accent variants. */
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
+
+/** Category accent for the current theme (light or dark). */
+@Composable
+@ReadOnlyComposable
+fun categoryAccentFor(key: String?): CategoryAccent =
+    if (LocalIsDarkTheme.current) CategoryColors.forKeyDark(key) else CategoryColors.forKey(key)
+
+/** Urgency accent for the current theme (light or dark). */
+@Composable
+@ReadOnlyComposable
+fun urgencyAccentFor(urgency: Urgency): UrgencyAccent = if (LocalIsDarkTheme.current) {
+    when (urgency) {
+        Urgency.LOW -> UrgencyColors.LowDark
+        Urgency.MEDIUM -> UrgencyColors.MediumDark
+        Urgency.HIGH -> UrgencyColors.HighDark
+        Urgency.CRITICAL -> UrgencyColors.CriticalDark
+    }
+} else {
+    when (urgency) {
+        Urgency.LOW -> UrgencyColors.Low
+        Urgency.MEDIUM -> UrgencyColors.Medium
+        Urgency.HIGH -> UrgencyColors.High
+        Urgency.CRITICAL -> UrgencyColors.Critical
+    }
 }

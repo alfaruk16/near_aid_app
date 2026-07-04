@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidButton
+import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
@@ -46,6 +47,7 @@ fun WelcomeScreen(
                 "Real help, right around you",
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.headingSemantics(),
             )
             Text(
                 "Post what you need or browse nearby requests. When you match, you coordinate the handoff safely in-app.",

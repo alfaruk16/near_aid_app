@@ -54,13 +54,14 @@ private fun trimDouble(value: Double): String =
 
 @Composable
 fun UrgencyTag(urgency: Urgency, modifier: Modifier = Modifier) {
-    val (container, content, label) = when (urgency) {
-        Urgency.LOW -> Triple(com.nearaid.core.designsystem.theme.UrgencyColors.LowContainer, com.nearaid.core.designsystem.theme.UrgencyColors.LowContent, "Low")
-        Urgency.MEDIUM -> Triple(com.nearaid.core.designsystem.theme.UrgencyColors.MediumContainer, com.nearaid.core.designsystem.theme.UrgencyColors.MediumContent, "Medium")
-        Urgency.HIGH -> Triple(com.nearaid.core.designsystem.theme.UrgencyColors.HighContainer, com.nearaid.core.designsystem.theme.UrgencyColors.HighContent, "High")
-        Urgency.CRITICAL -> Triple(com.nearaid.core.designsystem.theme.UrgencyColors.CriticalContainer, com.nearaid.core.designsystem.theme.UrgencyColors.CriticalContent, "Critical")
+    val accent = com.nearaid.core.designsystem.theme.urgencyAccentFor(urgency)
+    val label = when (urgency) {
+        Urgency.LOW -> "Low"
+        Urgency.MEDIUM -> "Medium"
+        Urgency.HIGH -> "High"
+        Urgency.CRITICAL -> "Critical"
     }
-    TagChip(label = label, container = container, content = content, modifier = modifier)
+    TagChip(label = label, container = accent.container, content = accent.content, modifier = modifier)
 }
 
 @Composable

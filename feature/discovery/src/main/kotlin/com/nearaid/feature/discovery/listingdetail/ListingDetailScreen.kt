@@ -1,7 +1,6 @@
 package com.nearaid.feature.discovery.listingdetail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +42,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.Avatar
+import com.nearaid.core.designsystem.component.accessibleClickable
+import com.nearaid.core.designsystem.component.headingSemantics
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.component.CategoryIconBox
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
@@ -104,7 +106,10 @@ fun ListingDetailScreen(
             when {
                 state.loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+                        CircularProgressIndicator(
+                            color = NearAidTheme.colors.marigold,
+                            modifier = Modifier.statusSemantics("Loading"),
+                        )
                     }
                 }
 
@@ -168,6 +173,7 @@ fun ListingDetailScreen(
                         Text(
                             text = listing.title,
                             style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.headingSemantics(),
                         )
 
                         Spacer(Modifier.height(10.dp))
@@ -216,7 +222,7 @@ fun ListingDetailScreen(
                                 .fillMaxWidth()
                                 .clip(MaterialTheme.shapes.medium)
                                 .background(NearAidTheme.colors.surface)
-                                .clickable { viewModel.onIntent(ListingDetailIntent.AuthorClicked) }
+                                .accessibleClickable(onClickLabel = "View profile") { viewModel.onIntent(ListingDetailIntent.AuthorClicked) }
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -297,7 +303,7 @@ fun ListingDetailScreen(
                 Text(
                     "Report listing",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = Modifier.padding(bottom = 8.dp).headingSemantics(),
                 )
                 Column(Modifier.selectableGroup()) {
                     REPORT_REASONS.forEach { reason ->
@@ -333,6 +339,13 @@ fun ListingDetailScreen(
                 NearAidButton(
                     text = "Block this user",
                     onClick = { viewModel.onIntent(ListingDetailIntent.BlockAuthor) },
+                    variant = NearAidButtonVariant.Ghost,
+                    enabled = !state.submittingReport,
+                )
+                Spacer(Modifier.height(8.dp))
+                NearAidButton(
+                    text = "Cancel",
+                    onClick = { viewModel.onIntent(ListingDetailIntent.DismissReportSheet) },
                     variant = NearAidButtonVariant.Ghost,
                     enabled = !state.submittingReport,
                 )

@@ -17,6 +17,7 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.NearAidTopBar
+import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.domain.usecase.PhoneNumber
 
@@ -43,7 +44,7 @@ fun OtpScreen(
             modifier = Modifier.padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Enter the code", style = MaterialTheme.typography.headlineMedium)
+            Text("Enter the code", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.headingSemantics())
             Text(
                 "Sent to ${PhoneNumber.formatForDisplay(phoneE164)}",
                 style = MaterialTheme.typography.bodyMedium,

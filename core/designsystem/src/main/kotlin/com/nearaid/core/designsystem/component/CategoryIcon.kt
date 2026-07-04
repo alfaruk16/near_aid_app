@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.nearaid.core.designsystem.theme.CategoryColors
+import com.nearaid.core.designsystem.theme.categoryAccentFor
 
 fun categoryIcon(key: String?): ImageVector = when (key) {
     "food" -> Icons.Filled.Restaurant
@@ -36,7 +36,7 @@ fun CategoryIconBox(
     boxSize: Int = 46,
     cornerRadius: Int = 13,
 ) {
-    val accent = CategoryColors.forKey(categoryKey)
+    val accent = categoryAccentFor(categoryKey)
     Box(
         modifier = modifier
             .size(boxSize.dp)

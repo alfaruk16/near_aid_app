@@ -1,7 +1,6 @@
 package com.nearaid.feature.messages.conversations
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,8 @@ import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.VerifiedBadge
+import com.nearaid.core.designsystem.component.accessibleClickable
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Conversation
 
@@ -60,7 +63,10 @@ fun MessagesScreen(
         when {
             state.loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+                    CircularProgressIndicator(
+                        modifier = Modifier.statusSemantics("Loading"),
+                        color = NearAidTheme.colors.marigold,
+                    )
                 }
             }
 
@@ -114,7 +120,8 @@ private fun ConversationRow(
         modifier = modifier
             .fillMaxWidth()
             .background(rowBg)
-            .clickable(onClick = onClick)
+            .accessibleClickable(onClickLabel = "Open conversation", onClick = onClick)
+            .semantics { stateDescription = if (isUnread) "Unread" else "Read" }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

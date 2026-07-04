@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nearaid.core.designsystem.component.NearAidTopBar
 import com.nearaid.core.designsystem.component.TextChooserRow
+import com.nearaid.core.designsystem.component.headingSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 /**
@@ -36,6 +37,7 @@ fun PostChooserScreen(
             Text(
                 text = "What would you like to post?",
                 style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.headingSemantics(),
             )
             Text(
                 text = "Ask for a hand, or share what you can spare.",

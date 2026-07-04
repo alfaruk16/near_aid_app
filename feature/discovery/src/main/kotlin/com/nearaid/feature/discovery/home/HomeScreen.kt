@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +36,7 @@ import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidSegmentedTabs
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
@@ -60,7 +62,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 10.dp)
-                .semantics(mergeDescendants = true) {},
+                .semantics(mergeDescendants = true) { heading() },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -126,7 +128,10 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+                    CircularProgressIndicator(
+                        color = NearAidTheme.colors.marigold,
+                        modifier = Modifier.statusSemantics("Loading"),
+                    )
                 }
             }
 

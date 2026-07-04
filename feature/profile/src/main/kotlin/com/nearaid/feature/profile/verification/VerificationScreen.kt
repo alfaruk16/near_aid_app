@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.NearAidButton
 import com.nearaid.core.designsystem.component.NearAidTopBar
+import com.nearaid.core.designsystem.component.accessibleClickable
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import java.io.File
 
@@ -194,7 +194,7 @@ private fun UploadRow(
                 color = if (isUploaded) NearAidTheme.colors.teal else NearAidTheme.colors.line,
                 shape = RoundedCornerShape(14.dp),
             )
-            .clickable(onClick = onClick)
+            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 20.dp),
     ) {
         Row(

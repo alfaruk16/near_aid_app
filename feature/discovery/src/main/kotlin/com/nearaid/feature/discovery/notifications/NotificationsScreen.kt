@@ -38,6 +38,7 @@ import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.NearAidTopBar
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.NotificationItem
 
@@ -68,7 +69,10 @@ fun NotificationsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+                    CircularProgressIndicator(
+                        color = NearAidTheme.colors.marigold,
+                        modifier = Modifier.statusSemantics("Loading"),
+                    )
                 }
             }
 

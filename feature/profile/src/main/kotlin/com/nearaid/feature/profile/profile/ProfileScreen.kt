@@ -1,7 +1,6 @@
 package com.nearaid.feature.profile.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.VerifiedBadge
+import com.nearaid.core.designsystem.component.accessibleClickable
+import com.nearaid.core.designsystem.component.headingSemantics
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
 @Composable
@@ -62,7 +64,10 @@ fun ProfileScreen(
 
     if (state.loading && state.me == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+            CircularProgressIndicator(
+                color = NearAidTheme.colors.marigold,
+                modifier = Modifier.statusSemantics("Loading"),
+            )
         }
         return
     }
@@ -104,6 +109,7 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
+                        modifier = Modifier.headingSemantics(),
                     )
                     if (me.isIdVerified) {
                         VerifiedBadge(tint = Color.White, size = 20)
@@ -224,7 +230,7 @@ private fun ProfileMenuItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .accessibleClickable(onClickLabel = "Open", onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

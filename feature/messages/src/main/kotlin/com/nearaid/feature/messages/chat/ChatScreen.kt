@@ -36,6 +36,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.common.util.TimeFormat
 import com.nearaid.core.designsystem.component.Avatar
 import com.nearaid.core.designsystem.component.CollectEffect
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.ChatMessage
 
@@ -96,7 +99,10 @@ fun ChatScreen(
             when {
                 state.loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = NearAidTheme.colors.marigold)
+                        CircularProgressIndicator(
+                            modifier = Modifier.statusSemantics("Loading"),
+                            color = NearAidTheme.colors.marigold,
+                        )
                     }
                 }
                 else -> {
@@ -213,8 +219,17 @@ private fun ChatBubble(
         RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
     }
 
+    val spokenSender = if (isOutgoing) "You sent" else "Received"
+    val spokenMessage = buildString {
+        append(spokenSender)
+        message.body?.takeIf { it.isNotBlank() }?.let { append(": $it") }
+        append(", ${TimeFormat.timeOfDay(message.createdAt)}")
+    }
+
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = spokenMessage },
         horizontalAlignment = alignment,
     ) {
         Box(

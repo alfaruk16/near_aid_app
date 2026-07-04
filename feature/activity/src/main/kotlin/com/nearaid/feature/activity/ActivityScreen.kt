@@ -2,7 +2,6 @@ package com.nearaid.feature.activity
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +36,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nearaid.core.designsystem.component.CategoryIconBox
 import com.nearaid.core.designsystem.component.CollectEffect
+import com.nearaid.core.designsystem.component.accessibleClickable
+import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
 import com.nearaid.core.designsystem.component.NearAidButton
@@ -122,7 +123,10 @@ private fun HelpingTab(
     when {
         state.claimsLoading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = NearAidTheme.colors.teal)
+                CircularProgressIndicator(
+                    color = NearAidTheme.colors.teal,
+                    modifier = Modifier.statusSemantics("Loading"),
+                )
             }
         }
         state.claimsError != null -> {
@@ -176,7 +180,7 @@ private fun ClaimRow(
             .clip(MaterialTheme.shapes.large)
             .background(NearAidTheme.colors.surface)
             .border(1.dp, NearAidTheme.colors.line, MaterialTheme.shapes.large)
-            .clickable { onOpenChat(claim.id, claim.chatThreadId ?: "", "") }
+            .accessibleClickable(onClickLabel = "Open chat") { onOpenChat(claim.id, claim.chatThreadId ?: "", "") }
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -205,7 +209,7 @@ private fun ClaimRow(
 
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
-                contentDescription = "Open chat",
+                contentDescription = null,
                 tint = NearAidTheme.colors.ink3,
                 modifier = Modifier.size(20.dp),
             )
@@ -255,7 +259,10 @@ private fun MyPostsTab(
     when {
         state.listingsLoading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = NearAidTheme.colors.teal)
+                CircularProgressIndicator(
+                    color = NearAidTheme.colors.teal,
+                    modifier = Modifier.statusSemantics("Loading"),
+                )
             }
         }
         state.listingsError != null -> {
