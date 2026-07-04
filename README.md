@@ -30,13 +30,14 @@ UI follows `near_aid_documents/nearaid_ui.html`; behaviour and data follow the
 6. [Data flow (end to end)](#data-flow-end-to-end)
 7. [Networking, realtime & auth](#networking-realtime--auth)
 8. [Navigation](#navigation)
-9. [Build & run](#build--run)
-10. [Configuration](#configuration)
-11. [Conventions](#conventions)
-12. [Testing](#testing)
-13. [Implementation status](#implementation-status)
-14. [Contributing](#contributing)
-15. [License](#license)
+9. [Accessibility, theming & localization](#accessibility-theming--localization)
+10. [Build & run](#build--run)
+11. [Configuration](#configuration)
+12. [Conventions](#conventions)
+13. [Testing](#testing)
+14. [Implementation status](#implementation-status)
+15. [Contributing](#contributing)
+16. [License](#license)
 
 ---
 
@@ -54,6 +55,13 @@ UI follows `near_aid_documents/nearaid_ui.html`; behaviour and data follow the
 - **Profile & trust** — trust score, ratings, verification, language (Bangla/English) & settings.
 - **Safety** — report listings/users, block, and a moderation‑friendly backend contract.
 - **Push** — FCM notifications for nearby urgent needs/offers, claims, messages and ratings.
+- **Accessible by design** — TalkBack labels, roles & headings on every interactive element,
+  48 dp touch targets, live‑region status announcements, and an automated Compose test that
+  fails the build on a regression.
+- **Light & dark theme** — a semantic color system that follows the system setting, with
+  contrast‑checked palettes for both modes.
+- **Localization‑ready** — all user‑facing copy lives in per‑module `strings.xml` (incl. Bangla),
+  ready for `values-<lang>` translations.
 
 ---
 
@@ -151,8 +159,11 @@ canonical example.
 | Local DB             | Room (offline cache for feed + conversations)                     |
 | Key‑value storage    | DataStore Preferences (JWT tokens + language/radius)              |
 | Images               | Coil                                                              |
+| Theming              | Semantic color system (`NearAidTheme.colors`) + Material 3 light/dark |
+| Localization         | Android string resources (`strings.xml`) per module               |
+| Accessibility        | Compose semantics (roles, headings, live regions) + a11y lint rules |
 | Build                | Gradle Kotlin DSL + version catalog + **convention plugins**      |
-| Testing              | JUnit4, MockK, Turbine, kotlinx‑coroutines‑test                   |
+| Testing              | JUnit4, MockK, Turbine, kotlinx‑coroutines‑test, **Robolectric** (Compose a11y) |
 
 Versions are centralized in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
@@ -290,6 +301,47 @@ Type‑safe Navigation‑Compose. Destinations are `@Serializable` types in `:co
 
 ---
 
+## Accessibility, theming & localization
+
+These three concerns are wired into `:core:designsystem` so features get them "for free."
+
+### Accessibility
+
+Reusable semantic modifiers live in
+[`core/designsystem/.../component/Accessibility.kt`](core/designsystem/src/main/kotlin/com/nearaid/core/designsystem/component/Accessibility.kt):
+
+- `Modifier.accessibleClickable(onClickLabel, role)` — merges a row into one screen‑reader node,
+  sets the role (e.g. `Button`), speaks an action label, and guarantees a **48 dp** touch target.
+- `Modifier.headingSemantics()` — marks titles/section labels as headings (TalkBack rotor).
+- `Modifier.politeLiveRegion()` / `Modifier.statusSemantics(text)` — announce loading/error/empty
+  states as they appear.
+
+Custom selectables (`NearAidChip`, segmented tabs, bottom‑nav items) use `selectable(role = Role.Tab)`
+with selected state; `NearAidTextField` exposes `error` semantics; list rows and chat bubbles merge
+into single, meaningfully‑labeled nodes. Accessibility lint checks (`ContentDescription`,
+`ClickableViewAccessibility`, `LabelFor`, …) are promoted to **errors** via a shared root
+[`lint.xml`](lint.xml).
+
+### Theming (light / dark)
+
+Colors are **semantic**, not hard‑coded. Components read `NearAidTheme.colors.<token>` (e.g.
+`ink`, `surface`, `marigold`) rather than raw `Color` values, so the whole design system reacts to
+the system light/dark setting via `isSystemInDarkTheme()`. The palette (brand + category + urgency
+accents) has contrast‑checked light **and** dark variants; `NearAidTheme(darkTheme = …)` provides
+both the Material 3 `ColorScheme` and the custom `NearAidColors` through a `CompositionLocal`. See
+[`theme/Color.kt`](core/designsystem/src/main/kotlin/com/nearaid/core/designsystem/theme/Color.kt)
+and `theme/Theme.kt`.
+
+### Localization
+
+Every user‑facing string is an Android string resource — each module owns its
+`src/main/res/values/strings.xml` and composables use `stringResource(R.string.…)` (with positional
+format args for interpolated text). Bangla copy is already extracted. To add a language, drop a
+`values-<lang>/strings.xml` into each module. A few strings that originate in ViewModels / non‑composable
+helpers are intentionally still inline (see *Implementation status*).
+
+---
+
 ## Build & run
 
 **Requirements:** Android Studio (Ladybug+), **JDK 17**, Android SDK 35.
@@ -362,6 +414,7 @@ across the modules below.
 | Module            | What's covered                                                                 |
 |-------------------|--------------------------------------------------------------------------------|
 | `:app`            | `MainViewModel` (login‑state → start destination), `TopLevelDestination` tabs  |
+| `:core:designsystem` | Compose **accessibility** tests (Robolectric): roles, selected state, labels, 48 dp targets |
 | `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
 | `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
 | `:core:network`   | `safeApiCall` + `HttpException` → `AppError` mapping (status codes + error envelope) |
@@ -377,8 +430,13 @@ across the modules below.
 ./gradlew :feature:discovery:testDebugUnitTest    # a single module
 ```
 
-> UI (Compose), DI wiring, Room DAOs and repository implementations are not yet unit‑tested —
-> those need instrumented / Robolectric setup, which is not configured in v1.
+**Compose accessibility tests** run on the JVM via **Robolectric** (no emulator) in
+`:core:designsystem` — `AccessibilityTest` (chip/tab role, selected state, touch target) and
+`AccessibilityChecksTest` (scans the whole semantics tree; fails if any clickable node is
+unlabeled or under 48 dp). Run them with `./gradlew :core:designsystem:testDebugUnitTest`.
+
+> DI wiring, Room DAOs and repository implementations are not yet unit‑tested, and full‑screen
+> Compose UI tests remain minimal — those need broader instrumented / Robolectric setup.
 
 ---
 
@@ -392,9 +450,13 @@ across the modules below.
 | Activity                   | ✅ Implemented  | Claims (Helping) + my posts; deliver/confirm/withdraw.      |
 | Messages + Chat            | ✅ Implemented  | Conversation list + realtime WebSocket chat.                |
 | Profile / Trust / Safety   | ✅ Implemented  | Trust score, ratings, verification, language, settings.     |
+| Accessibility              | ✅ Implemented  | Roles/headings/live regions, 48 dp targets, a11y lint + tests. |
+| Light / dark theme         | ✅ Implemented  | Semantic colors follow the system; contrast‑checked palettes. |
+| Localization (strings)     | ✅ Implemented  | All UI copy in `strings.xml`; add `values-<lang>` to translate. |
 | Maps (fuzzed pins)         | ⏳ Deferred     | List‑based discovery in v1 (Tech Doc §2).                   |
 | Device GPS                 | 🚧 Stub        | Fixed Dhaka location placeholder (`// TODO`).               |
 | Push delivery (FCM)        | 🚧 Needs config| Code wired; add `google-services.json`.                     |
+| A few ViewModel strings    | 🚧 Partial     | Composable copy is fully in `strings.xml`; ~4 ViewModel/helper strings still inline. |
 
 The client is feature‑complete against the v1 contract and runs against any backend that
 implements the documented API; the items above are the only intentional gaps.
