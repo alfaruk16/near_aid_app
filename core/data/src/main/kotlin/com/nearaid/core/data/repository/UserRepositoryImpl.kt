@@ -18,9 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 class UserRepositoryImpl(
@@ -71,9 +68,7 @@ class UserRepositoryImpl(
         withContext(ioDispatcher) {
             safeApiCall {
                 val file = File(documentPath)
-                val body = file.asRequestBody("image/*".toMediaTypeOrNull())
-                val part = MultipartBody.Part.createFormData("document", file.name, body)
-                userApi.submitVerification(part)
+                userApi.submitVerification(file.readBytes(), file.name)
             }
         }
 

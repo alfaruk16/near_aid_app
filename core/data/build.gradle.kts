@@ -14,7 +14,6 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:datastore"))
 
-    implementation(libs.okhttp.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.koin.core)
 }

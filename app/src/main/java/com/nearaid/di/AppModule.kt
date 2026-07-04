@@ -8,6 +8,12 @@ import org.koin.dsl.module
 
 /** App-level bindings — supplies values the core modules need but can't know themselves. */
 val appModule = module {
-    single { NetworkConfig(baseUrl = BuildConfig.BASE_URL, wsUrl = BuildConfig.WS_URL) }
+    single {
+        NetworkConfig(
+            baseUrl = BuildConfig.BASE_URL,
+            wsUrl = BuildConfig.WS_URL,
+            debugLogging = BuildConfig.DEBUG,
+        )
+    }
     viewModelOf(::MainViewModel)
 }
