@@ -1,15 +1,23 @@
 plugins {
-    alias(libs.plugins.nearaid.android.library)
+    alias(libs.plugins.nearaid.kmp.library)
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // api: these types appear in this module's public API (MviViewModel : ViewModel,
+            // StateFlow/Flow, and the public `commonModule` of Koin's Module type).
+            api(libs.koin.core)
+            api(libs.kotlinx.coroutines.core)
+            api(libs.jetbrains.lifecycle.viewmodel)
+            implementation(libs.kotlinx.datetime)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+    }
 }
 
 android {
     namespace = "com.nearaid.core.common"
-}
-
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.koin.core)
 }
