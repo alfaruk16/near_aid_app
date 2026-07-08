@@ -38,6 +38,7 @@ coroutines = "1.9.0"
 # Multiplatform
 lifecycleViewmodelKmp = "2.8.2"
 kotlinxDatetime = "0.6.1"
+skie = "0.10.4"
 
 # Compose Multiplatform runtime (only the platform-agnostic runtime — no UI toolkit — so the
 # Kotlin Compose compiler plugin is satisfied on the iOS compilation of KMP feature modules).
@@ -146,6 +147,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+skie = { id = "co.touchlab.skie", version.ref = "skie" }
 
 # Convention plugins (defined in build-logic)
 nearaid-android-application = { id = "nearaid.android.application" }

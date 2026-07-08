@@ -4,19 +4,9 @@ plugins {
 }
 
 kotlin {
-    // Expose the shared code to Xcode as the `Shared` framework. As more modules become
-    // multiplatform this framework becomes the umbrella the iosApp links against.
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Shared"
-            isStatic = true
-        }
-    }
-
+    // The `Shared` iOS framework now lives in `:shared` — the umbrella that re-exports every shared
+    // module. `:core:model` is just one more module folded into it (Phase 0 produced the framework
+    // here as the walking skeleton; Phase 3's milestone moved it to the umbrella).
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.json)

@@ -45,3 +45,6 @@ include(":feature:post")
 include(":feature:activity")
 include(":feature:messages")
 include(":feature:profile")
+
+// iOS umbrella framework — exports the shared modules to Xcode as `Shared`.
+include(":shared")
