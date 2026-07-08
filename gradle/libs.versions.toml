@@ -1,8 +1,12 @@
 [versions]
 # Build / language
 agp = "8.7.3"
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.27"
+# Kotlin 2.1.x is required by Room-KMP 2.7 (its Native klibs are produced by Kotlin 2.1.10;
+# a 2.0.21 compiler can't read that ABI). All other deps were built with older Kotlin and stay readable.
+# KSP is pinned to the KSP1 line (-1.0.x): KSP2 (-2.0.x) fails Room's Native processor with
+# "cannot find required type kotlin.coroutines.Continuation" on suspend DAOs.
+kotlin = "2.1.20"
+ksp = "2.1.20-1.0.32"
 javaTarget = "17"
 
 # AndroidX core
@@ -23,7 +27,8 @@ kotlinxSerialization = "1.7.3"
 ktor = "3.0.3"
 
 # Persistence
-room = "2.6.1"
+room = "2.7.1"
+sqlite = "2.5.1"
 datastore = "1.1.1"
 okio = "3.9.1"
 
@@ -33,6 +38,10 @@ coroutines = "1.9.0"
 # Multiplatform
 lifecycleViewmodelKmp = "2.8.2"
 kotlinxDatetime = "0.6.1"
+
+# Compose Multiplatform runtime (only the platform-agnostic runtime — no UI toolkit — so the
+# Kotlin Compose compiler plugin is satisfied on the iOS compilation of KMP feature modules).
+composeMultiplatform = "1.7.3"
 
 # Image loading
 coil = "2.7.0"
@@ -72,6 +81,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 
 # DI (Koin)
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-core-viewmodel = { group = "io.insert-koin", name = "koin-core-viewmodel", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 
@@ -91,8 +101,8 @@ ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref =
 
 # Persistence
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 
@@ -101,6 +111,9 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 jetbrains-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleViewmodelKmp" }
+
+# Compose Multiplatform runtime (platform-agnostic; no UI)
+compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "composeMultiplatform" }
 
 # Image loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
@@ -132,6 +145,7 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
 # Convention plugins (defined in build-logic)
 nearaid-android-application = { id = "nearaid.android.application" }
@@ -139,6 +153,6 @@ nearaid-android-application-compose = { id = "nearaid.android.application.compos
 nearaid-android-library = { id = "nearaid.android.library" }
 nearaid-android-library-compose = { id = "nearaid.android.library.compose" }
 nearaid-android-feature = { id = "nearaid.android.feature" }
-nearaid-android-room = { id = "nearaid.android.room" }
 nearaid-jvm-library = { id = "nearaid.jvm.library" }
 nearaid-kmp-library = { id = "nearaid.kmp.library" }
+nearaid-kmp-feature = { id = "nearaid.kmp.feature" }

@@ -38,10 +38,6 @@ gradlePlugin {
             id = "nearaid.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
-        register("androidRoom") {
-            id = "nearaid.android.room"
-            implementationClass = "AndroidRoomConventionPlugin"
-        }
         register("jvmLibrary") {
             id = "nearaid.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
@@ -49,6 +45,10 @@ gradlePlugin {
         register("kmpLibrary") {
             id = "nearaid.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
+        }
+        register("kmpFeature") {
+            id = "nearaid.kmp.feature"
+            implementationClass = "KmpFeatureConventionPlugin"
         }
     }
 }
