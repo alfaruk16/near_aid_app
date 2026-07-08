@@ -46,6 +46,9 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:database"))
 
+    // Shared Compose UI + Koin wiring (hosts the whole app tree; also drives iOS)
+    implementation(project(":shared"))
+
     // Features
     implementation(project(":feature:auth"))
     implementation(project(":feature:discovery"))
@@ -59,7 +62,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.core.splashscreen)

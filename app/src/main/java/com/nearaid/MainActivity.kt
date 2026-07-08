@@ -8,40 +8,23 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nearaid.core.designsystem.theme.NearAidTheme
-import com.nearaid.feature.auth.SplashScreen
-import com.nearaid.navigation.NearAidNavHost
+import com.nearaid.shared.App
 import org.koin.androidx.compose.KoinAndroidContext
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splash = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-        // Keep the system splash until we know whether the user is signed in.
-        splash.setKeepOnScreenCondition { viewModel.isLoggedIn.value == null }
         enableEdgeToEdge()
         setContent {
             KoinAndroidContext {
-                NearAidTheme {
-                    NotificationPermissionRequester()
-                    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
-                    when (val loggedIn = isLoggedIn) {
-                        null -> SplashScreen(modifier = Modifier.fillMaxSize().background(NearAidTheme.colors.paper))
-                        else -> NearAidNavHost(startLoggedIn = loggedIn)
-                    }
-                }
+                NotificationPermissionRequester()
+                // The entire UI is the shared Compose tree (also hosted on iOS via MainViewController).
+                App()
             }
         }
     }

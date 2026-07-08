@@ -1,6 +1,7 @@
 package com.nearaid
 
 import com.nearaid.core.domain.usecase.ObserveLoginStateUseCase
+import com.nearaid.shared.MainViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

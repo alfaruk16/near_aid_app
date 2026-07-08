@@ -13,6 +13,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.compose.gradlePlugin)
 }
 
 // Register the convention plugins so module scripts can apply them by id.
@@ -49,6 +50,10 @@ gradlePlugin {
         register("kmpFeature") {
             id = "nearaid.kmp.feature"
             implementationClass = "KmpFeatureConventionPlugin"
+        }
+        register("cmpLibrary") {
+            id = "nearaid.cmp.library"
+            implementationClass = "CmpLibraryConventionPlugin"
         }
     }
 }

@@ -14,6 +14,7 @@ import com.nearaid.feature.messages.di.messagesModule
 import com.nearaid.feature.post.di.postModule
 import com.nearaid.feature.profile.di.profileModule
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
@@ -28,6 +29,7 @@ fun doInitKoin(baseUrl: String, wsUrl: String) {
         modules(
             module {
                 single { NetworkConfig(baseUrl = baseUrl, wsUrl = wsUrl, debugLogging = false) }
+                viewModelOf(::MainViewModel)
             },
             commonModule,
             networkModule,

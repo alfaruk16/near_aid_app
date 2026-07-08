@@ -1,9 +1,3 @@
 <resources>
     <string name="app_name">NearAid</string>
-    <string name="cd_post">Post</string>
-    <string name="action_create_post">Create a post</string>
-    <string name="nav_home">Home</string>
-    <string name="nav_activity">Activity</string>
-    <string name="nav_messages">Messages</string>
-    <string name="nav_profile">Profile</string>
 </resources>

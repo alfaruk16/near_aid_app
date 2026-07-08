@@ -1,12 +1,12 @@
 plugins {
-    alias(libs.plugins.nearaid.kmp.library)
+    alias(libs.plugins.nearaid.cmp.library)
     alias(libs.plugins.skie)
 }
 
 kotlin {
     // The `Shared` umbrella framework the iosApp links against. It re-exports the shared modules
     // (models, MVI base, domain, navigation and every feature's ViewModels) so Swift can construct
-    // and drive them directly.
+    // and drive them directly, and now hosts the shared Compose UI via `MainViewController`.
     listOf(
         iosX64(),
         iosArm64(),
@@ -42,17 +42,37 @@ kotlin {
             api(project(":feature:messages"))
             api(project(":feature:profile"))
 
-            // Wiring only (not exported) — needed to assemble the Koin graph.
+            // Wiring only (not exported) — needed to assemble the Koin graph + shared UI.
             implementation(project(":core:data"))
             implementation(project(":core:network"))
             implementation(project(":core:datastore"))
             implementation(project(":core:database"))
+            implementation(project(":core:designsystem"))
+
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.components.resources)
+            implementation(compose.ui)
+
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
 
             api(libs.koin.core)
+            implementation(libs.koin.core.viewmodel)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
     }
 }
 
 android {
     namespace = "com.nearaid.shared"
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.nearaid.shared.resources"
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cd_post">Post</string>
+    <string name="action_create_post">Create a post</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_activity">Activity</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_profile">Profile</string>
+</resources>

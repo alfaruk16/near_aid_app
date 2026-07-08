@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.nearaid.kmp.feature)
+    alias(libs.plugins.nearaid.cmp.library)
 }
 
 kotlin {
@@ -9,27 +9,26 @@ kotlin {
             implementation(project(":core:model"))
             implementation(project(":core:domain"))
             implementation(project(":core:navigation"))
+            implementation(project(":core:designsystem"))
+
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.components.resources)
+            implementation(compose.ui)
+
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
+
             implementation(libs.koin.core)
             implementation(libs.koin.core.viewmodel)
-            implementation(libs.compose.runtime)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
-        }
-        androidMain.dependencies {
-            implementation(project(":core:designsystem"))
-            implementation(project.dependencies.platform(libs.androidx.compose.bom))
-            implementation(libs.androidx.compose.ui)
-            implementation(libs.androidx.compose.ui.graphics)
-            implementation(libs.androidx.compose.ui.tooling.preview)
-            implementation(libs.androidx.compose.material3)
-            implementation(libs.androidx.compose.material.icons.extended)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.androidx.lifecycle.runtime.ktx)
-            implementation(libs.androidx.navigation.compose)
-            implementation(libs.koin.androidx.compose)
-            implementation(libs.coil.compose)
         }
         getByName("androidUnitTest").dependencies {
             implementation(libs.junit)
@@ -42,4 +41,9 @@ kotlin {
 
 android {
     namespace = "com.nearaid.feature.discovery"
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.nearaid.feature.discovery.resources"
 }

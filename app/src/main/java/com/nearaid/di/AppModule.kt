@@ -1,8 +1,8 @@
 package com.nearaid.di
 
 import com.nearaid.BuildConfig
-import com.nearaid.MainViewModel
 import com.nearaid.core.network.di.NetworkConfig
+import com.nearaid.shared.MainViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

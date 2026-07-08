@@ -4,8 +4,9 @@ import com.nearaid.core.navigation.ActivityRoute
 import com.nearaid.core.navigation.HomeRoute
 import com.nearaid.core.navigation.MessagesRoute
 import com.nearaid.core.navigation.ProfileRoute
+import com.nearaid.shared.TopLevelDestination
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 class TopLevelDestinationTest {
@@ -38,12 +39,10 @@ class TopLevelDestinationTest {
     }
 
     @Test
-    fun `every tab has a label resource`() {
+    fun `every tab has a route and icon`() {
         TopLevelDestination.entries.forEach { destination ->
-            assertTrue(
-                "Expected a valid label resource for $destination",
-                destination.labelRes != 0,
-            )
+            assertNotNull("Expected a route for $destination", destination.route)
+            assertNotNull("Expected an icon for $destination", destination.icon)
         }
     }
 }
