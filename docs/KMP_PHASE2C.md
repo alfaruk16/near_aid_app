@@ -1,7 +1,7 @@
-# KMM Phase 2c — :core:data → commonMain (done)
+# KMP Phase 2c — :core:data → commonMain (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Completes roadmap **Phase 2**
-("share data access"): after [2a](KMM_PHASE2A.md) (Ktor + DataStore) and [2b](KMM_PHASE2B.md)
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Completes roadmap **Phase 2**
+("share data access"): after [2a](KMP_PHASE2A.md) (Ktor + DataStore) and [2b](KMP_PHASE2B.md)
 (Room-KMP), 2c moves `:core:data` — the mappers and every `RepositoryImpl` — into `commonMain`.
 **Milestone reached: the entire non-UI stack is shared Kotlin; the Android app runs fully on it.**
 

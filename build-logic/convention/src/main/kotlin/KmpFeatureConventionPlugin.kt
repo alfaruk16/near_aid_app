@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * Convention for a KMP feature module. The shared MVI surface — `*Contract.kt`, `*ViewModel.kt`
  * and the feature's Koin `module {}` — lives in `commonMain` and compiles for Android + iOS; the
  * Android Compose `Screen.kt` composables stay in `androidMain`. Compose is enabled on the Android
- * target only (Phase 3 is logic-only KMM; Compose Multiplatform is a later, optional phase).
+ * target only (Phase 3 is logic-only KMP; Compose Multiplatform is a later, optional phase).
  *
  * Each feature declares its own dependencies in `kotlin { sourceSets { ... } }` and sets
  * `android { namespace = "..." }`.

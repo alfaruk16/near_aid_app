@@ -1,4 +1,4 @@
-# NearAid — Kotlin Multiplatform (KMM) Migration Roadmap
+# NearAid — Kotlin Multiplatform (KMP) Migration Roadmap
 
 Goal: share NearAid's business logic — and optionally the UI — between **Android** and **iOS**
 using Kotlin Multiplatform, with the **smallest, lowest-risk sequence** given the current
@@ -23,7 +23,7 @@ model → domain → common(MVI) → network → datastore → database → data
 ```
 
 Two strategic forks decide the scope (see §6):
-- **Logic-only KMM** (share down to ViewModels; native SwiftUI on iOS) — lower risk, idiomatic iOS.
+- **Logic-only KMP** (share down to ViewModels; native SwiftUI on iOS) — lower risk, idiomatic iOS.
 - **Full Compose Multiplatform** (share the UI too) — maximum reuse, one codebase.
 
 Recommended: **start logic-only**, keep Compose MP as a fast-follow once the shared core is proven.
@@ -96,7 +96,7 @@ Recommended: **start logic-only**, keep Compose MP as a fast-follow once the sha
 ### Phase 3 — Share presentation (ViewModels)
 - Move each `feature/*` `*Contract.kt` + `*ViewModel.kt` to `commonMain` (they extend the now-shared `MviViewModel` and inject use cases via Koin).
 - Keep Android `Screen.kt` composables as-is, bound to shared ViewModels.
-- **Milestone:** iOS can now drive shared ViewModels from SwiftUI (observe `StateFlow` via SKIE/KMP-NativeCoroutines). **This is the logic-only KMM finish line.**
+- **Milestone:** iOS can now drive shared ViewModels from SwiftUI (observe `StateFlow` via SKIE/KMP-NativeCoroutines). **This is the logic-only KMP finish line.**
 
 ### Phase 4 — Share the UI (optional, Full-CMP)
 - Convert `:core:designsystem` to Compose Multiplatform (theme is pure; Coil→Coil3; fonts via CMP resources).
@@ -152,7 +152,7 @@ Recommended: **start logic-only**, keep Compose MP as a fast-follow once the sha
 | 0 | Plugins + PoC + decisions | S | walking skeleton |
 | 1 | Pure core + Koin | M | Android on shared core |
 | 2 | Network + DB + DataStore + data | **L** (Ktor + Room-KMP are the heavy items) | shared non-UI stack |
-| 3 | ViewModels shared | M | **logic-only KMM done** |
+| 3 | ViewModels shared | M | **logic-only KMP done** |
 | 4 | Compose MP UI | **L** | shared UI (optional) |
 | 5 | Platform edges + CI | M | iOS release-ready |
 

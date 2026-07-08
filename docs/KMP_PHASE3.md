@@ -1,10 +1,10 @@
-# KMM Phase 3 — share presentation (ViewModels) (done)
+# KMP Phase 3 — share presentation (ViewModels) (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Phase 3 moves every feature's MVI
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Phase 3 moves every feature's MVI
 surface — `*Contract.kt`, `*ViewModel.kt` and the Koin `module {}` — into `commonMain`, so all 15
 ViewModels are shared Kotlin compiling for Android and iOS. The Android Compose `Screen.kt`s stay on
-the Android target, bound to the now-shared ViewModels. **This is the logic-only KMM finish line for
-the shared code**; wiring Swift to it is the [Phase 3 milestone](KMM_PHASE3_IOS.md).
+the Android target, bound to the now-shared ViewModels. **This is the logic-only KMP finish line for
+the shared code**; wiring Swift to it is the [Phase 3 milestone](KMP_PHASE3_IOS.md).
 
 ## What changed
 - New **`nearaid.kmp.feature`** convention plugin: KMP module (`androidTarget` + iOS) with the Kotlin
@@ -31,6 +31,6 @@ the shared code**; wiring Swift to it is the [Phase 3 milestone](KMM_PHASE3_IOS.
   + Koin module compiles for iOS.
 
 ## Next
-[Phase 3 milestone](KMM_PHASE3_IOS.md) — export the shared modules through the `Shared` umbrella
+[Phase 3 milestone](KMP_PHASE3_IOS.md) — export the shared modules through the `Shared` umbrella
 framework (+ SKIE for ergonomic Swift `Flow`/suspend interop) and drive a shared ViewModel from
-SwiftUI, closing the logic-only KMM loop.
+SwiftUI, closing the logic-only KMP loop.

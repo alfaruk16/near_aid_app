@@ -1,6 +1,6 @@
-# KMM Phase 1a — Hilt → Koin (done)
+# KMP Phase 1a — Hilt → Koin (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Roadmap Phase 1 is split into
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Roadmap Phase 1 is split into
 **1a: the app-wide DI swap** (this PR) and **1b: moving the pure core to `commonMain`** (next).
 All modules stay Android libraries here — no source-set moves — so the DI change is de-risked on
 its own. Hilt is Android/JVM-only and can't cross into `commonMain`; Koin can, so it replaces Hilt

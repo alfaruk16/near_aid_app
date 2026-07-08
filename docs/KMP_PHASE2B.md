@@ -1,7 +1,7 @@
-# KMM Phase 2b — Room → Room-KMP (done)
+# KMP Phase 2b — Room → Room-KMP (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Phase 2 ("share data access") is
-sliced; [2a](KMM_PHASE2A.md) moved network + datastore. **2b moves `:core:database` (the Room
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Phase 2 ("share data access") is
+sliced; [2a](KMP_PHASE2A.md) moved network + datastore. **2b moves `:core:database` (the Room
 cache) into `commonMain`** so the DAOs, entities and the database compile for Android and iOS off
 one source set. 2c moves `:core:data`.
 

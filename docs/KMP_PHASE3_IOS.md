@@ -1,8 +1,8 @@
-# KMM Phase 3 milestone — iOS drives the shared ViewModels (done)
+# KMP Phase 3 milestone — iOS drives the shared ViewModels (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). [Phase 3](KMM_PHASE3.md) made every
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). [Phase 3](KMP_PHASE3.md) made every
 ViewModel shared Kotlin; this milestone wires **SwiftUI to that shared code**, closing the
-roadmap's **logic-only KMM finish line**: iOS runs the same ViewModels, repositories, network and DB
+roadmap's **logic-only KMP finish line**: iOS runs the same ViewModels, repositories, network and DB
 as Android, with a native SwiftUI front end.
 
 ## What changed

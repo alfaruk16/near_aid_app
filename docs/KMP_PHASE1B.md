@@ -1,6 +1,6 @@
-# KMM Phase 1b — pure core → commonMain (done)
+# KMP Phase 1b — pure core → commonMain (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Completes roadmap **Phase 1**:
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Completes roadmap **Phase 1**:
 after 1a made DI portable (Hilt→Koin), 1b moves the pure core — `:core:navigation`,
 `:core:common`, `:core:domain` — into `commonMain`, so the MVI base, error types, routes,
 repositories and 40 use cases are shared Kotlin that compiles for **Android and iOS**. `:core:model`

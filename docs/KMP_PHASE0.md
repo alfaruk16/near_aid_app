@@ -1,10 +1,10 @@
-# KMM Phase 0 — Walking Skeleton (done)
+# KMP Phase 0 — Walking Skeleton (done)
 
-This is the first step of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). It proves the
+This is the first step of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). It proves the
 Kotlin Multiplatform toolchain end-to-end (Gradle KMP plugin → shared Kotlin → iOS framework →
 SwiftUI app) **before** the heavy data-layer work in later phases.
 
-Strategic forks locked in (roadmap §6): **logic-only KMM** with **native SwiftUI** on iOS;
+Strategic forks locked in (roadmap §6): **logic-only KMP** with **native SwiftUI** on iOS;
 target libraries **Koin + Room-KMP + Ktor + SKIE** (introduced in Phases 1–3, not yet present).
 
 ## What changed

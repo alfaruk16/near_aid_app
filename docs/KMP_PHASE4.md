@@ -1,6 +1,6 @@
-# KMM Phase 4 — Share the UI (Compose Multiplatform) (done)
+# KMP Phase 4 — Share the UI (Compose Multiplatform) (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). The optional Full-CMP phase: the
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). The optional Full-CMP phase: the
 Android Compose UI becomes **one shared UI** rendering on Android and iOS. After this, ~all of NearAid
 — logic *and* UI — is shared Kotlin; each platform is a thin host.
 

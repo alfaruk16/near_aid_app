@@ -35,7 +35,7 @@ google-services.json
 .idea/
 !.idea/icon.png
 
-# ─────────────────────── Xcode / iOS (KMM) ────────────────
+# ─────────────────────── Xcode / iOS (KMP) ────────────────
 xcuserdata/
 *.xcuserstate
 DerivedData/

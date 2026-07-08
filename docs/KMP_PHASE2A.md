@@ -1,6 +1,6 @@
-# KMM Phase 2a — Retrofit→Ktor + DataStore-KMP (done)
+# KMP Phase 2a — Retrofit→Ktor + DataStore-KMP (done)
 
-Part of the [KMM migration roadmap](KMM_MIGRATION_ROADMAP.md). Phase 2 ("share data access") is
+Part of the [KMP migration roadmap](KMP_MIGRATION_ROADMAP.md). Phase 2 ("share data access") is
 sliced; **2a moves `:core:network` (transport) and `:core:datastore` (key-value) into `commonMain`**.
 2b = Room-KMP (`:core:database`), 2c = `:core:data` → commonMain.
 
