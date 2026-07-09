@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -31,17 +32,36 @@ class ChatSocket(
 ) {
     fun observe(threadId: String): Flow<ChatMessage> = callbackFlow {
         val token = authPrefs.currentTokens()?.accessToken
-        val session = client.webSocketSession("$wsUrl?token=$token")
-        session.send(Frame.Text("""{"event":"subscribe","thread_id":"$threadId"}"""))
+        // Realtime transport is best-effort: message history loads over REST, so a
+        // failed upgrade (server 404, unreachable host, expired token) must degrade
+        // gracefully rather than crash the collector. Complete the flow instead.
+        val session = try {
+            client.webSocketSession("$wsUrl?token=$token").also {
+                it.send(Frame.Text("""{"event":"subscribe","thread_id":"$threadId"}"""))
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            close()
+            return@callbackFlow
+        }
 
         val reader = launch {
-            for (frame in session.incoming) {
-                val text = (frame as? Frame.Text)?.readText() ?: continue
-                val event = runCatching { json.parseToJsonElement(text).jsonObject }.getOrNull() ?: continue
-                if (event.string("event") != "message.new") continue
-                if (event.string("thread_id") != threadId) continue
-                val msg = event["message"]?.jsonObject ?: continue
-                trySend(msg.toChatMessage())
+            try {
+                for (frame in session.incoming) {
+                    val text = (frame as? Frame.Text)?.readText() ?: continue
+                    val event = runCatching { json.parseToJsonElement(text).jsonObject }.getOrNull() ?: continue
+                    if (event.string("event") != "message.new") continue
+                    if (event.string("thread_id") != threadId) continue
+                    val msg = event["message"]?.jsonObject ?: continue
+                    trySend(msg.toChatMessage())
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Socket dropped/errored mid-stream — stop emitting, don't propagate.
+            } finally {
+                close()
             }
         }
 
