@@ -9,6 +9,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.navigation.AuthGraph
 import com.nearaid.core.navigation.MainGraph
@@ -23,6 +26,15 @@ import org.koin.compose.viewmodel.koinViewModel
  */
 @Composable
 fun App() {
+    // Register a process-wide Coil ImageLoader backed by a Ktor network fetcher so `AsyncImage`
+    // (avatars, listing photos) can load remote URLs. Without a network fetcher Coil 3 only resolves
+    // local/embedded data, so remote images silently fell back to placeholders. `setSafe` semantics
+    // mean this is a no-op if the singleton is already built, so calling it from composition is fine.
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context)
+            .components { add(KtorNetworkFetcherFactory()) }
+            .build()
+    }
     NearAidTheme {
         val mainViewModel = koinViewModel<MainViewModel>()
         val isLoggedIn by mainViewModel.isLoggedIn.collectAsStateWithLifecycle()

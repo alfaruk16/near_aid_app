@@ -71,20 +71,23 @@ class AccessibilityChecksTest {
     fun everyClickable_isLabeled_andMeetsTouchTarget() {
         composeRule.setContent { Sample() }
 
-        val minPx = with(composeRule.density) { 48.dp.roundToPx() }
+        // Thresholds and the labeling rule come from the shared A11y contract (commonMain), so this
+        // rendering test and the cross-platform A11yContractTest stay in lockstep.
+        val minPx = with(composeRule.density) { A11y.MinTouchTarget.roundToPx() }
         val nodes = composeRule.onAllNodes(hasClickAction()).fetchSemanticsNodes()
         assertTrue("expected clickable nodes to be present", nodes.isNotEmpty())
 
         nodes.forEach { node ->
             val cfg = node.config
-            val labeled =
-                cfg.getOrNull(SemanticsProperties.ContentDescription)?.any { it.isNotBlank() } == true ||
-                    cfg.getOrNull(SemanticsProperties.Text)?.any { it.text.isNotBlank() } == true ||
-                    cfg.getOrNull(SemanticsProperties.StateDescription)?.isNotBlank() == true
+            val labeled = A11y.isLabeled(
+                contentDescriptions = cfg.getOrNull(SemanticsProperties.ContentDescription),
+                texts = cfg.getOrNull(SemanticsProperties.Text)?.map { it.text },
+                stateDescription = cfg.getOrNull(SemanticsProperties.StateDescription),
+            )
             assertTrue("Clickable node has no accessibility label: $cfg", labeled)
 
             assertTrue(
-                "Clickable node smaller than 48dp: ${node.size}",
+                "Clickable node smaller than ${A11y.MinTouchTarget}: ${node.size}",
                 node.size.width >= minPx && node.size.height >= minPx,
             )
         }

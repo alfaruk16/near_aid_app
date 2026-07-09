@@ -3,7 +3,6 @@ package com.nearaid.core.designsystem.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -34,7 +33,7 @@ fun Modifier.accessibleClickable(
     role: Role = Role.Button,
     onClick: () -> Unit,
 ): Modifier = this
-    .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+    .defaultMinSize(minWidth = A11y.MinTouchTarget, minHeight = A11y.MinTouchTarget)
     .clickable(onClickLabel = onClickLabel, role = role, onClick = onClick)
 
 /** Labels an otherwise-silent status node (e.g. a bare progress indicator). */

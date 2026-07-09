@@ -19,7 +19,12 @@ kotlin {
             implementation(libs.coil.compose3)
             implementation(libs.coil.network.ktor3)
         }
-        // Compose accessibility tests run on the JVM via Robolectric (no emulator needed).
+        // The shared a11y contract (A11y) is verified here so the rules run on Android + iOS.
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+        // Rendering-based Compose accessibility tests run on the JVM via Robolectric (no emulator).
+        // Porting these to run on iOS via `runComposeUiTest` remains a follow-up.
         getByName("androidUnitTest").dependencies {
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
             implementation(libs.androidx.compose.ui.test.junit4)

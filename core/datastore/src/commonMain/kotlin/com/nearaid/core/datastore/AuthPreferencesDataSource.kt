@@ -1,57 +1,47 @@
 package com.nearaid.core.datastore
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nearaid.core.model.AuthTokens
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 /**
- * Persists the JWT pair in DataStore Preferences and exposes session state as a
- * [Flow]. The network layer reads tokens from here to attach the `Authorization`
- * header and to refresh (§9.2).
+ * Persists the JWT pair in the platform [SecureTokenStore] (Android Keystore-backed
+ * EncryptedSharedPreferences / iOS Keychain) and exposes session state as a [Flow]. The network
+ * layer reads tokens from here to attach the `Authorization` header and to refresh (§9.2).
+ *
+ * The secure backends aren't observable, so the current session is mirrored into a [MutableStateFlow]
+ * — seeded from the store at construction and updated on every mutation — to preserve the reactive
+ * `tokens` / `isLoggedIn` surface the rest of the app depends on.
  */
 class AuthPreferencesDataSource(
-    private val dataStore: DataStore<Preferences>,
+    private val secureStore: SecureTokenStore,
 ) {
-    private object Keys {
-        val ACCESS = stringPreferencesKey("access_token")
-        val REFRESH = stringPreferencesKey("refresh_token")
-        val USER_ID = stringPreferencesKey("user_id")
-    }
+    private val session = MutableStateFlow(secureStore.readSession())
 
-    val tokens: Flow<AuthTokens?> = dataStore.data.map { prefs ->
-        val access = prefs[Keys.ACCESS]
-        val refresh = prefs[Keys.REFRESH]
-        if (access != null && refresh != null) AuthTokens(access, refresh) else null
-    }
+    val tokens: Flow<AuthTokens?> = session.map { it?.let { s -> AuthTokens(s.accessToken, s.refreshToken) } }
 
-    val isLoggedIn: Flow<Boolean> = dataStore.data.map { it[Keys.ACCESS] != null }
+    val isLoggedIn: Flow<Boolean> = session.map { it != null }
 
-    suspend fun userId(): String? = dataStore.data.first()[Keys.USER_ID]
+    suspend fun userId(): String? = session.value?.userId
 
     suspend fun saveSession(tokens: AuthTokens, userId: String) {
-        dataStore.edit { prefs ->
-            prefs[Keys.ACCESS] = tokens.accessToken
-            prefs[Keys.REFRESH] = tokens.refreshToken
-            prefs[Keys.USER_ID] = userId
-        }
+        val stored = StoredSession(tokens.accessToken, tokens.refreshToken, userId)
+        secureStore.save(stored)
+        session.value = stored
     }
 
     suspend fun updateAccessToken(accessToken: String) {
-        dataStore.edit { prefs -> prefs[Keys.ACCESS] = accessToken }
+        secureStore.updateAccessToken(accessToken)
+        session.update { it?.copy(accessToken = accessToken) }
     }
 
     suspend fun clear() {
-        dataStore.edit { prefs ->
-            prefs.remove(Keys.ACCESS)
-            prefs.remove(Keys.REFRESH)
-            prefs.remove(Keys.USER_ID)
-        }
+        secureStore.clear()
+        session.value = null
     }
 
-    suspend fun currentTokens(): AuthTokens? = tokens.first()
+    suspend fun currentTokens(): AuthTokens? =
+        session.value?.let { AuthTokens(it.accessToken, it.refreshToken) }
 }

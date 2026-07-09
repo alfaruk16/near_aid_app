@@ -2,6 +2,8 @@ package com.nearaid.core.datastore.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.nearaid.core.datastore.IosSecureTokenStore
+import com.nearaid.core.datastore.SecureTokenStore
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -13,6 +15,7 @@ actual val dataStorePlatformModule: Module = module {
     single<DataStore<Preferences>> {
         createPreferenceDataStore(iosDataStorePath())
     }
+    single<SecureTokenStore> { IosSecureTokenStore() }
 }
 
 @OptIn(ExperimentalForeignApi::class)

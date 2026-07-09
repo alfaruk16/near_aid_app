@@ -56,6 +56,11 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.ui)
 
+            // Coil 3 — a singleton ImageLoader with the Ktor network fetcher is installed in App()
+            // so remote images (avatars) load on both Android and iOS.
+            implementation(libs.coil.compose3)
+            implementation(libs.coil.network.ktor3)
+
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.jetbrains.lifecycle.runtime.compose)

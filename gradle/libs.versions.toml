@@ -30,6 +30,7 @@ ktor = "3.0.3"
 room = "2.7.1"
 sqlite = "2.5.1"
 datastore = "1.1.1"
+securityCrypto = "1.1.0-alpha06"
 okio = "3.9.1"
 
 # Async
@@ -111,6 +112,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 
 # Async

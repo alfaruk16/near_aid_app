@@ -63,7 +63,7 @@ fun NearAidChip(
     val fg = if (selected) NearAidTheme.colors.surface else NearAidTheme.colors.ink2
     Box(
         modifier = modifier
-            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+            .defaultMinSize(minWidth = A11y.MinTouchTarget, minHeight = A11y.MinTouchTarget)
             .clip(RoundedCornerShape(999.dp))
             .background(bg)
             .border(1.dp, if (selected) NearAidTheme.colors.ink else NearAidTheme.colors.line, RoundedCornerShape(999.dp))
@@ -201,7 +201,7 @@ fun NearAidSegmentedTabs(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .defaultMinSize(minHeight = 48.dp)
+                    .defaultMinSize(minHeight = A11y.MinTouchTarget)
                     .clip(RoundedCornerShape(10.dp))
                     .background(if (active) NearAidTheme.colors.surface else Color.Transparent)
                     .selectable(selected = active, onClick = { onSelect(index) }, role = Role.Tab)
