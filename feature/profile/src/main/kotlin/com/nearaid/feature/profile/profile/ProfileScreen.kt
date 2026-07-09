@@ -87,7 +87,10 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(NearAidTheme.colors.marigold, NearAidTheme.colors.marigoldDeep),
+                        colors = listOf(
+                            NearAidTheme.colors.marigold,
+                            NearAidTheme.colors.marigoldDeep
+                        ),
                     )
                 )
                 .padding(horizontal = 24.dp, vertical = 32.dp),
@@ -121,13 +124,27 @@ fun ProfileScreen(
                 val subtitleParts = buildList {
                     if (me.isIdVerified) add(stringResource(R.string.profile_subtitle_verified))
                     me.defaultArea?.let { add(it) }
-                    add(stringResource(R.string.profile_subtitle_trust_score, String.format("%.1f", me.trustScore)))
+                    add(
+                        stringResource(
+                            R.string.profile_subtitle_trust_score,
+                            String.format("%.1f", me.trustScore)
+                        )
+                    )
                 }
                 Text(
                     text = subtitleParts.joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.85f),
                 )
+                if (me.phone.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = me.phone,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
             }
         }
 
@@ -232,7 +249,10 @@ private fun ProfileMenuItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .accessibleClickable(onClickLabel = stringResource(R.string.action_open), onClick = onClick)
+            .accessibleClickable(
+                onClickLabel = stringResource(R.string.action_open),
+                onClick = onClick
+            )
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
