@@ -20,11 +20,13 @@ import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -56,7 +58,13 @@ val networkModule = module {
             install(WebSockets)
 
             install(Logging) {
-                level = if (config.debugLogging) LogLevel.HEADERS else LogLevel.NONE
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        println("HTTP: $message")
+                    }
+                }
+                level = if (config.debugLogging) LogLevel.ALL else LogLevel.NONE
+                sanitizeHeader { header -> header == HttpHeaders.Authorization }
             }
 
             install(Auth) {
