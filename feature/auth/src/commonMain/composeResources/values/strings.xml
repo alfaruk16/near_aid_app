@@ -11,8 +11,8 @@
     <string name="welcome_get_started">Get started</string>
 
     <!-- Phone -->
-    <string name="phone_title">What\'s your number?</string>
-    <string name="phone_subtitle">We\'ll text a 6-digit code to verify it. Your number stays private.</string>
+    <string name="phone_title">What's your number?</string>
+    <string name="phone_subtitle">We'll text a 6-digit code to verify it. Your number stays private.</string>
     <string name="phone_label">Phone (+880)</string>
     <string name="phone_placeholder">1712 345 678</string>
     <string name="phone_send_code">Send code</string>

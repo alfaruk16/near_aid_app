@@ -8,7 +8,7 @@
     <string name="tab_my_posts">My posts</string>
 
     <!-- Empty / error states -->
-    <string name="empty_couldnt_load_title">Couldn\'t load</string>
+    <string name="empty_couldnt_load_title">Couldn't load</string>
     <string name="empty_no_activity_title">No activity yet</string>
     <string name="empty_no_activity_message">When you help someone, your active claims will appear here.</string>
     <string name="empty_no_posts_title">No posts yet</string>
@@ -20,7 +20,7 @@
     <string name="action_open_chat">Open chat</string>
 
     <!-- Claim status labels -->
-    <string name="claim_status_active">You\'re helping</string>
+    <string name="claim_status_active">You're helping</string>
     <string name="claim_status_completed">You helped</string>
     <string name="claim_status_withdrawn">Withdrawn</string>
     <string name="claim_status_cancelled">Cancelled</string>
