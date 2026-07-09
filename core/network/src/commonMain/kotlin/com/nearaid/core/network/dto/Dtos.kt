@@ -256,7 +256,7 @@ data class ConversationsResponse(
 @Serializable
 data class MessageDto(
     val id: String,
-    @SerialName("sender_id") val senderId: String,
+    @SerialName("sender") val senderId: String,
     val type: String = "text",
     val body: String? = null,
     @SerialName("image_url") val imageUrl: String? = null,
