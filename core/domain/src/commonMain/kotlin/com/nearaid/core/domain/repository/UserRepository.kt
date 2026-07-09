@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun observeMe(): Flow<Me?>
+    /** Drops the in-memory cached [Me] so it can't leak across accounts (e.g. on logout). */
+    fun clear()
     suspend fun refreshMe(): DataResult<Me>
     suspend fun updateProfile(
         displayName: String? = null,

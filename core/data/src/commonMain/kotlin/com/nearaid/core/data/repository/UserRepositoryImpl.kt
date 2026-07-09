@@ -30,6 +30,10 @@ class UserRepositoryImpl(
 
     override fun observeMe(): Flow<Me?> = me.asStateFlow()
 
+    override fun clear() {
+        me.value = null
+    }
+
     override suspend fun refreshMe(): DataResult<Me> = withContext(ioDispatcher) {
         safeApiCall { userApi.getMe().toDomain() }.also {
             if (it is DataResult.Success) me.value = it.data

@@ -43,6 +43,9 @@ class AuthRepositoryImpl(
         withContext(ioDispatcher) {
             runCatching { authApi.logout() }
             authPrefs.clear()
+            // Invalidate the Bearer plugin's cached token; otherwise the next login reuses the
+            // previous user's access token and API calls return the old account's data.
+            authApi.clearAuthCache()
         }
     }
 }

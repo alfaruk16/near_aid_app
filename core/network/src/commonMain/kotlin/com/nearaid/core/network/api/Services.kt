@@ -29,6 +29,8 @@ import com.nearaid.core.network.dto.TokenRefreshRequestDto
 import com.nearaid.core.network.dto.TokenRefreshResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -57,6 +59,15 @@ class AuthApi(private val client: HttpClient) {
 
     suspend fun logout() {
         client.post("auth/logout")
+    }
+
+    /**
+     * Drops the Bearer plugin's in-memory token cache. Ktor caches tokens from [loadTokens] and only
+     * re-reads them on a 401; without this, a logout→login as a different account keeps reusing the
+     * previous user's still-valid access token, so requests like `getMe` return the old user's data.
+     */
+    fun clearAuthCache() {
+        client.authProvider<BearerAuthProvider>()?.clearToken()
     }
 }
 
