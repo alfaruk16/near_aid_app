@@ -48,6 +48,17 @@ class ChatSocket @Inject constructor(
                 val msg = event["message"]?.jsonObject ?: return
                 trySend(msg.toChatMessage())
             }
+
+            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                close()
+            }
+
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                // Realtime transport is best-effort: message history loads over REST,
+                // so a failed upgrade (server 404, unreachable host, expired token) must
+                // degrade gracefully. Complete the flow instead of leaving it hanging.
+                close()
+            }
         }
 
         val socket = client.newWebSocket(request, listener)

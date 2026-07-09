@@ -9,6 +9,7 @@ import com.nearaid.core.domain.usecase.ObserveCurrentUserUseCase
 import com.nearaid.core.domain.usecase.ObserveThreadUseCase
 import com.nearaid.core.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,14 +60,17 @@ class ChatViewModel @Inject constructor(
             // Mark as read (fire-and-forget — ignore result)
             markThreadRead(claimId)
 
-            // Observe live thread messages
-            observeThread(threadId).collect { newMsg ->
-                setState {
-                    val exists = messages.any { it.id == newMsg.id }
-                    if (exists) this
-                    else copy(messages = messages + newMsg)
+            // Observe live thread messages. Realtime is best-effort — if the socket
+            // is unavailable, keep the REST-loaded history rather than crashing.
+            observeThread(threadId)
+                .catch { /* realtime transport unavailable; history already loaded */ }
+                .collect { newMsg ->
+                    setState {
+                        val exists = messages.any { it.id == newMsg.id }
+                        if (exists) this
+                        else copy(messages = messages + newMsg)
+                    }
                 }
-            }
         }
     }
 
