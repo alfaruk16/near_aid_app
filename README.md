@@ -20,6 +20,29 @@ UI follows `near_aid_documents/nearaid_ui.html`; behaviour and data follow the
 
 ---
 
+## 🔀 Kotlin Multiplatform version available
+
+This app has been **fully migrated to Kotlin Multiplatform + Compose Multiplatform**
+(Android + iOS from shared code) on the [**`KMP` branch**](https://github.com/alfaruk16/near_aid_app/tree/KMP):
+
+- **16 modules with `commonMain`** — including the Compose UI screens themselves, shared across platforms
+- **Room (KMP)**, **Ktor 3**, **Koin**, and `expect`/`actual` platform APIs (DataStore, database, image picker)
+- A native **iOS app** (`iosApp/`, Xcode project) linking against a shared umbrella framework
+
+`main` intentionally remains the **Kotlin‑native Android version** (Hilt, Retrofit/OkHttp), so the
+two architectures can be compared side by side — same product, same Clean Architecture + MVI,
+two dependency stacks:
+
+| | `main` (native) | [`KMP`](https://github.com/alfaruk16/near_aid_app/tree/KMP) |
+|---|---|---|
+| UI | Jetpack Compose | Compose Multiplatform (shared) |
+| DI | Hilt | Koin |
+| Networking | Retrofit/OkHttp | Ktor 3 |
+| Database | Room | Room (KMP) |
+| Targets | Android | Android + iOS |
+
+---
+
 ## Table of contents
 
 1. [Features](#features)
