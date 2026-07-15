@@ -55,6 +55,9 @@ coil3 = "3.0.4"
 # Firebase / push
 firebaseBom = "33.7.0"
 
+# Debug tooling
+leakcanary = "2.14"
+
 # Testing
 junit = "4.13.2"
 junitExt = "1.2.1"
@@ -135,6 +138,9 @@ coil-network-ktor3 = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", 
 # Firebase / push
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+
+# Debug tooling
+leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
