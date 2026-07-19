@@ -11,7 +11,7 @@ Android `:app` + iOS `iosApp`/`:shared`) and the roadmap for extending it.
 | 1 | PR validation (build + test + lint) | ✅ Done (`.github/workflows/ci.yml`) |
 | 2 | Quality gates (detekt / spotless) | ✅ Done (detekt gating; spotless advisory) |
 | 3 | CD — Android release (signing → Firebase App Distribution) | ✅ Done (needs secrets) |
-| 4 | CD — iOS release (signing → TestFlight) | ⬜ Not started |
+| 4 | CD — iOS release (signing → TestFlight) | ⏸ Deferred (no Apple Developer account yet) |
 
 ---
 
@@ -177,9 +177,16 @@ git tag v1.0.0 && git push origin v1.0.0
 
 ---
 
-## Phase 4 — CD: iOS release (roadmap)
+## Phase 4 — CD: iOS release (deferred)
 
-Most greenfield — requires setup before automation is possible:
+**Blocked on a paid Apple Developer account** — TestFlight/App Store uploads and
+code signing are impossible without one. This is deferred until an account exists.
+
+Note: the **iOS CI job** (`ci.yml`) is unaffected — it builds and tests the
+shared framework and Xcode app with `CODE_SIGNING_ALLOWED=NO`, which needs no
+account. Only the release/distribution below is blocked.
+
+When an account is available, the setup required before automation is possible:
 1. Set `DEVELOPMENT_TEAM`, switch to manual signing, add an `ExportOptions.plist`
    (none exist today).
 2. **Fastlane `match`** for certs/profiles, with an App Store Connect API key.
