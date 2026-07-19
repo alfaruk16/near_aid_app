@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MaxLineLength:AuthNavigation.kt$composable&lt;OtpRoute&gt; { entry -&gt; val r = entry.toRoute&lt;OtpRoute&gt;(); OtpScreen(requestId = r.requestId, phoneE164 = r.phone, onBack = { navController.popBackStack() }, onVerified = { isNewUser -&gt; if (isNewUser) navController.navigate(ProfileSetupRoute) else onAuthenticated() }) }</ID>
+    <ID>MaxLineLength:AuthNavigation.kt$composable&lt;PhoneRoute&gt; { PhoneScreen(onBack = { navController.popBackStack() }, onCodeSent = { reqId, e164 -&gt; navController.navigate(OtpRoute(reqId, e164)) }) }</ID>
+    <ID>MaxLineLength:OtpScreen.kt$Text(stringResource(Res.string.otp_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.headingSemantics())</ID>
+    <ID>MaxLineLength:PhoneScreen.kt$Text(stringResource(Res.string.phone_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.headingSemantics())</ID>
+    <ID>MaxLineLength:ProfileSetupScreen.kt$NearAidChip(stringResource(Res.string.profile_language_bn), state.language == AppLanguage.BN, { viewModel.onIntent(ProfileSetupIntent.LanguageChanged(AppLanguage.BN)) })</ID>
+    <ID>MaxLineLength:ProfileSetupScreen.kt$NearAidChip(stringResource(Res.string.profile_language_en), state.language == AppLanguage.EN, { viewModel.onIntent(ProfileSetupIntent.LanguageChanged(AppLanguage.EN)) })</ID>
+    <ID>MaxLineLength:ProfileSetupScreen.kt$Text(stringResource(Res.string.profile_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.headingSemantics())</ID>
+    <ID>MaxLineLength:SplashScreen.kt$Text(stringResource(Res.string.splash_app_name), style = MaterialTheme.typography.displaySmall, color = Color.White, modifier = Modifier.padding(top = 18.dp))</ID>
+    <ID>MaxLineLength:SplashScreen.kt$Text(stringResource(Res.string.splash_tagline_bn), style = MaterialTheme.typography.titleMedium, color = Color.White.copy(alpha = 0.92f))</ID>
+    <ID>WildcardImport:OtpScreen.kt$import com.nearaid.feature.auth.resources.*</ID>
+    <ID>WildcardImport:PhoneScreen.kt$import com.nearaid.feature.auth.resources.*</ID>
+    <ID>WildcardImport:ProfileSetupScreen.kt$import com.nearaid.feature.auth.resources.*</ID>
+    <ID>WildcardImport:SplashScreen.kt$import com.nearaid.feature.auth.resources.*</ID>
+    <ID>WildcardImport:WelcomeScreen.kt$import com.nearaid.feature.auth.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

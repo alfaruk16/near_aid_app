@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>FunctionNaming:MainViewController.kt$fun MainViewController(): UIViewController</ID>
+    <ID>MaxLineLength:MainScreen.kt$Icon(Icons.Filled.Add, contentDescription = stringResource(Res.string.cd_post), tint = NearAidTheme.colors.surface, modifier = Modifier.size(26.dp))</ID>
+  </CurrentIssues>
+</SmellBaseline>

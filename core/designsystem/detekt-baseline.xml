@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongParameterList:TextField.kt$( value: String, onValueChange: (String) -&gt; Unit, label: String, modifier: Modifier = Modifier.fillMaxWidth(), placeholder: String? = null, singleLine: Boolean = true, minLines: Int = 1, keyboardType: KeyboardType = KeyboardType.Text, isError: Boolean = false, supportingText: String? = null, )</ID>
+    <ID>MatchingDeclarationName:Buttons.kt$NearAidButtonVariant</ID>
+    <ID>MaxLineLength:Badges.kt$ListingStatus.CLAIMED -&gt; Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, stringResource(Res.string.status_claimed))</ID>
+    <ID>MaxLineLength:Badges.kt$ListingStatus.COMPLETED -&gt; Triple(NearAidTheme.colors.tealTint, NearAidTheme.colors.teal, stringResource(Res.string.status_completed))</ID>
+    <ID>MaxLineLength:Badges.kt$ListingStatus.DELIVERED -&gt; Triple(NearAidTheme.colors.marigoldTint, NearAidTheme.colors.marigoldDeep, stringResource(Res.string.status_delivered))</ID>
+    <ID>MaxLineLength:Common.kt$Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.cd_back), tint = NearAidTheme.colors.ink)</ID>
+    <ID>MaxLineLength:Common.kt$Text(subtitle, style = MaterialTheme.typography.bodySmall, color = if (highlighted) NearAidTheme.colors.teal else NearAidTheme.colors.ink3, maxLines = 2, overflow = TextOverflow.Ellipsis)</ID>
+    <ID>WildcardImport:Badges.kt$import com.nearaid.core.designsystem.resources.*</ID>
+    <ID>WildcardImport:ListingCard.kt$import com.nearaid.core.designsystem.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>WildcardImport:ChatScreen.kt$import com.nearaid.feature.messages.resources.*</ID>
+    <ID>WildcardImport:MessagesScreen.kt$import com.nearaid.feature.messages.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

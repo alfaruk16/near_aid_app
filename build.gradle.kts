@@ -9,4 +9,8 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.jetbrains.compose) apply false
+    // Quality tooling — classpath only; QualityConventionPlugin applies + configures them.
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.nearaid.quality)
 }

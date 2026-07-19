@@ -9,7 +9,7 @@ Android `:app` + iOS `iosApp`/`:shared`) and the roadmap for extending it.
 |-------|-------|-------|
 | 0 | Make the build CI-portable | ✅ Done |
 | 1 | PR validation (build + test + lint) | ✅ Done (`.github/workflows/ci.yml`) |
-| 2 | Quality gates (detekt / spotless / Kover) | ⬜ Not started |
+| 2 | Quality gates (detekt / spotless) | ✅ Done (detekt gating; spotless advisory) |
 | 3 | CD — Android release (signing → Play/Firebase) | ⬜ Not started |
 | 4 | CD — iOS release (signing → TestFlight) | ⬜ Not started |
 
@@ -85,17 +85,42 @@ settings, or gate it to run only on labeled PRs / release branches.
 
 ---
 
-## Phase 2 — Quality gates (roadmap)
+## Phase 2 — Quality gates (done)
 
-None configured yet. Recommended, wired via `build-logic` convention plugins so
-all 16 modules inherit them:
+Wired via a single `build-logic` convention plugin,
+[`QualityConventionPlugin`](../build-logic/convention/src/main/kotlin/QualityConventionPlugin.kt)
+(id `nearaid.quality`), applied once in the root `build.gradle.kts`. It configures
+**detekt** and **Spotless** across the root and every subproject via
+`allprojects {}`, so all modules inherit the rules without editing 16 build scripts.
 
-- **detekt** (static analysis) — introduce with a baseline to avoid a wall of
-  initial violations.
-- **spotless** + **ktlint** (formatting) — `kotlin.code.style=official` is set.
-- **Kover** (coverage) — report + optional thresholds.
+### detekt (blocking)
+- Config: [`config/detekt/detekt.yml`](../config/detekt/detekt.yml) with
+  `buildUponDefaultConfig = true`.
+- Source: KMP source sets are listed explicitly (`commonMain`, `androidMain`,
+  `iosMain`, `main`, plus test sets) — detekt's default detection only covers
+  `src/main`.
+- **Baselines** (`<module>/detekt-baseline.xml`, committed) grandfather the
+  pre-existing issues, so only *new* violations fail the build.
+- CI: `./gradlew detekt` in the `quality` job — a required check.
 
-Add each as a step in the `android` job and mark it a required check.
+Regenerate baselines after intentionally accepting new debt:
+```sh
+./gradlew detektBaseline    # rewrites every module's detekt-baseline.xml
+```
+
+### Spotless / ktlint (advisory for now)
+- Formats `src/**/*.kt` and `*.gradle.kts` with ktlint.
+- The existing code predates ktlint formatting, so `spotlessCheck` currently
+  fails repo-wide. The CI step is therefore **advisory** (`continue-on-error`).
+
+**To make formatting a required gate:**
+1. Run `./gradlew spotlessApply` on a dedicated formatting-only PR (large diff —
+   land it separately from feature work to avoid conflicts).
+2. Remove the `continue-on-error: true` line from the `Spotless` step in
+   `.github/workflows/ci.yml`.
+
+### Not yet included
+- **Kover** (coverage report + thresholds) — a natural Phase 2.1 add.
 
 ---
 
@@ -154,5 +179,6 @@ Store each as an encrypted GitHub Actions secret; never commit them.
 
 Once green, require these checks to merge into `main`:
 - `Android / JVM / common` (required)
+- `Static analysis` (required — detekt gates; Spotless advisory until the
+  formatting PR lands)
 - `iOS (shared + Xcode)` (required, or advisory if controlling cost)
-- Phase 2 quality gates once added.
