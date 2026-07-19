@@ -10,7 +10,7 @@ Android `:app` + iOS `iosApp`/`:shared`) and the roadmap for extending it.
 | 0 | Make the build CI-portable | ✅ Done |
 | 1 | PR validation (build + test + lint) | ✅ Done (`.github/workflows/ci.yml`) |
 | 2 | Quality gates (detekt / spotless) | ✅ Done (detekt gating; spotless advisory) |
-| 3 | CD — Android release (signing → Play/Firebase) | ⬜ Not started |
+| 3 | CD — Android release (signing → Firebase App Distribution) | ✅ Done (needs secrets) |
 | 4 | CD — iOS release (signing → TestFlight) | ⬜ Not started |
 
 ---
@@ -124,26 +124,56 @@ Regenerate baselines after intentionally accepting new debt:
 
 ---
 
-## Phase 3 — CD: Android release (roadmap)
+## Phase 3 — CD: Android release (done — needs secrets)
 
-Prerequisites (these do not exist yet):
-1. **Signing config** in `app/build.gradle.kts` — the `release` build type is
-   currently debug-signed. Read keystore path + passwords from env /
-   `keystore.properties`; store the keystore as a base64 GitHub secret and decode
-   it in the workflow.
-2. **`BASE_URL` / `WS_URL`** are hardcoded per build type today. Inject via
-   secrets/BuildConfig if release environments differ.
-3. Publishing target:
-   - **Firebase App Distribution** — lightest first step for internal testers.
-   - **Play Store** — Fastlane `supply` or `r0adkll/upload-google-play` with a
-     Play service-account JSON secret.
+Workflow: [`.github/workflows/release.yml`](../.github/workflows/release.yml).
+Triggered by pushing a `v*` tag (or manual dispatch). It decodes the keystore,
+builds a **signed release APK**, and pushes it to **Firebase App Distribution**
+(group `testers`), also uploading the APK as a build artifact.
 
-Workflow shape: trigger on tag/release → `./gradlew :app:bundleRelease` → sign →
-upload → publish.
+**Signing** is wired in `app/build.gradle.kts`: it reads `keystore.properties`
+(local, gitignored) first, then env vars (CI). If no signing material is present,
+the release build stays debug-signed — so nothing breaks for devs without a key.
 
-Required secrets (suggested names): `ANDROID_KEYSTORE_BASE64`,
-`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`,
-`PLAY_SERVICE_ACCOUNT_JSON` (and/or `FIREBASE_APP_ID` + `FIREBASE_TOKEN`).
+### One-time setup
+
+**1. Generate a keystore** (do this once; keep the `.jks` safe — losing it means
+you can no longer update the app on Play):
+```sh
+keytool -genkeypair -v \
+  -keystore release.keystore \
+  -alias nearaid \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+**2. Local signed builds** (optional): copy `keystore.properties.example` to
+`keystore.properties`, fill in the passwords, and put `release.keystore` at the
+repo root. Then `./gradlew :app:assembleRelease` produces a signed APK.
+
+**3. Add GitHub Actions secrets** (Repo → Settings → Secrets and variables →
+Actions):
+
+| Secret | How to get it |
+|--------|---------------|
+| `ANDROID_KEYSTORE_BASE64` | `base64 -i release.keystore \| pbcopy` (macOS) |
+| `ANDROID_KEYSTORE_PASSWORD` | the store password you chose |
+| `ANDROID_KEY_ALIAS` | `nearaid` (or your alias) |
+| `ANDROID_KEY_PASSWORD` | the key password you chose |
+| `FIREBASE_APP_ID` | Firebase Console → Project settings → your Android app (`1:...:android:...`) |
+| `FIREBASE_SERVICE_ACCOUNT` | a Google Cloud service-account JSON with the *Firebase App Distribution Admin* role (paste the whole file contents) |
+
+**4. Create the `testers` group** in Firebase Console → App Distribution, and add
+testers. Change the `groups:` value in `release.yml` to match your group name(s).
+
+### Release
+```sh
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+> Note: `BASE_URL` / `WS_URL` are hardcoded per build type (`release` →
+> `api.nearaid.app`). Inject via secrets/BuildConfig if environments differ.
+> To ship an **AAB** to Play later, swap `assembleRelease` → `bundleRelease` and
+> add `r0adkll/upload-google-play` with a Play service-account secret.
 
 ---
 
