@@ -13,4 +13,7 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.nearaid.quality)
+    // Coverage — classpath only; KoverConventionPlugin applies + aggregates across modules.
+    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.nearaid.kover)
 }

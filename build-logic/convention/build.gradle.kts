@@ -16,6 +16,7 @@ dependencies {
     compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.detekt.gradlePlugin)
     compileOnly(libs.spotless.gradlePlugin)
+    compileOnly(libs.kover.gradlePlugin)
 }
 
 // Register the convention plugins so module scripts can apply them by id.
@@ -60,6 +61,10 @@ gradlePlugin {
         register("quality") {
             id = "nearaid.quality"
             implementationClass = "QualityConventionPlugin"
+        }
+        register("kover") {
+            id = "nearaid.kover"
+            implementationClass = "KoverConventionPlugin"
         }
     }
 }
