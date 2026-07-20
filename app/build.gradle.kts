@@ -63,6 +63,20 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.nearaid.app/v1/\"")
             buildConfigField("String", "WS_URL", "\"wss://api.nearaid.app/ws\"")
         }
+        // Macrobenchmark target: a non-debuggable, profileable variant the :benchmark
+        // module drives via `connectedBenchmarkAndroidTest`. Based on release so every
+        // library module resolves its `release` variant (via matchingFallbacks) — the
+        // graph has no `benchmark` variant elsewhere. Debug-signed so it installs without
+        // the release keystore; minify off to keep the benchmark build fast and avoid R8
+        // keep-rule risk. `isProfileable = true` injects <profileable> for Macrobenchmark.
+        create("benchmark") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isProfileable = true
+        }
     }
 
     buildFeatures {

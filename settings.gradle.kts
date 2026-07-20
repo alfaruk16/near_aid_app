@@ -48,3 +48,6 @@ include(":feature:profile")
 
 // iOS umbrella framework — exports the shared modules to Xcode as `Shared`.
 include(":shared")
+
+// Macrobenchmark — measures cold/warm startup against the app's `benchmark` variant.
+include(":benchmark")

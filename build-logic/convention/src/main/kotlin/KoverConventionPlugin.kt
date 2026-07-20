@@ -25,7 +25,12 @@ class KoverConventionPlugin : Plugin<Project> {
 
         pluginManager.apply("org.jetbrains.kotlinx.kover")
 
+        // The macrobenchmark module (com.android.test) has no coverable production code
+        // and no library/app variant for Kover to instrument — keep it out of the report.
+        val covered = subprojects.filter { it.path != ":benchmark" }
+
         subprojects {
+            if (path == ":benchmark") return@subprojects
             pluginManager.apply("org.jetbrains.kotlinx.kover")
 
             extensions.configure<KoverProjectExtension> {
@@ -49,9 +54,9 @@ class KoverConventionPlugin : Plugin<Project> {
             }
         }
 
-        // Merge every subproject into the root report.
+        // Merge every covered subproject into the root report.
         dependencies {
-            subprojects.forEach { add("kover", it) }
+            covered.forEach { add("kover", it) }
         }
     }
 }
