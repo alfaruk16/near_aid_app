@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MaxLineLength:ActivityScreen.kt$.</ID>
+    <ID>WildcardImport:ActivityScreen.kt$import com.nearaid.feature.activity.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

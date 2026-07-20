@@ -1,0 +1,40 @@
+# detekt configuration for NearAid.
+# `buildUponDefaultConfig = true` is set in QualityConventionPlugin, so this file
+# only overrides the defaults. A per-module `detekt-baseline.xml` grandfathers
+# pre-existing issues; new violations fail the build.
+
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 80
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 10
+  TooManyFunctions:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: true
+    # Jetpack Compose @Composable functions are intentionally PascalCase.
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: true
+    max: 4
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  UnusedPrivateMember:
+    active: true

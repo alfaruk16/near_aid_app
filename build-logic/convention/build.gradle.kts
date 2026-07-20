@@ -14,6 +14,8 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.detekt.gradlePlugin)
+    compileOnly(libs.spotless.gradlePlugin)
 }
 
 // Register the convention plugins so module scripts can apply them by id.
@@ -54,6 +56,10 @@ gradlePlugin {
         register("cmpLibrary") {
             id = "nearaid.cmp.library"
             implementationClass = "CmpLibraryConventionPlugin"
+        }
+        register("quality") {
+            id = "nearaid.quality"
+            implementationClass = "QualityConventionPlugin"
         }
     }
 }

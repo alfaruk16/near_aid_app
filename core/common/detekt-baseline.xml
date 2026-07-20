@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MemberNameEqualsClassName:TimeFormat.kt$TimeFormat$// "8:00 PM" — 12-hour clock, no leading zero on the hour. private val timeFormat = LocalDateTime.Format { amPmHour(padding = Padding.NONE) char(':') minute() char(' ') amPmMarker("AM", "PM") }</ID>
+    <ID>ReturnCount:TimeFormat.kt$TimeFormat$fun relativeFromNow(iso: String?, now: Long = Clock.System.now().toEpochMilliseconds()): String</ID>
+  </CurrentIssues>
+</SmellBaseline>

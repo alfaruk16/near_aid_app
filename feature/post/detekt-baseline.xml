@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:CreateListingScreen.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun CreateListingScreen( type: ListingType, onBack: () -&gt; Unit, onPosted: (listingId: String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: CreateListingViewModel = koinViewModel(), )</ID>
+    <ID>ForbiddenComment:CreateListingViewModel.kt$CreateListingViewModel$// TODO: replace with real GPS lat in v2</ID>
+    <ID>ForbiddenComment:CreateListingViewModel.kt$CreateListingViewModel$// TODO: replace with real GPS lng in v2</ID>
+    <ID>ForbiddenComment:CreateListingViewModel.kt$CreateListingViewModel$// TODO: replace with real device location once location is wired in v2</ID>
+    <ID>LongMethod:CreateListingScreen.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun CreateListingScreen( type: ListingType, onBack: () -&gt; Unit, onPosted: (listingId: String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: CreateListingViewModel = koinViewModel(), )</ID>
+    <ID>MaxLineLength:CreateListingScreen.kt$label = if (type == ListingType.REQUEST) stringResource(Res.string.field_title_label_request) else stringResource(Res.string.field_title_label_offer)</ID>
+    <ID>MaxLineLength:CreateListingScreen.kt$text = if (type == ListingType.REQUEST) stringResource(Res.string.create_submit_request) else stringResource(Res.string.create_submit_offer)</ID>
+    <ID>MaxLineLength:CreateListingScreen.kt$title = if (type == ListingType.REQUEST) stringResource(Res.string.create_title_request) else stringResource(Res.string.create_title_offer)</ID>
+    <ID>WildcardImport:CreateListingScreen.kt$import com.nearaid.feature.post.resources.*</ID>
+    <ID>WildcardImport:PostChooserScreen.kt$import com.nearaid.feature.post.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

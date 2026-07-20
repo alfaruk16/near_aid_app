@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:ChatSocket.kt$ChatSocket$fun observe(threadId: String): Flow&lt;ChatMessage&gt;</ID>
+    <ID>LongParameterList:Services.kt$ListingApi$( type: String, lat: Double, lng: Double, radiusKm: Double, categories: List&lt;String&gt;?, urgency: String?, query: String?, cursor: String?, )</ID>
+    <ID>LoopWithTooManyJumpStatements:ChatSocket.kt$ChatSocket$for</ID>
+    <ID>SwallowedException:ChatSocket.kt$ChatSocket$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ChatSocket.kt$ChatSocket$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SafeApiCall.kt$e: Throwable</ID>
+    <ID>TooGenericExceptionThrown:SafeApiCallTest.kt$SafeApiCallTest$throw RuntimeException("offline")</ID>
+  </CurrentIssues>
+</SmellBaseline>

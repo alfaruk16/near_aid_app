@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:ListingDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ListingDetailScreen( listingId: String, onBack: () -&gt; Unit, onOpenChat: (claimId: String, threadId: String, title: String) -&gt; Unit, onAuthorClick: (userId: String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: ListingDetailViewModel = koinViewModel(), )</ID>
+    <ID>ForbiddenComment:HomeViewModel.kt$// TODO: Wire fused location provider when GPS is enabled in v2.</ID>
+    <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onListingClick: (id: String) -&gt; Unit, onOpenNotifications: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = koinViewModel(), )</ID>
+    <ID>LongMethod:ListingDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ListingDetailScreen( listingId: String, onBack: () -&gt; Unit, onOpenChat: (claimId: String, threadId: String, title: String) -&gt; Unit, onAuthorClick: (userId: String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: ListingDetailViewModel = koinViewModel(), )</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$.</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$Icon(Icons.Filled.MoreVert, contentDescription = stringResource(Res.string.cd_more_options), tint = NearAidTheme.colors.ink2)</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$Text(stringResource(Res.string.detail_label_area), style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$Text(stringResource(Res.string.detail_label_quantity), style = MaterialTheme.typography.labelSmall, color = NearAidTheme.colors.ink3)</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$label = stringResource(Res.string.detail_offer_available_until, TimeFormat.timeOfDay(listing.availableUntil))</ID>
+    <ID>MaxLineLength:ListingDetailScreen.kt$val actionLabel = if (listing.type == ListingType.REQUEST) stringResource(Res.string.detail_action_offer_help) else stringResource(Res.string.detail_action_request_this)</ID>
+    <ID>WildcardImport:HomeScreen.kt$import com.nearaid.feature.discovery.resources.*</ID>
+    <ID>WildcardImport:ListingDetailScreen.kt$import com.nearaid.feature.discovery.resources.*</ID>
+    <ID>WildcardImport:NotificationsScreen.kt$import com.nearaid.feature.discovery.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

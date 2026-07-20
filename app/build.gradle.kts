@@ -1,13 +1,46 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.nearaid.android.application)
     alias(libs.plugins.nearaid.android.application.compose)
 }
+
+// Release signing material. Read from keystore.properties (local, gitignored)
+// first, then from environment variables (CI secrets). If nothing is provided
+// the release build stays debug-signed, so debug/dev flows never break.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+val releaseStoreFile = (keystoreProperties.getProperty("storeFile")
+    ?: System.getenv("KEYSTORE_FILE"))?.let { rootProject.file(it) }
+val releaseStorePassword = keystoreProperties.getProperty("storePassword")
+    ?: System.getenv("KEYSTORE_PASSWORD")
+val releaseKeyAlias = keystoreProperties.getProperty("keyAlias")
+    ?: System.getenv("KEY_ALIAS")
+val releaseKeyPassword = keystoreProperties.getProperty("keyPassword")
+    ?: System.getenv("KEY_PASSWORD")
+val hasReleaseSigning = releaseStoreFile?.exists() == true &&
+    releaseStorePassword != null && releaseKeyAlias != null && releaseKeyPassword != null
 
 android {
     namespace = "com.nearaid"
 
     defaultConfig {
         applicationId = "com.nearaid"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = releaseStoreFile
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -18,6 +51,9 @@ android {
             buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8000/ws\"")
         }
         release {
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

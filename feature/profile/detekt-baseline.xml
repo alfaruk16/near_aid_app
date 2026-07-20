@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:ProfileScreen.kt$@Composable fun ProfileScreen( onOpenVerification: () -&gt; Unit, onOpenSettings: () -&gt; Unit, onOpenPublicProfile: (userId: String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: ProfileViewModel = koinViewModel(), )</ID>
+    <ID>LongMethod:PublicProfileScreen.kt$@Composable fun PublicProfileScreen( userId: String, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: PublicProfileViewModel = koinViewModel(), )</ID>
+    <ID>LongMethod:VerificationScreen.kt$@Composable fun VerificationScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: VerificationViewModel = koinViewModel(), )</ID>
+    <ID>MaxLineLength:PublicProfileScreen.kt$NearAidTopBar(title = stringResource(Res.string.public_profile_title), onBack = { viewModel.onIntent(PublicProfileIntent.BackClicked) })</ID>
+    <ID>MaxLineLength:VerificationScreen.kt$NearAidTopBar(title = stringResource(Res.string.verification_title), onBack = { viewModel.onIntent(VerificationIntent.BackClicked) })</ID>
+    <ID>WildcardImport:ProfileScreen.kt$import com.nearaid.feature.profile.resources.*</ID>
+    <ID>WildcardImport:PublicProfileScreen.kt$import com.nearaid.feature.profile.resources.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import com.nearaid.feature.profile.resources.*</ID>
+    <ID>WildcardImport:VerificationScreen.kt$import com.nearaid.feature.profile.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>
