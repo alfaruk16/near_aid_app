@@ -44,6 +44,33 @@ class KoverConventionPlugin : Plugin<Project> {
                                 "*_*Factory",
                                 "*Kt\$*",
                                 "*.databinding.*",
+                                // Room-KMP generated database/DAO implementations and the
+                                // per-target generated database constructor.
+                                "*_Impl",
+                                "*_Impl\$*",
+                                "*NearAidDatabaseConstructor*",
+                                // Koin DI modules + platform provider glue: wiring, not logic.
+                                // The module files compile to top-level `…ModuleKt` classes.
+                                "*.di.*",
+                                "*ModuleKt",
+                                // Platform secure-storage adapters over Android Keystore /
+                                // EncryptedSharedPreferences and the iOS Keychain: thin I/O
+                                // wrappers requiring on-device crypto (not unit-testable on the
+                                // JVM). The session lifecycle logic lives in
+                                // AuthPreferencesDataSource, which is fully covered.
+                                "*SecureTokenStore",
+                            )
+                            // Whole packages of framework glue / pure data holders.
+                            packages(
+                                // DI wiring.
+                                "com.nearaid.*.di",
+                                // Wire DTOs: pure @Serializable data-transfer holders with no
+                                // branch logic (the network analog of :core:model). The mapping
+                                // logic that consumes them is covered in :core:data.
+                                "com.nearaid.core.network.dto",
+                                // Compose Resources codegen (Res, String0_*, resource collectors):
+                                // the generated accessors for strings/drawables/fonts.
+                                "com.nearaid.*.resources",
                             )
                             // Compose UI + generated resource accessors: excluded so the number
                             // reflects testable logic (ViewModels, repositories, use cases, mappers).

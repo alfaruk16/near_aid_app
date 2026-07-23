@@ -14,6 +14,11 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+        }
+        getByName("androidUnitTest").dependencies {
+            implementation(libs.junit)
         }
     }
 }
