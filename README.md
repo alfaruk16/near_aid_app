@@ -1,5 +1,15 @@
 # NearAid — Kotlin Multiplatform App (Android + iOS)
 
+[![CI](https://github.com/alfaruk16/near_aid_app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alfaruk16/near_aid_app/actions/workflows/ci.yml)
+[![Logic coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/alfaruk16/near_aid_app/main/docs/badges/coverage.json)](NearAid_Repo_Report.md#5-metric-evidence)
+[![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin-Multiplatform-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/docs/multiplatform.html)
+
+> **Coverage badge** shows Kover line coverage of hand‑written logic (ViewModels, repositories,
+> use cases, mappers, utilities); UI and generated code are excluded — see
+> [the evidence report](NearAid_Repo_Report.md#5-metric-evidence) for the basis and the
+> whole‑repository figure. It is regenerated from the merged Kover report and committed by CI
+> on every push to `main`.
+
 **NearAid** (পাশের মানুষ — *"the person beside you"*) is a hyperlocal **mutual‑aid**
 client. It connects people who need everyday help — food, clothes, medicine, household
 goods, shelter — with nearby neighbours willing to give. It is a two‑sided board:
