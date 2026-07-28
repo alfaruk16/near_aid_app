@@ -206,7 +206,7 @@ data class MyListingsResponse(val results: List<ListingCardDto> = emptyList())
 data class ClaimDto(
     @SerialName("claim_id") val claimId: String? = null,
     val id: String? = null,
-    @SerialName("listing_id") val listingId: String,
+    @SerialName("listing_id") val listingId: String? = null,
     @SerialName("listing_type") val listingType: String = "request",
     val status: String = "active",
     @SerialName("chat_thread_id") val chatThreadId: String? = null,

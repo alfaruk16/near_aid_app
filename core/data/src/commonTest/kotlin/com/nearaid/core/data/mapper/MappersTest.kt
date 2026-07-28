@@ -24,6 +24,7 @@ import com.nearaid.core.network.dto.MessageDto
 import com.nearaid.core.network.dto.NotificationDto
 import com.nearaid.core.network.dto.PublicUserDto
 import com.nearaid.core.network.dto.RatingDto
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -117,6 +118,15 @@ class MappersTest {
         assertEquals("cid", claimDto(claimId = "cid", id = "other").toDomain().id)
         assertEquals("other", claimDto(claimId = null, id = "other").toDomain().id)
         assertEquals("", claimDto(claimId = null, id = null).toDomain().id)
+    }
+
+    @Test
+    fun claimDto_tolerates_missing_listing_id() {
+        // The backend may omit listing_id on a claim; deserialization must not fail and the mapper
+        // coerces it to an empty string (regression for the /me/claims JsonConvertException).
+        val json = Json { ignoreUnknownKeys = true }
+        val dto = json.decodeFromString<ClaimDto>("""{"claim_id":"c1","status":"active"}""")
+        assertEquals("", dto.toDomain().listingId)
     }
 
     @Test

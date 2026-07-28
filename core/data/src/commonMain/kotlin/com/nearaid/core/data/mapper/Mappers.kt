@@ -122,7 +122,7 @@ fun ListingDetailDto.toDomain() = ListingDetail(
 
 fun ClaimDto.toDomain() = Claim(
     id = claimId ?: id.orEmpty(),
-    listingId = listingId,
+    listingId = listingId.orEmpty(),
     listingType = listingType.toListingType(),
     status = status.toClaimStatus(),
     chatThreadId = chatThreadId,
