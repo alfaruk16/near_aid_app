@@ -95,6 +95,7 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
+    implementation(project(":core:proximity"))
 
     // Shared Compose UI + Koin wiring (hosts the whole app tree; also drives iOS)
     implementation(project(":shared"))

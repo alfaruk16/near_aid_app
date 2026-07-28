@@ -79,6 +79,17 @@ fun ActivityScreen(
         }
     }
 
+    // Proximity couldn't confirm the handoff: inform the user; the row keeps a manual-confirm button.
+    val fallback = state.handoffFallback
+    if (fallback != null) {
+        val message = when (fallback.reason) {
+            HandoffFailureReason.NotNearby -> stringResource(Res.string.proximity_not_nearby)
+            HandoffFailureReason.PermissionOff -> stringResource(Res.string.proximity_permission_off)
+            HandoffFailureReason.Error -> stringResource(Res.string.proximity_error)
+        }
+        LaunchedEffect(fallback) { snackbarHostState.showSnackbar(message) }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             NearAidTopBar(title = stringResource(Res.string.activity_title))
@@ -100,6 +111,7 @@ fun ActivityScreen(
                         viewModel.onIntent(ActivityIntent.ClaimClicked(claimId, threadId, title))
                     },
                     onMarkDelivered = { viewModel.onIntent(ActivityIntent.MarkDelivered(it)) },
+                    onMarkDeliveredManually = { viewModel.onIntent(ActivityIntent.MarkDeliveredManually(it)) },
                     onRefresh = { viewModel.onIntent(ActivityIntent.Refresh) },
                 )
                 1 -> MyPostsTab(
@@ -124,6 +136,7 @@ private fun HelpingTab(
     state: ActivityState,
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
+    onMarkDeliveredManually: (claimId: String) -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -162,8 +175,11 @@ private fun HelpingTab(
                     ClaimRow(
                         claim = claim,
                         actionLoading = state.actionLoading,
+                        proximityChecking = state.proximityClaimId == claim.id,
+                        showManualFallback = state.handoffFallback?.claimId == claim.id,
                         onOpenChat = onOpenChat,
                         onMarkDelivered = onMarkDelivered,
+                        onMarkDeliveredManually = onMarkDeliveredManually,
                     )
                 }
             }
@@ -175,8 +191,11 @@ private fun HelpingTab(
 private fun ClaimRow(
     claim: Claim,
     actionLoading: Boolean,
+    proximityChecking: Boolean,
+    showManualFallback: Boolean,
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
+    onMarkDeliveredManually: (claimId: String) -> Unit,
 ) {
     val mappedStatus = claim.status.toListingStatus()
 
@@ -223,15 +242,32 @@ private fun ClaimRow(
 
         when (claim.status) {
             ClaimStatus.ACTIVE -> {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Tapping "Mark delivered" first prompts for BLE permission (Android), then starts the
+                // proximity check; the confirmer degrades gracefully so the handoff is never blocked.
+                val launchHandoff = rememberHandoffPermissionGate(onReady = { onMarkDelivered(claim.id) })
+                val busy = actionLoading || proximityChecking
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     NearAidButton(
-                        text = stringResource(Res.string.action_mark_delivered),
-                        onClick = { onMarkDelivered(claim.id) },
-                        enabled = !actionLoading,
-                        loading = actionLoading,
+                        text = if (proximityChecking) {
+                            stringResource(Res.string.proximity_checking)
+                        } else {
+                            stringResource(Res.string.action_mark_delivered)
+                        },
+                        onClick = launchHandoff,
+                        enabled = !busy,
+                        loading = busy,
                         variant = NearAidButtonVariant.Teal,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(),
                     )
+                    if (showManualFallback) {
+                        NearAidButton(
+                            text = stringResource(Res.string.action_confirm_manually),
+                            onClick = { onMarkDeliveredManually(claim.id) },
+                            enabled = !actionLoading,
+                            variant = NearAidButtonVariant.Ghost,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
             ClaimStatus.COMPLETED -> {

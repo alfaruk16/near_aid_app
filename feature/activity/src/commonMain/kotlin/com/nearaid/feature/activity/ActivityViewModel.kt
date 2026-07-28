@@ -10,6 +10,9 @@ import com.nearaid.core.domain.usecase.MarkDeliveredUseCase
 import com.nearaid.core.domain.usecase.WithdrawClaimUseCase
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingType
+import com.nearaid.core.proximity.HandoffToken
+import com.nearaid.core.proximity.ProximityConfirmer
+import com.nearaid.core.proximity.ProximityResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -19,6 +22,7 @@ class ActivityViewModel(
     private val markDelivered: MarkDeliveredUseCase,
     private val confirmReceipt: ConfirmReceiptUseCase,
     private val withdrawClaim: WithdrawClaimUseCase,
+    private val proximityConfirmer: ProximityConfirmer,
 ) : MviViewModel<ActivityState, ActivityIntent, ActivityEffect>() {
 
     override fun initialState(): ActivityState = ActivityState()
@@ -35,10 +39,43 @@ class ActivityViewModel(
             is ActivityIntent.ClaimClicked -> sendEffect(
                 ActivityEffect.OpenChat(intent.claimId, intent.threadId, intent.title)
             )
-            is ActivityIntent.MarkDelivered -> performAction { markDelivered(intent.claimId) }
+            is ActivityIntent.MarkDelivered -> confirmProximityThenDeliver(intent.claimId)
+            is ActivityIntent.MarkDeliveredManually -> {
+                setState { copy(handoffFallback = null) }
+                performAction { markDelivered(intent.claimId) }
+            }
             is ActivityIntent.ConfirmReceipt -> performAction { confirmReceipt(intent.claimId) }
             is ActivityIntent.Withdraw -> performAction { withdrawClaim(intent.claimId) }
             ActivityIntent.DismissActionError -> setState { copy(actionError = null) }
+            ActivityIntent.DismissHandoffFallback -> setState { copy(handoffFallback = null) }
+        }
+    }
+
+    /**
+     * Gate the in-person handoff on a BLE proximity check: the two devices on this claim must be
+     * physically together (Tier-0, client-only — matched via the claim id, no backend token).
+     * Proximity *strengthens* the handoff but never *blocks* it: when BLE is unavailable (iOS, no
+     * adapter, turned off) we proceed silently; when it's available but can't confirm, we surface a
+     * manual-confirm fallback rather than trapping a legitimate handoff.
+     */
+    private fun confirmProximityThenDeliver(claimId: String) {
+        setState { copy(proximityClaimId = claimId, actionError = null, handoffFallback = null) }
+        viewModelScope.launch {
+            val result = proximityConfirmer.confirmNearby(HandoffToken(claimId))
+            setState { copy(proximityClaimId = null) }
+            when (result) {
+                is ProximityResult.Confirmed,
+                ProximityResult.Unavailable -> performAction { markDelivered(claimId) }
+                ProximityResult.Timeout -> setState {
+                    copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.NotNearby))
+                }
+                ProximityResult.PermissionDenied -> setState {
+                    copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.PermissionOff))
+                }
+                is ProximityResult.Error -> setState {
+                    copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.Error))
+                }
+            }
         }
     }
 

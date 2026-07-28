@@ -18,6 +18,13 @@
     <string name="action_retry">Retry</string>
     <string name="action_mark_delivered">Mark delivered</string>
     <string name="action_open_chat">Open chat</string>
+    <string name="action_confirm_manually">Confirm manually</string>
+
+    <!-- Proximity handoff (BLE) -->
+    <string name="proximity_checking">Checking you\'re together…</string>
+    <string name="proximity_not_nearby">Couldn\'t detect the other person nearby. Move closer and retry, or confirm manually.</string>
+    <string name="proximity_permission_off">Bluetooth permission is off. Enable it to auto-verify, or confirm manually.</string>
+    <string name="proximity_error">Couldn\'t verify you\'re together. Confirm manually if you\'ve met.</string>
 
     <!-- Claim status labels -->
     <string name="claim_status_active">You're helping</string>
