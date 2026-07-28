@@ -569,7 +569,7 @@ on **both** the JVM and iOS native.
 | `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
 | `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
 | `:core:network`   | `safeApiCall` + error → `AppError` mapping (status codes + error envelope)      |
-| `:core:proximity` | `HandoffToken` payload determinism (cross‑platform) + `ProximityConfirmer` seam (`commonTest`) |
+| `:core:proximity` | `HandoffToken` payload determinism + the `isHandoffMatch` predicate (payload + RSSI gate) in `commonTest`; BLE confirmer guard branches (no adapter / disabled / no advertiser·scanner / permission denied) via MockK in `androidUnitTest` |
 | `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
 | `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
 | `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |

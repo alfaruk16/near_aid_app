@@ -59,8 +59,8 @@ internal class BleProximityConfirmer(private val context: Context) : ProximityCo
             .build()
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
-                val data = result.scanRecord?.getServiceData(ParcelUuid(SERVICE_UUID)) ?: return
-                if (data.contentEquals(payload) && result.rssi >= config.nearRssiThreshold) {
+                val data = result.scanRecord?.getServiceData(ParcelUuid(SERVICE_UUID))
+                if (isHandoffMatch(data, payload, result.rssi, config.nearRssiThreshold)) {
                     if (continuation.isActive) {
                         runCatching { scanner.stopScan(this) }
                         continuation.resume(ProximityResult.Confirmed(result.rssi))

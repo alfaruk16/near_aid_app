@@ -9,20 +9,20 @@ Generated 2026-07-20 · **updated 2026-07-24** (unit-test coverage push) · **up
 | Gradle modules | **19** |
 | Commits (all branches) | **48**² |
 | Contributor (solo) | **1** |
-| Line coverage — logic¹ (Kover) | **84%**³ |
+| Line coverage — logic¹ (Kover) | **85%**³ |
 | Line coverage — whole repo (Kover) | **~31%**⁴ |
-| Unit tests | **323** (48 files)⁵ |
+| Unit tests | **335** (50 files)⁵ |
 | Cold start (emulator) | **585 ms** |
 
 ¹ *"Logic" = hand-written, unit-testable code: ViewModels, repositories, use cases, mappers, utilities. Excludes Compose UI, generated code (Room / Compose Resources / factories / `BuildConfig`), DI wiring, wire DTOs, and platform secure-storage adapters. See §5.*
 
 ² *Commit count reflects the last full audit (2026-07-24); the proximity feature adds further commits on `feature/ble-proximity-handoff` not counted here.*
 
-³ ***Re-measured 2026-07-28** (Kover `koverXmlReport`, logic-filtered root report) including the proximity feature: **84.2% (1,718 / 2,041 lines)** — down from 86.4% at the 2026-07-24 audit. The whole ~2-point dip is `:core:proximity`, whose Android BLE `actual`s (advertise/scan) are untested platform glue (**21.1%, 15 / 71 lines**) not yet excluded by the logic filters — see §5. Excluding it, the rest of the logic surface is unchanged.*
+³ ***Re-measured 2026-07-28** (Kover `koverXmlReport`, logic-filtered root report) including the proximity feature and its tests: **84.8% (1,731 / 2,042 lines)** — vs 86.4% at the 2026-07-24 audit. The ~1.5-point difference is `:core:proximity`, whose testable logic is now covered (**41.7%, 30 / 72 lines**) but whose BLE advertise/scan/callback `actual`s remain untestable platform glue not excluded by the logic filters — see §5. Excluding that glue, the logic surface is ~86%.*
 
-⁴ *Whole-repository line coverage was **not** separately re-derived (the root report is logic-filtered); it remains **~31%** — proximity adds ~71 hand-written lines to a ~6,541-line base, a negligible shift.*
+⁴ *Whole-repository line coverage was **not** separately re-derived (the root report is logic-filtered); it remains **~31%** — proximity adds ~72 hand-written lines to a ~6,541-line base, a negligible shift.*
 
-⁵ ***Measured 2026-07-28** from source `@Test` methods: **323 unit tests across 48 files** (`commonTest` 207 + `androidUnitTest` 116) — **+9 / +2** vs the 2026-07-24 audit (5 in `:core:proximity` `commonTest`, 4 in `:feature:activity`). Excludes the 2 macrobenchmark `@Test`s in `:benchmark`.*
+⁵ ***Measured 2026-07-28** from source `@Test` methods: **335 unit tests across 50 files** (`commonTest` + `androidUnitTest`) — vs 315 / 46 at the 2026-07-24 audit. The proximity feature contributed **21**: 17 in `:core:proximity` (11 `commonTest` — `HandoffToken`, the `isHandoffMatch` predicate, the confirmer seam — + 6 `androidUnitTest` MockK guard-branch tests) and 4 in `:feature:activity`. Excludes the 2 macrobenchmark `@Test`s in `:benchmark`.*
 
 ---
 
@@ -115,7 +115,7 @@ $ git log --all --format='%ae' | sort -u                         → alfarukemai
 
 | Metric | Status | What the repo actually contains |
 | --- | --- | --- |
-| **Test coverage %** | now evidenced | **84.2% line coverage on hand-written logic** (1,718 / 2,041 lines) as re-measured 2026-07-28 with the proximity feature included — **86.4%** (1,679 / 1,943) at the prior 2026-07-24 audit. Measured with Kotlinx Kover 0.9.1, wired as a `nearaid.kover` convention plugin aggregating all modules over the JVM/Android unit tests (`./gradlew koverXmlReport`). **323 unit tests across 48 files.** The figure excludes non-logic code — Compose UI (`@Composable`), generated code (Room `*_Impl` + Compose Resources accessors + factories + `BuildConfig`), Koin DI modules, wire DTOs, and platform Keystore/Keychain adapters — so it reflects the testable logic surface (ViewModels, repositories, use cases, mappers, utilities). The 2-point drop is entirely `:core:proximity`'s untested BLE `actual`s (21.1%, 15/71), which are platform glue in the same category as the already-excluded secure-storage adapters but not yet added to the filters; excluding them the logic surface holds ~86%. Including all UI + generated code, whole-repository line coverage is **~31%** (≈2,074 / 6,612; not separately re-derived). Cite as *"~84–86% coverage of core logic (ViewModels, repositories, use cases, mappers), ~31% whole-repository including UI"* — state the exclusion basis so the figure survives scrutiny. |
+| **Test coverage %** | now evidenced | **84.8% line coverage on hand-written logic** (1,731 / 2,042 lines) as re-measured 2026-07-28 with the proximity feature included — **86.4%** (1,679 / 1,943) at the prior 2026-07-24 audit. Measured with Kotlinx Kover 0.9.1, wired as a `nearaid.kover` convention plugin aggregating all modules over the JVM/Android unit tests (`./gradlew koverXmlReport`). **335 unit tests across 50 files.** The figure excludes non-logic code — Compose UI (`@Composable`), generated code (Room `*_Impl` + Compose Resources accessors + factories + `BuildConfig`), Koin DI modules, wire DTOs, and platform Keystore/Keychain adapters — so it reflects the testable logic surface (ViewModels, repositories, use cases, mappers, utilities). The small dip vs 86.4% is `:core:proximity`: its decision logic is unit-tested (the `isHandoffMatch` predicate + the confirmer guard branches, 41.7%, 30/72), but its BLE advertise/scan/callback `actual`s are untestable without a radio — platform glue in the same category as the already-excluded secure-storage adapters, not yet added to the filters; excluding them the logic surface holds ~86%. Including all UI + generated code, whole-repository line coverage is **~31%** (not separately re-derived). Cite as *"~85% coverage of core logic (ViewModels, repositories, use cases, mappers), ~31% whole-repository including UI"* — state the exclusion basis so the figure survives scrutiny. |
 | **Startup time** | now evidenced | Cold start 585 ms median (531–758 ms), warm start 116 ms median (98–179 ms) — `timeToInitialDisplayMs`, 5 iterations each, AndroidX Macrobenchmark 1.3.3 (`StartupTimingMetric`) against a new profileable, non-minified benchmark app variant. Caveat: run on an Android emulator (API 37, `suppressErrors=EMULATOR`) — not representative of a specific physical device; cite as an emulator baseline or re-run on a phone. An `adb am start -W` cross-check on the debug build gave ~1.0–1.45 s (debug + LeakCanary overhead, expected higher). |
 | **Build time** | measured, noisy | Gradle `--profile` reports generated (Gradle 8.11.1, 402 tasks). Configuration ~1.1–1.3 s; clean `:app:assembleDebug` ranged ~20 s to ~1m40 s wall-clock across runs depending on daemon/machine warmth, and a no-op re-ran 322/402 tasks (no configuration cache). Too variable to cite a single build-time figure honestly — report the range with the caveat, or stabilize (configuration cache + clean-room run) before quoting a number. |
 
@@ -126,10 +126,10 @@ $ git log --all --format='%ae' | sort -u                         → alfarukemai
 | **Logic — core (78–100%)** | `core:datastore` 100% · `core:common` 98.5% · `core:data` 95.8% · `core:domain` 91.2% · `core:network` 78.5% |
 | **Logic — features (88–98%)** | `feature:discovery` 98.0% · `feature:messages` 96.7% · `feature:activity` 91.5% · `feature:auth` 93.3% · `feature:profile` 91.6% · `feature:post` 87.8% |
 | **UI (design system)** | `core:designsystem` 72.9% (a11y contract + component tests) |
-| **Platform glue — low by nature** | `core:proximity` 21.1% (15/71 — `HandoffToken`/seam tested in `commonTest`; the BLE advertise/scan `actual`s are untestable without a radio, like the excluded secure-storage adapters) |
+| **Platform glue — partly tested** | `core:proximity` 41.7% (30/72 — `HandoffToken`, the `isHandoffMatch` predicate and the confirmer guard branches are unit-tested; the remaining ~42 lines are the BLE advertise/scan/callback flow, untestable without a radio, like the excluded secure-storage adapters) |
 | **Not logic — excluded from the 70% target** | `core:model` (pure data classes) · `core:navigation` (route markers) · `core:database` (entities + generated DAOs; mappers covered in `core:data`) · `app` / `shared` (host wiring + iOS umbrella framework) |
 
-> **Proximity note (2026-07-28):** `:core:proximity` pulls the aggregate down ~2 points because its Android BLE `actual`s are counted as logic but can't be unit-tested (no radio in JVM/emulator). The honest fix is to add them to the Kover logic-filter exclusions (same rationale as the Keystore/Keychain adapters), which restores the ~86% figure; left un-excluded here so the number is not massaged.
+> **Proximity note (2026-07-28):** the decision logic in `:core:proximity` is now unit-tested — the pure `isHandoffMatch` predicate (payload equality + RSSI gate) was extracted to `commonMain` and exercised in `commonTest`, and the confirmer's guard branches (no adapter / disabled / no advertiser·scanner / permission denied) are covered by MockK tests in `androidUnitTest`. What remains uncovered is the BLE advertise/scan/callback flow, which needs a real radio. That residual glue is the reason the module sits at 41.7% rather than higher; it could be filtered out (same rationale as the Keystore/Keychain adapters) to restore the ~86% aggregate, but is left counted so the number is not massaged.
 
 ---
 
@@ -143,7 +143,7 @@ $ git log --all --format='%ae' | sort -u                         → alfarukemai
 
 **SAFE TO CLAIM (EVIDENCED):**
 
-19-module KMP architecture · full stack above · sole authorship · CI/CD pipeline · WebSocket realtime chat · BLE proximity-confirmed handoff (Android) · complete Android→KMP migration · shared Compose UI on Android + iOS · **84% Kover coverage of core logic (86% excluding the new untested BLE glue), 323 unit tests, ~31% whole-repository**
+19-module KMP architecture · full stack above · sole authorship · CI/CD pipeline · WebSocket realtime chat · BLE proximity-confirmed handoff (Android) · complete Android→KMP migration · shared Compose UI on Android + iOS · **85% Kover coverage of core logic (86% excluding untestable BLE radio glue), 335 unit tests, ~31% whole-repository**
 
 ---
 
@@ -161,14 +161,14 @@ Every number below is backed by the evidence in this report. Pick 3–5; the emu
 - Architected an **MVI + Clean Architecture** multi-module setup with custom **build-logic convention plugins**, keeping 15 feature/core modules on consistent, DRY build config.
 - Led a full **Android→KMP migration**: swapped Hilt→**Koin**, Retrofit→**Ktor** (incl. WebSocket realtime chat), and moved persistence to **Room-KMP** + DataStore with platform-secure token storage.
 - Built a **CI/CD pipeline** (GitHub Actions): unit tests, Android lint, detekt + Spotless gates, iOS shared-framework tests + Xcode build on a macOS runner, and signed-APK release to Firebase App Distribution on version tags.
-- Drove unit-test coverage to **~84–86% of core logic** (Kotlinx Kover — ViewModels, repositories, use cases, mappers, utilities) across **323 tests / 48 files**, and instrumented startup benchmarking via **AndroidX Macrobenchmark** — ~0.6 s cold / ~0.12 s warm time-to-initial-display (emulator baseline).
+- Drove unit-test coverage to **~85% of core logic** (Kotlinx Kover — ViewModels, repositories, use cases, mappers, utilities) across **335 tests / 50 files**, and instrumented startup benchmarking via **AndroidX Macrobenchmark** — ~0.6 s cold / ~0.12 s warm time-to-initial-display (emulator baseline).
 - Shipped accessible, localized UI: TalkBack/VoiceOver semantics, a semantic light/dark color system, and Bangla/English string resources — validated by a shared cross-platform accessibility contract.
 
 ### Tech-stack line
 
 > Kotlin Multiplatform · Compose Multiplatform · Coroutines/Flow · Ktor · Koin · Room-KMP · DataStore · kotlinx.serialization · SKIE · JUnit/MockK/Turbine/Robolectric · Kover · Macrobenchmark · detekt/Spotless · GitHub Actions · Gradle convention plugins
 
-**Keep out** (unsupported by evidence): any single build-time figure (measurements are noisy), device-specific startup numbers (only measured on emulator), and any "team/led a team" framing (solo project). On coverage, always pair the **84%** (86% excluding the untested BLE `actual`s) with its basis ("core logic" / "excluding UI + generated code") — the whole-repository figure is **~31%**, so an unqualified "84% test coverage" would overstate.
+**Keep out** (unsupported by evidence): any single build-time figure (measurements are noisy), device-specific startup numbers (only measured on emulator), and any "team/led a team" framing (solo project). On coverage, always pair the **85%** (86% excluding the untestable BLE radio `actual`s) with its basis ("core logic" / "excluding UI + generated code") — the whole-repository figure is **~31%**, so an unqualified "85% test coverage" would overstate.
 
 ---
 
