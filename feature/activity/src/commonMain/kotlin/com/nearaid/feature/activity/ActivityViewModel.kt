@@ -45,6 +45,8 @@ class ActivityViewModel(
                 performAction { markDelivered(intent.claimId) }
             }
             is ActivityIntent.ConfirmReceipt -> performAction { confirmReceipt(intent.claimId) }
+            is ActivityIntent.OwnerMarkDelivered -> performAction(reloadListings = true) { markDelivered(intent.claimId) }
+            is ActivityIntent.OwnerConfirmReceipt -> performAction(reloadListings = true) { confirmReceipt(intent.claimId) }
             is ActivityIntent.Withdraw -> performAction { withdrawClaim(intent.claimId) }
             ActivityIntent.DismissActionError -> setState { copy(actionError = null) }
             ActivityIntent.DismissHandoffFallback -> setState { copy(handoffFallback = null) }
@@ -137,12 +139,18 @@ class ActivityViewModel(
         }
     }
 
-    private fun performAction(action: suspend () -> DataResult<Unit>) {
+    private fun performAction(
+        reloadListings: Boolean = false,
+        action: suspend () -> DataResult<Unit>,
+    ) {
         setState { copy(actionLoading = true, actionError = null) }
         viewModelScope.launch {
             when (val result = action()) {
                 is DataResult.Success -> {
                     setState { copy(actionLoading = false) }
+                    // Handoff steps flip both a claim's state and its listing's status, so refresh
+                    // the listings too when the action originated from the "My posts" (author) side.
+                    if (reloadListings) loadMyListings()
                     loadClaims()
                 }
                 is DataResult.Failure -> setState {

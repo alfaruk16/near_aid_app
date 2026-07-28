@@ -64,6 +64,26 @@ class ClaimRepositoryImplTest {
     }
 
     @Test
+    fun getMyClaims_parses_the_nested_listing_shape_and_derives_delivered() = runTest {
+        // Real /me/claims shape: listing type/status are nested, not top-level. An OFFER claim the
+        // user is receiving must map to listingType=OFFER (not the "request" default) so the UI
+        // shows "Confirm receipt" instead of "Mark delivered".
+        val rec = RecordingRequests()
+        val repo = repo(rec) {
+            """{"results":[{"id":"c1","status":"active","delivered_at":"2026-07-29T00:00:00Z",
+               "listing":{"id":"l1","type":"offer","title":"Rice","status":"delivered"},
+               "role":"receiving","claimed_at":"2026-07-28T00:00:00Z"}]}"""
+        }
+        val result = repo.getMyClaims(null)
+        assertIs<DataResult.Success<*>>(result)
+        val claim = (result as DataResult.Success).data.single()
+        assertEquals("c1", claim.id)
+        assertEquals("l1", claim.listingId)
+        assertEquals(com.nearaid.core.model.ListingType.OFFER, claim.listingType)
+        assertEquals(ClaimStatus.DELIVERED, claim.status)
+    }
+
+    @Test
     fun getMyClaims_omits_the_status_param_when_null() = runTest {
         val rec = RecordingRequests()
         val repo = repo(rec) { """{"results":[]}""" }

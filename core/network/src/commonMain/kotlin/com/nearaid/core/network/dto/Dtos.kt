@@ -150,6 +150,9 @@ data class ListingCardDto(
     val author: AuthorDto,
     val status: String = "open",
     @SerialName("created_at") val createdAt: String = "",
+    // Owner-only: the id of the active claim on this listing, so the author can drive their side of
+    // the handoff (mark delivered / confirm receipt) from "My posts". Null for non-owners.
+    @SerialName("active_claim_id") val activeClaimId: String? = null,
 )
 
 @Serializable
@@ -211,10 +214,41 @@ data class ClaimDto(
     val status: String = "active",
     @SerialName("chat_thread_id") val chatThreadId: String? = null,
     @SerialName("claimed_at") val claimedAt: String? = null,
+    // Set once the fulfilling party marks delivered; the claim's own `status` stays "active"
+    // until the receiving party confirms receipt (backend two-step handoff).
+    @SerialName("delivered_at") val deliveredAt: String? = null,
+    @SerialName("completed_at") val completedAt: String? = null,
 )
 
 @Serializable
 data class ClaimsResponse(val results: List<ClaimDto> = emptyList())
+
+// GET /me/claims uses a different shape than ClaimDto: the listing is nested (type/status live
+// under `listing`, not top-level) and there is no `listing_type`/`chat_thread_id`. Parsing it as
+// ClaimDto silently defaulted listing_type to "request", so every claim looked like one the user
+// fulfills. Model the real shape here instead.
+@Serializable
+data class MyClaimListingDto(
+    val id: String? = null,
+    val type: String = "request",
+    val title: String? = null,
+    val status: String? = null,
+)
+
+@Serializable
+data class MyClaimDto(
+    val id: String? = null,
+    val status: String = "active",
+    val listing: MyClaimListingDto? = null,
+    val role: String? = null,
+    @SerialName("chat_thread_id") val chatThreadId: String? = null,
+    @SerialName("claimed_at") val claimedAt: String? = null,
+    @SerialName("delivered_at") val deliveredAt: String? = null,
+    @SerialName("completed_at") val completedAt: String? = null,
+)
+
+@Serializable
+data class MyClaimsResponse(val results: List<MyClaimDto> = emptyList())
 
 @Serializable
 data class RatingBody(val score: Int, val comment: String? = null)

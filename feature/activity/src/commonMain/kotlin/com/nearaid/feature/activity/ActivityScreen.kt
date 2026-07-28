@@ -50,6 +50,7 @@ import com.nearaid.core.designsystem.theme.NearAidTheme
 import com.nearaid.core.model.Claim
 import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingStatus
+import com.nearaid.core.model.ListingType
 import com.nearaid.feature.activity.resources.Res
 import com.nearaid.feature.activity.resources.*
 
@@ -112,11 +113,14 @@ fun ActivityScreen(
                     },
                     onMarkDelivered = { viewModel.onIntent(ActivityIntent.MarkDelivered(it)) },
                     onMarkDeliveredManually = { viewModel.onIntent(ActivityIntent.MarkDeliveredManually(it)) },
+                    onConfirmReceipt = { viewModel.onIntent(ActivityIntent.ConfirmReceipt(it)) },
                     onRefresh = { viewModel.onIntent(ActivityIntent.Refresh) },
                 )
                 1 -> MyPostsTab(
                     state = state,
                     onListingClick = { viewModel.onIntent(ActivityIntent.ListingClicked(it)) },
+                    onMarkDelivered = { viewModel.onIntent(ActivityIntent.OwnerMarkDelivered(it)) },
+                    onConfirmReceipt = { viewModel.onIntent(ActivityIntent.OwnerConfirmReceipt(it)) },
                     onRefresh = { viewModel.onIntent(ActivityIntent.Refresh) },
                 )
             }
@@ -137,6 +141,7 @@ private fun HelpingTab(
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
     onMarkDeliveredManually: (claimId: String) -> Unit,
+    onConfirmReceipt: (claimId: String) -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -180,6 +185,7 @@ private fun HelpingTab(
                         onOpenChat = onOpenChat,
                         onMarkDelivered = onMarkDelivered,
                         onMarkDeliveredManually = onMarkDeliveredManually,
+                        onConfirmReceipt = onConfirmReceipt,
                     )
                 }
             }
@@ -196,8 +202,12 @@ private fun ClaimRow(
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
     onMarkDeliveredManually: (claimId: String) -> Unit,
+    onConfirmReceipt: (claimId: String) -> Unit,
 ) {
     val mappedStatus = claim.status.toListingStatus()
+    // On a REQUEST the claimant is the fulfilling party (marks delivered); on an OFFER the claimant
+    // is the receiving party (confirms receipt). Backend enforces this — calling the wrong action 403s.
+    val isFulfiller = claim.listingType == ListingType.REQUEST
 
     Column(
         modifier = Modifier
@@ -241,9 +251,10 @@ private fun ClaimRow(
         }
 
         when (claim.status) {
-            ClaimStatus.ACTIVE -> {
-                // Tapping "Mark delivered" first prompts for BLE permission (Android), then starts the
-                // proximity check; the confirmer degrades gracefully so the handoff is never blocked.
+            ClaimStatus.ACTIVE -> if (isFulfiller) {
+                // Fulfilling party (helper on a request). Tapping "Mark delivered" first prompts for
+                // BLE permission (Android), then runs the proximity check; the confirmer degrades
+                // gracefully so the handoff is never blocked.
                 val launchHandoff = rememberHandoffPermissionGate(onReady = { onMarkDelivered(claim.id) })
                 val busy = actionLoading || proximityChecking
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -269,6 +280,25 @@ private fun ClaimRow(
                         )
                     }
                 }
+            } else {
+                // Receiving party (recipient on an offer). Nothing to do until the giver marks
+                // delivered — confirming before that would 409.
+                AwaitingChip(text = stringResource(Res.string.claim_awaiting_delivery))
+            }
+            ClaimStatus.DELIVERED -> if (isFulfiller) {
+                // Fulfilling party already delivered; waiting on the recipient's receipt confirmation.
+                // No deliver button here — tapping it again would 409 on the backend.
+                AwaitingChip(text = stringResource(Res.string.claim_awaiting_confirmation))
+            } else {
+                // Receiving party: the giver marked delivered, so confirm receipt → COMPLETED.
+                NearAidButton(
+                    text = stringResource(Res.string.action_confirm_receipt),
+                    onClick = { onConfirmReceipt(claim.id) },
+                    enabled = !actionLoading,
+                    loading = actionLoading,
+                    variant = NearAidButtonVariant.Teal,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
             ClaimStatus.COMPLETED -> {
                 Row(
@@ -296,6 +326,8 @@ private fun ClaimRow(
 private fun MyPostsTab(
     state: ActivityState,
     onListingClick: (id: String) -> Unit,
+    onMarkDelivered: (claimId: String) -> Unit,
+    onConfirmReceipt: (claimId: String) -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -331,19 +363,68 @@ private fun MyPostsTab(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(state.myListings, key = { it.id }) { card ->
-                    ListingCardView(
-                        card = card,
-                        onClick = { onListingClick(card.id) },
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ListingCardView(
+                            card = card,
+                            onClick = { onListingClick(card.id) },
+                        )
+                        // Author's side of the two-step handoff. The giver marks an offer delivered;
+                        // the seeker confirms receipt once a request has been delivered. Both need
+                        // the active claim id (owner-only field), so guard on it.
+                        val claimId = card.activeClaimId
+                        if (claimId != null) {
+                            when {
+                                card.type == ListingType.OFFER && card.status == ListingStatus.CLAIMED ->
+                                    NearAidButton(
+                                        text = stringResource(Res.string.action_mark_delivered),
+                                        onClick = { onMarkDelivered(claimId) },
+                                        enabled = !state.actionLoading,
+                                        loading = state.actionLoading,
+                                        variant = NearAidButtonVariant.Teal,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                card.type == ListingType.REQUEST && card.status == ListingStatus.DELIVERED ->
+                                    NearAidButton(
+                                        text = stringResource(Res.string.action_confirm_receipt),
+                                        onClick = { onConfirmReceipt(claimId) },
+                                        enabled = !state.actionLoading,
+                                        loading = state.actionLoading,
+                                        variant = NearAidButtonVariant.Teal,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+/** Neutral "waiting on the other party" pill shown when the claimant has no action to take yet. */
+@Composable
+private fun AwaitingChip(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(NearAidTheme.colors.marigoldTint)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            color = NearAidTheme.colors.marigoldDeep,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
 @Composable
 private fun claimTitle(status: ClaimStatus): String = when (status) {
     ClaimStatus.ACTIVE -> stringResource(Res.string.claim_status_active)
+    ClaimStatus.DELIVERED -> stringResource(Res.string.claim_status_delivered)
     ClaimStatus.COMPLETED -> stringResource(Res.string.claim_status_completed)
     ClaimStatus.WITHDRAWN -> stringResource(Res.string.claim_status_withdrawn)
     ClaimStatus.CANCELLED -> stringResource(Res.string.claim_status_cancelled)
@@ -351,6 +432,7 @@ private fun claimTitle(status: ClaimStatus): String = when (status) {
 
 private fun ClaimStatus.toListingStatus(): ListingStatus = when (this) {
     ClaimStatus.ACTIVE -> ListingStatus.CLAIMED
+    ClaimStatus.DELIVERED -> ListingStatus.DELIVERED
     ClaimStatus.COMPLETED -> ListingStatus.COMPLETED
     ClaimStatus.WITHDRAWN -> ListingStatus.CANCELLED
     ClaimStatus.CANCELLED -> ListingStatus.CANCELLED

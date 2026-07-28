@@ -4,6 +4,7 @@ import com.nearaid.core.network.dto.AuthorDto
 import com.nearaid.core.network.dto.CategoryDto
 import com.nearaid.core.network.dto.CategoryRefDto
 import com.nearaid.core.network.dto.ClaimDto
+import com.nearaid.core.network.dto.MyClaimDto
 import com.nearaid.core.network.dto.ConversationDto
 import com.nearaid.core.network.dto.GeoDto
 import com.nearaid.core.network.dto.ListingCardDto
@@ -56,6 +57,7 @@ fun String?.toListingStatus(): ListingStatus = when (this) {
 }
 
 fun String?.toClaimStatus(): ClaimStatus = when (this) {
+    "delivered" -> ClaimStatus.DELIVERED
     "withdrawn" -> ClaimStatus.WITHDRAWN
     "completed" -> ClaimStatus.COMPLETED
     "cancelled" -> ClaimStatus.CANCELLED
@@ -99,6 +101,7 @@ fun ListingCardDto.toDomain() = ListingCard(
     author = author.toDomain(),
     status = status.toListingStatus(),
     createdAt = createdAt,
+    activeClaimId = activeClaimId,
 )
 
 fun ListingDetailDto.toDomain() = ListingDetail(
@@ -120,11 +123,29 @@ fun ListingDetailDto.toDomain() = ListingDetail(
     createdAt = createdAt,
 )
 
+// The backend keeps a claim's `status` = "active" after delivery (only `delivered_at` is set) and
+// flips it to "completed" on receipt confirmation. Surface DELIVERED so the UI stops offering
+// "Mark delivered" (a second deliver 409s) and, for the receiving party, offers "Confirm receipt".
+private fun claimStatusOf(rawStatus: String?, deliveredAt: String?): ClaimStatus =
+    rawStatus.toClaimStatus().let { mapped ->
+        if (mapped == ClaimStatus.ACTIVE && deliveredAt != null) ClaimStatus.DELIVERED else mapped
+    }
+
 fun ClaimDto.toDomain() = Claim(
     id = claimId ?: id.orEmpty(),
     listingId = listingId.orEmpty(),
     listingType = listingType.toListingType(),
-    status = status.toClaimStatus(),
+    status = claimStatusOf(status, deliveredAt),
+    chatThreadId = chatThreadId,
+    claimedAt = claimedAt,
+)
+
+// GET /me/claims — nested listing shape (drives the Activity "Helping" tab).
+fun MyClaimDto.toDomain() = Claim(
+    id = id.orEmpty(),
+    listingId = listing?.id.orEmpty(),
+    listingType = listing?.type.toListingType(),
+    status = claimStatusOf(status, deliveredAt),
     chatThreadId = chatThreadId,
     claimedAt = claimedAt,
 )

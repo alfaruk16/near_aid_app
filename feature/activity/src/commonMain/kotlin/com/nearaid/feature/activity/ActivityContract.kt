@@ -39,6 +39,10 @@ sealed interface ActivityIntent : UiIntent {
     /** Bypass the proximity check (fallback offered after it can't confirm). */
     data class MarkDeliveredManually(val claimId: String) : ActivityIntent
     data class ConfirmReceipt(val claimId: String) : ActivityIntent
+    /** Author-side handoff from "My posts": giver marks an offer delivered (no proximity check). */
+    data class OwnerMarkDelivered(val claimId: String) : ActivityIntent
+    /** Author-side handoff from "My posts": seeker confirms receipt on a delivered request. */
+    data class OwnerConfirmReceipt(val claimId: String) : ActivityIntent
     data class Withdraw(val claimId: String) : ActivityIntent
     data object DismissActionError : ActivityIntent
     data object DismissHandoffFallback : ActivityIntent

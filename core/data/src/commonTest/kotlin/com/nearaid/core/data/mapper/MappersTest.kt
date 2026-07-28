@@ -64,11 +64,26 @@ class MappersTest {
 
     @Test
     fun toClaimStatus_maps_states_and_defaults_to_active() {
+        assertEquals(ClaimStatus.DELIVERED, "delivered".toClaimStatus())
         assertEquals(ClaimStatus.WITHDRAWN, "withdrawn".toClaimStatus())
         assertEquals(ClaimStatus.COMPLETED, "completed".toClaimStatus())
         assertEquals(ClaimStatus.CANCELLED, "cancelled".toClaimStatus())
         assertEquals(ClaimStatus.ACTIVE, "active".toClaimStatus())
         assertEquals(ClaimStatus.ACTIVE, (null as String?).toClaimStatus())
+    }
+
+    @Test
+    fun claimDto_derives_delivered_from_deliveredAt_while_status_still_active() {
+        // Backend keeps status="active" after delivery and only sets delivered_at.
+        val delivered = ClaimDto(claimId = "c1", status = "active", deliveredAt = "2026-07-29T00:00:00Z")
+        assertEquals(ClaimStatus.DELIVERED, delivered.toDomain().status)
+
+        // No delivered_at yet → still active.
+        assertEquals(ClaimStatus.ACTIVE, ClaimDto(claimId = "c1", status = "active").toDomain().status)
+
+        // A terminal status wins over delivered_at.
+        val completed = ClaimDto(claimId = "c1", status = "completed", deliveredAt = "2026-07-29T00:00:00Z")
+        assertEquals(ClaimStatus.COMPLETED, completed.toDomain().status)
     }
 
     // --- Simple DTO mappers ---
