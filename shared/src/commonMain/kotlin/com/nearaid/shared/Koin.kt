@@ -7,6 +7,7 @@ import com.nearaid.core.datastore.di.dataStoreModule
 import com.nearaid.core.domain.di.domainModule
 import com.nearaid.core.network.di.NetworkConfig
 import com.nearaid.core.network.di.networkModule
+import com.nearaid.core.proximity.di.proximityModule
 import com.nearaid.feature.activity.di.activityModule
 import com.nearaid.feature.auth.di.authModule
 import com.nearaid.feature.discovery.di.discoveryModule
@@ -37,6 +38,7 @@ fun doInitKoin(baseUrl: String, wsUrl: String) {
             databaseModule,
             dataModule,
             domainModule,
+            proximityModule,
             authModule,
             discoveryModule,
             postModule,

@@ -35,12 +35,37 @@ object TimeFormat {
         year()
     }
 
+    // "15 Jan 2026, 8:00 PM"
+    private val dateTimeFormat = LocalDateTime.Format {
+        dayOfMonth(padding = Padding.NONE)
+        char(' ')
+        monthName(MonthNames.ENGLISH_ABBREVIATED)
+        char(' ')
+        year()
+        char(',')
+        char(' ')
+        amPmHour(padding = Padding.NONE)
+        char(':')
+        minute()
+        char(' ')
+        amPmMarker("AM", "PM")
+    }
+
     fun parseEpochMillis(iso: String?): Long? {
         if (iso.isNullOrBlank()) return null
+        // Preferred: full ISO-8601 with an offset ("…+06:00") or "…Z" — keeps the instant correct.
+        runCatching { Instant.parse(iso).toEpochMilliseconds() }.getOrNull()?.let { return it }
+        // Fallback: a bare local date-time with no offset — assume UTC.
         val cleaned = iso.removeSuffix("Z").substringBefore('.')
         return runCatching {
             LocalDateTime.parse(cleaned).toInstant(TimeZone.UTC).toEpochMilliseconds()
         }.getOrNull()
+    }
+
+    /** "15 Jan 2026, 8:00 PM" in the device's local time zone. */
+    fun dateTime(iso: String?): String {
+        val millis = parseEpochMillis(iso) ?: return ""
+        return dateTimeFormat.format(millis.toLocalDateTime())
     }
 
     /** "18 min ago", "just now", "3 d", etc. */

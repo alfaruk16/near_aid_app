@@ -6,6 +6,7 @@ import com.nearaid.core.network.dto.CancelBody
 import com.nearaid.core.network.dto.CategoriesResponse
 import com.nearaid.core.network.dto.ClaimDto
 import com.nearaid.core.network.dto.ClaimsResponse
+import com.nearaid.core.network.dto.MyClaimsResponse
 import com.nearaid.core.network.dto.ConversationsResponse
 import com.nearaid.core.network.dto.CreateListingBody
 import com.nearaid.core.network.dto.DeviceBody
@@ -174,7 +175,7 @@ class ClaimApi(private val client: HttpClient) {
         client.post("claims/$id/rating") { contentType(ContentType.Application.Json); setBody(body) }
     }
 
-    suspend fun getMyClaims(status: String?): ClaimsResponse =
+    suspend fun getMyClaims(status: String?): MyClaimsResponse =
         client.get("me/claims") { parameter("status", status) }.body()
 
     suspend fun getMessages(id: String, cursor: String?): MessagesResponse =

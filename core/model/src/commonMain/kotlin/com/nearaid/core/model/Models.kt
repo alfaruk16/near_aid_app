@@ -35,6 +35,8 @@ data class ListingCard(
     val author: Author,
     val status: ListingStatus,
     val createdAt: String,
+    /** Owner-only: id of the active claim on this listing (drives the author's handoff action). */
+    val activeClaimId: String? = null,
 )
 
 data class ListingImage(
@@ -82,6 +84,8 @@ data class Claim(
     val id: String,
     val listingId: String,
     val listingType: ListingType,
+    /** Title of the claimed listing (e.g. "Potato"), shown on the activity row. */
+    val listingTitle: String? = null,
     val status: ClaimStatus,
     val chatThreadId: String?,
     val claimedAt: String?,

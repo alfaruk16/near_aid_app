@@ -10,6 +10,7 @@ kotlin {
             implementation(project(":core:domain"))
             implementation(project(":core:navigation"))
             implementation(project(":core:designsystem"))
+            implementation(project(":core:proximity"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)

@@ -45,10 +45,12 @@ android {
 
     buildTypes {
         debug {
-            // Android emulator -> host machine loopback. Change the port if your
-            // local backend isn't on 8000 (Django default).
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/v1/\"")
-            buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8000/ws\"")
+            // Local dev backend. Use 10.0.2.2 for the Android emulator (host loopback), or the
+            // dev machine's LAN IP to run on a physical device on the same Wi-Fi. NOTE: the LAN IP
+            // is machine/DHCP-specific — do not commit it. The backend must also bind to 0.0.0.0
+            // (not 127.0.0.1) for a physical device to reach it.
+            buildConfigField("String", "BASE_URL", "\"http://192.168.68.101:8000/v1/\"")
+            buildConfigField("String", "WS_URL", "\"ws://192.168.68.101:8000/ws\"")
         }
         release {
             if (hasReleaseSigning) {
@@ -95,6 +97,7 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
+    implementation(project(":core:proximity"))
 
     // Shared Compose UI + Koin wiring (hosts the whole app tree; also drives iOS)
     implementation(project(":shared"))

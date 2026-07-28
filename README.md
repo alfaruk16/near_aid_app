@@ -67,6 +67,11 @@ Android→KMP migration is documented phase‑by‑phase under [`docs/`](docs) (
   request (with urgency) or an offer (with an availability window).
 - **Claim & fulfil** — claim an open listing → a private chat opens → fulfilling party marks
   *delivered* → receiving party *confirms* → both parties rate each other.
+- **Proximity‑confirmed handoff (BLE)** — when the helper marks a claim *delivered* in person, a
+  short‑range **Bluetooth LE** check confirms both devices are physically together before completing
+  the handoff (Android; foreground‑only, client‑side). It *strengthens* the handoff but never
+  *blocks* it — no Bluetooth (or a denied permission) transparently falls back to manual confirmation.
+  iOS is a v1 stub; server‑side attestation is a documented later step.
 - **Messages** — all conversation threads in one tab; realtime 1:1 chat over WebSocket with a
   safety bar suggesting public meetup points.
 - **Profile & trust** — trust score, ratings, verification, language (Bangla/English) & settings.
@@ -180,6 +185,9 @@ except `:app` (the Android host). The `:shared` umbrella packages the shared mod
   to each other through the central type‑safe routes in `:core:navigation`.
 - **`:core:data`** is the only module that knows `:core:network`, `:core:database` and
   `:core:datastore` at once; it stitches them into repositories.
+- **`:core:proximity`** provides the platform BLE proximity confirmer (Android advertise + scan; iOS
+  deferred stub) that `:feature:activity` uses to gate the in‑person handoff. It has no backend
+  dependency — the two devices match on the shared claim id (Tier 0, client‑only).
 - **`:shared`** is the composition root of the shared UI: it hosts `App()` (the root NavHost,
   theme, and Koin bootstrap `doInitKoin(...)`), `api`‑exports the modules Swift must see, and
   produces the `Shared` iOS framework via SKIE.
@@ -200,6 +208,7 @@ except `:app` (the Android host). The `:shared` umbrella packages the shared mod
 | Swift interop        | **SKIE** — `StateFlow` → `AsyncSequence`, `suspend` → `async`     |
 | Networking           | **Ktor Client** (OkHttp / Darwin engines) + kotlinx.serialization |
 | Realtime             | **Ktor WebSockets** (1:1 chat, §10)                              |
+| Proximity            | **Bluetooth LE** advertise + scan (Android `BluetoothLeAdvertiser`/`Scanner`; iOS CoreBluetooth deferred) |
 | Push                 | Firebase Cloud Messaging (Android; iOS APNs deferred)             |
 | Local DB             | **Room‑KMP** (bundled SQLite driver) — offline cache             |
 | Key‑value storage    | **DataStore‑KMP** (language/radius) + platform‑secure JWT store   |
@@ -265,7 +274,8 @@ near_aid_app/
 │   ├── network/       # Ktor client + APIs, DTOs, Auth/refresh plugin, safeApiCall, ChatSocket (WS)
 │   ├── database/      # Room-KMP database, cache entities, DAOs (bundled SQLite driver)
 │   ├── domain/        # Repository interfaces (one per file) + UseCases (one per action)
-│   └── data/          # Repository implementations + DTO/Entity↔Model mappers + Koin data module
+│   ├── data/          # Repository implementations + DTO/Entity↔Model mappers + Koin data module
+│   └── proximity/     # (BLE) short-range proximity confirmer for the in-person handoff (Android; iOS stub)
 │
 └── feature/                          # KMP + CMP feature modules
     ├── auth/          # Splash · Welcome · Phone · OTP · Profile setup
@@ -439,6 +449,8 @@ The only code that is not shared is the genuine platform surface, split by sourc
 | Secure token store   | `EncryptedSharedPreferences` (Keystore AES‑GCM)    | **Keychain** (`kSecClassGenericPassword`)       |
 | Preferences path     | `filesDir`                                         | `NSDocumentDirectory`                           |
 | Image picker         | `GetContent` + cache‑copy                          | `PHPickerViewController` → `NSTemporaryDirectory` |
+| BLE proximity        | `BluetoothLeAdvertiser` + `BluetoothLeScanner`     | *(deferred stub — CoreBluetooth TODO)*          |
+| BLE permission gate  | `RequestMultiplePermissions` (BLUETOOTH_SCAN/ADVERTISE) | no pre‑grant (CoreBluetooth prompts on use) |
 | App host             | `MainActivity` (`setContent { App() }`)            | `ContentView` → `MainViewController()`          |
 | Push                 | FCM service                                        | APNs + Firebase iOS SDK *(deferred)*            |
 
@@ -507,6 +519,11 @@ To sanity‑check that everything compiles for iOS without Xcode:
   fixed Dhaka coordinate, marked with `// TODO`), the custom Bricolage / Plus‑Jakarta /
   Hind‑Siliguri fonts (the type scale is in place; assets aren't bundled yet), iOS push, and
   iOS CI/TestFlight (see *Implementation status*).
+- **BLE proximity handoff.** The Android implementation is client‑side only (**Tier 0** — the two
+  devices match on the shared claim id; the server can't yet *verify* proximity). iOS ships a
+  deferred stub (CoreBluetooth `CBPeripheralManager`/`CBCentralManager`, foreground‑only, is TODO'd
+  inline). A trust‑enforcing **Tier 1** — server‑issued single‑use token + attestation on
+  `claims/{id}/deliver` — is a later step and leaves the radio code unchanged.
 
 ---
 
@@ -552,10 +569,11 @@ on **both** the JVM and iOS native.
 | `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
 | `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
 | `:core:network`   | `safeApiCall` + error → `AppError` mapping (status codes + error envelope)      |
+| `:core:proximity` | `HandoffToken` payload determinism + the `isHandoffMatch` predicate (payload + RSSI gate) in `commonTest`; BLE confirmer guard branches (no adapter / disabled / no advertiser·scanner / permission denied) via MockK in `androidUnitTest` |
 | `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
 | `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
 | `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |
-| `:feature:activity` | Activity ViewModel (claims/listings load, sorting, deliver/confirm/withdraw)  |
+| `:feature:activity` | Activity ViewModel (claims/listings load, sorting, deliver/confirm/withdraw + BLE proximity gate & manual fallback) |
 | `:feature:messages` | Conversations + realtime Chat ViewModels (history, streamed messages, send)   |
 | `:feature:profile` | Profile, public profile, settings and verification ViewModels                 |
 
@@ -588,6 +606,7 @@ which `A11yContractTest` also verifies on iOS native.
 | Discovery (feed + detail)  | ✅ Implemented  | Needs/Offers toggle, filters, claim, report/block, cache.   |
 | Post (request / offer)     | ✅ Implemented  | Category picker, urgency vs availability window.            |
 | Activity                   | ✅ Implemented  | Claims (Helping) + my posts; deliver/confirm/withdraw.      |
+| Proximity handoff (BLE)    | 🚧 Android impl | Client‑side (Tier 0) BLE advertise + scan gates *Mark delivered*; never blocks (manual fallback). **Unproven on hardware** (no radio in emulator/tests). iOS is a stub; server attestation deferred. |
 | Messages + Chat            | ✅ Implemented  | Conversation list + realtime Ktor WebSocket chat.           |
 | Profile / Trust / Safety   | ✅ Implemented  | Trust score, ratings, verification, language, settings.     |
 | Image picker               | ✅ Implemented  | Android `GetContent` + iOS `PHPickerViewController` actuals. |

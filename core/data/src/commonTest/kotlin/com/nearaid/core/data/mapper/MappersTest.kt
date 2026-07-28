@@ -24,6 +24,7 @@ import com.nearaid.core.network.dto.MessageDto
 import com.nearaid.core.network.dto.NotificationDto
 import com.nearaid.core.network.dto.PublicUserDto
 import com.nearaid.core.network.dto.RatingDto
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -63,11 +64,26 @@ class MappersTest {
 
     @Test
     fun toClaimStatus_maps_states_and_defaults_to_active() {
+        assertEquals(ClaimStatus.DELIVERED, "delivered".toClaimStatus())
         assertEquals(ClaimStatus.WITHDRAWN, "withdrawn".toClaimStatus())
         assertEquals(ClaimStatus.COMPLETED, "completed".toClaimStatus())
         assertEquals(ClaimStatus.CANCELLED, "cancelled".toClaimStatus())
         assertEquals(ClaimStatus.ACTIVE, "active".toClaimStatus())
         assertEquals(ClaimStatus.ACTIVE, (null as String?).toClaimStatus())
+    }
+
+    @Test
+    fun claimDto_derives_delivered_from_deliveredAt_while_status_still_active() {
+        // Backend keeps status="active" after delivery and only sets delivered_at.
+        val delivered = ClaimDto(claimId = "c1", status = "active", deliveredAt = "2026-07-29T00:00:00Z")
+        assertEquals(ClaimStatus.DELIVERED, delivered.toDomain().status)
+
+        // No delivered_at yet → still active.
+        assertEquals(ClaimStatus.ACTIVE, ClaimDto(claimId = "c1", status = "active").toDomain().status)
+
+        // A terminal status wins over delivered_at.
+        val completed = ClaimDto(claimId = "c1", status = "completed", deliveredAt = "2026-07-29T00:00:00Z")
+        assertEquals(ClaimStatus.COMPLETED, completed.toDomain().status)
     }
 
     // --- Simple DTO mappers ---
@@ -117,6 +133,15 @@ class MappersTest {
         assertEquals("cid", claimDto(claimId = "cid", id = "other").toDomain().id)
         assertEquals("other", claimDto(claimId = null, id = "other").toDomain().id)
         assertEquals("", claimDto(claimId = null, id = null).toDomain().id)
+    }
+
+    @Test
+    fun claimDto_tolerates_missing_listing_id() {
+        // The backend may omit listing_id on a claim; deserialization must not fail and the mapper
+        // coerces it to an empty string (regression for the /me/claims JsonConvertException).
+        val json = Json { ignoreUnknownKeys = true }
+        val dto = json.decodeFromString<ClaimDto>("""{"claim_id":"c1","status":"active"}""")
+        assertEquals("", dto.toDomain().listingId)
     }
 
     @Test
