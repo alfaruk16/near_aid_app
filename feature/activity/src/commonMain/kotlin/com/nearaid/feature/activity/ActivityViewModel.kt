@@ -13,7 +13,9 @@ import com.nearaid.core.model.ListingType
 import com.nearaid.core.proximity.HandoffToken
 import com.nearaid.core.proximity.ProximityConfirmer
 import com.nearaid.core.proximity.ProximityResult
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(
@@ -26,6 +28,9 @@ class ActivityViewModel(
 ) : MviViewModel<ActivityState, ActivityIntent, ActivityEffect>() {
 
     override fun initialState(): ActivityState = ActivityState()
+
+    /** The receiving party's advertise/scan loop, kept so it can be cancelled when it stops. */
+    private var receiverJob: Job? = null
 
     init {
         loadAll()
@@ -45,9 +50,15 @@ class ActivityViewModel(
                 performAction { markDelivered(intent.claimId) }
             }
             is ActivityIntent.ConfirmReceipt -> performAction { confirmReceipt(intent.claimId) }
-            is ActivityIntent.OwnerMarkDelivered -> performAction(reloadListings = true) { markDelivered(intent.claimId) }
+            is ActivityIntent.OwnerMarkDelivered -> confirmProximityThenDeliver(intent.claimId, reloadListings = true)
+            is ActivityIntent.OwnerMarkDeliveredManually -> {
+                setState { copy(handoffFallback = null) }
+                performAction(reloadListings = true) { markDelivered(intent.claimId) }
+            }
             is ActivityIntent.OwnerConfirmReceipt -> performAction(reloadListings = true) { confirmReceipt(intent.claimId) }
             is ActivityIntent.Withdraw -> performAction { withdrawClaim(intent.claimId) }
+            is ActivityIntent.StartReceiverProximity -> startReceiverProximity(intent.claimId)
+            ActivityIntent.StopReceiverProximity -> stopReceiverProximity()
             ActivityIntent.DismissActionError -> setState { copy(actionError = null) }
             ActivityIntent.DismissHandoffFallback -> setState { copy(handoffFallback = null) }
         }
@@ -60,14 +71,14 @@ class ActivityViewModel(
      * adapter, turned off) we proceed silently; when it's available but can't confirm, we surface a
      * manual-confirm fallback rather than trapping a legitimate handoff.
      */
-    private fun confirmProximityThenDeliver(claimId: String) {
+    private fun confirmProximityThenDeliver(claimId: String, reloadListings: Boolean = false) {
         setState { copy(proximityClaimId = claimId, actionError = null, handoffFallback = null) }
         viewModelScope.launch {
             val result = proximityConfirmer.confirmNearby(HandoffToken(claimId))
             setState { copy(proximityClaimId = null) }
             when (result) {
                 is ProximityResult.Confirmed,
-                ProximityResult.Unavailable -> performAction { markDelivered(claimId) }
+                ProximityResult.Unavailable -> performAction(reloadListings) { markDelivered(claimId) }
                 ProximityResult.Timeout -> setState {
                     copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.NotNearby))
                 }
@@ -79,6 +90,49 @@ class ActivityViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * The receiving party advertises the claim's [HandoffToken] (and scans) in a loop so the other
+     * device's "Mark delivered" proximity check can see it. The loop restarts on each timeout window
+     * and stops once the two devices confirm they're together (then refreshes, in case the giver has
+     * already delivered), the radio is unusable, or the caller stops it.
+     */
+    private fun startReceiverProximity(claimId: String) {
+        if (state.value.receiverListeningClaimId == claimId) return
+        receiverJob?.cancel()
+        setState { copy(receiverListeningClaimId = claimId, actionError = null) }
+        receiverJob = viewModelScope.launch {
+            try {
+                while (isActive) {
+                    when (proximityConfirmer.confirmNearby(HandoffToken(claimId))) {
+                        is ProximityResult.Confirmed -> { loadAll(); break }
+                        ProximityResult.Timeout -> Unit // keep listening
+                        // Terminal, non-recoverable: surface why so the tap isn't a silent no-op
+                        // (e.g. Bluetooth off, or the device can't BLE-advertise).
+                        ProximityResult.Unavailable -> {
+                            setState { copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.Unavailable)) }
+                            break
+                        }
+                        ProximityResult.PermissionDenied -> {
+                            setState { copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.PermissionOff)) }
+                            break
+                        }
+                        is ProximityResult.Error -> {
+                            setState { copy(handoffFallback = HandoffFallback(claimId, HandoffFailureReason.Error)) }
+                            break
+                        }
+                    }
+                }
+            } finally {
+                setState { copy(receiverListeningClaimId = null) }
+            }
+        }
+    }
+
+    private fun stopReceiverProximity() {
+        receiverJob?.cancel()
+        receiverJob = null
     }
 
     private fun loadAll() {

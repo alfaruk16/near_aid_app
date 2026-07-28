@@ -84,6 +84,8 @@ data class Claim(
     val id: String,
     val listingId: String,
     val listingType: ListingType,
+    /** Title of the claimed listing (e.g. "Potato"), shown on the activity row. */
+    val listingTitle: String? = null,
     val status: ClaimStatus,
     val chatThreadId: String?,
     val claimedAt: String?,
