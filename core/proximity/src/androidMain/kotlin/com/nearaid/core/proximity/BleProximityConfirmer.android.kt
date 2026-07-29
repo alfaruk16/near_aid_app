@@ -14,10 +14,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.ParcelUuid
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Android BLE proximity confirmer. Simultaneously advertises the claim's [HandoffToken] as BLE
@@ -35,9 +37,25 @@ internal class BleProximityConfirmer(private val context: Context) : ProximityCo
         if (!hasPermissions()) return ProximityResult.PermissionDenied
 
         val payload = token.payload()
-        val advertiseCallback = object : AdvertiseCallback() {}
+        // Completes with null on onStartSuccess, or an Error result on onStartFailure. Without this
+        // the peer can never see us and we would silently scan until Timeout — the exact failure that
+        // an over-31-byte advertisement (ADVERTISE_FAILED_DATA_TOO_LARGE) produced on real hardware.
+        val advertiseStarted = CompletableDeferred<ProximityResult?>()
+        val advertiseCallback = object : AdvertiseCallback() {
+            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                advertiseStarted.complete(null)
+            }
+
+            override fun onStartFailure(errorCode: Int) {
+                advertiseStarted.complete(ProximityResult.Error("advertise failed: $errorCode"))
+            }
+        }
         return try {
             advertiser.startAdvertising(advertiseSettings(), advertiseData(payload), advertiseCallback)
+            // Fail fast if the radio rejects our advertisement rather than scanning in vain. A null
+            // here means success (or the callback was slow) — either way we go on to scan.
+            val advertiseFailure = withTimeoutOrNull(ADVERTISE_START_TIMEOUT) { advertiseStarted.await() }
+            if (advertiseFailure != null) return advertiseFailure
             withTimeoutOrNull(config.timeout) {
                 scanForPeer(scanner, payload, config)
             } ?: ProximityResult.Timeout
@@ -53,7 +71,10 @@ internal class BleProximityConfirmer(private val context: Context) : ProximityCo
         payload: ByteArray,
         config: ProximityConfig,
     ): ProximityResult = suspendCancellableCoroutine { continuation ->
-        val filter = ScanFilter.Builder().setServiceUuid(ParcelUuid(SERVICE_UUID)).build()
+        // Match on service *data* (UUID + this claim's payload), not a standalone service-UUID field:
+        // the advertisement carries only service data to stay within the 31-byte legacy limit, and
+        // filtering on the payload means the scanner only surfaces a peer on the same claim.
+        val filter = ScanFilter.Builder().setServiceData(ParcelUuid(SERVICE_UUID), payload).build()
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build()
@@ -88,9 +109,11 @@ internal class BleProximityConfirmer(private val context: Context) : ProximityCo
         .setConnectable(false)
         .build()
 
+    // Service data only (UUID + 4-byte payload ≈ 22 bytes). Adding a separate 128-bit service-UUID
+    // field too would push the packet past the 31-byte legacy advertising limit and the radio would
+    // reject it with ADVERTISE_FAILED_DATA_TOO_LARGE — the scanner reads the UUID from service data.
     private fun advertiseData(payload: ByteArray): AdvertiseData = AdvertiseData.Builder()
         .setIncludeDeviceName(false)
-        .addServiceUuid(ParcelUuid(SERVICE_UUID))
         .addServiceData(ParcelUuid(SERVICE_UUID), payload)
         .build()
 
@@ -109,5 +132,8 @@ internal class BleProximityConfirmer(private val context: Context) : ProximityCo
     private companion object {
         /** Custom 128-bit service UUID that scopes NearAid handoff advertisements. */
         val SERVICE_UUID: UUID = UUID.fromString("6e617261-6964-4841-4e44-4f46460001a0")
+
+        /** How long to wait for the advertiser's start callback before scanning regardless. */
+        val ADVERTISE_START_TIMEOUT = 3.seconds
     }
 }

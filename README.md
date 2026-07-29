@@ -71,7 +71,8 @@ Android→KMP migration is documented phase‑by‑phase under [`docs/`](docs) (
   short‑range **Bluetooth LE** check confirms both devices are physically together before completing
   the handoff (Android; foreground‑only, client‑side). It *strengthens* the handoff but never
   *blocks* it — no Bluetooth (or a denied permission) transparently falls back to manual confirmation.
-  iOS is a v1 stub; server‑side attestation is a documented later step.
+  **Proven on real hardware** — two physical phones each resolve `Confirmed` off the other over BLE
+  (see [*Testing*](#testing)). iOS is a v1 stub; server‑side attestation is a documented later step.
 - **Messages** — all conversation threads in one tab; realtime 1:1 chat over WebSocket with a
   safety bar suggesting public meetup points.
 - **Profile & trust** — trust score, ratings, verification, language (Bangla/English) & settings.
@@ -185,9 +186,9 @@ except `:app` (the Android host). The `:shared` umbrella packages the shared mod
   to each other through the central type‑safe routes in `:core:navigation`.
 - **`:core:data`** is the only module that knows `:core:network`, `:core:database` and
   `:core:datastore` at once; it stitches them into repositories.
-- **`:core:proximity`** provides the platform BLE proximity confirmer (Android advertise + scan; iOS
-  deferred stub) that `:feature:activity` uses to gate the in‑person handoff. It has no backend
-  dependency — the two devices match on the shared claim id (Tier 0, client‑only).
+- **`:core:proximity`** provides the platform BLE proximity confirmer (Android advertise + scan,
+  hardware‑proven; iOS deferred stub) that `:feature:activity` uses to gate the in‑person handoff. It
+  has no backend dependency — the two devices match on the shared claim id (Tier 0, client‑only).
 - **`:shared`** is the composition root of the shared UI: it hosts `App()` (the root NavHost,
   theme, and Koin bootstrap `doInitKoin(...)`), `api`‑exports the modules Swift must see, and
   produces the `Shared` iOS framework via SKIE.
@@ -519,11 +520,15 @@ To sanity‑check that everything compiles for iOS without Xcode:
   fixed Dhaka coordinate, marked with `// TODO`), the custom Bricolage / Plus‑Jakarta /
   Hind‑Siliguri fonts (the type scale is in place; assets aren't bundled yet), iOS push, and
   iOS CI/TestFlight (see *Implementation status*).
-- **BLE proximity handoff.** The Android implementation is client‑side only (**Tier 0** — the two
-  devices match on the shared claim id; the server can't yet *verify* proximity). iOS ships a
-  deferred stub (CoreBluetooth `CBPeripheralManager`/`CBCentralManager`, foreground‑only, is TODO'd
-  inline). A trust‑enforcing **Tier 1** — server‑issued single‑use token + attestation on
-  `claims/{id}/deliver` — is a later step and leaves the radio code unchanged.
+- **BLE proximity handoff.** The Android implementation is **proven on real hardware** (two physical
+  phones each resolve `Confirmed` off the other; see [*Testing*](#testing)) but client‑side only
+  (**Tier 0** — the two devices match on the shared claim id; the server can't yet *verify*
+  proximity). Mutual same‑instant confirmation is timing‑sensitive on low‑end radios (the first phone
+  to confirm stops advertising and can briefly starve the peer) — fine for a gates‑never‑blocks
+  feature, since a missed side falls back to manual confirm or retries. iOS ships a deferred stub
+  (CoreBluetooth `CBPeripheralManager`/`CBCentralManager`, foreground‑only, is TODO'd inline). A
+  trust‑enforcing **Tier 1** — server‑issued single‑use token + attestation on `claims/{id}/deliver`
+  — is a later step and leaves the radio code unchanged.
 
 ---
 
@@ -569,7 +574,7 @@ on **both** the JVM and iOS native.
 | `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
 | `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
 | `:core:network`   | `safeApiCall` + error → `AppError` mapping (status codes + error envelope)      |
-| `:core:proximity` | `HandoffToken` payload determinism + the `isHandoffMatch` predicate (payload + RSSI gate) in `commonTest`; BLE confirmer guard branches (no adapter / disabled / no advertiser·scanner / permission denied) via MockK in `androidUnitTest` |
+| `:core:proximity` | `HandoffToken` payload determinism + the `isHandoffMatch` predicate (payload + RSSI gate) in `commonTest`; BLE confirmer guard branches (no adapter / disabled / no advertiser·scanner / permission denied) via MockK in `androidUnitTest`; **on‑device hardware proof** (`BleProximityHardwareTest` in `androidInstrumentedTest`, run via `scripts/ble-proximity-proof.sh`) — two physical phones each resolve `Confirmed` over real BLE |
 | `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
 | `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
 | `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |
@@ -582,6 +587,20 @@ on **both** the JVM and iOS native.
 ./gradlew :feature:discovery:testDebugUnitTest     # a single module (Android/JVM)
 ./gradlew :core:designsystem:iosSimulatorArm64Test # commonTest on iOS native (e.g. a11y contract)
 ```
+
+**BLE proximity — on‑device hardware proof.** BLE can't be exercised in the emulator or unit tests
+(no radio), so the handoff is proven on **two physical Android phones** by `BleProximityHardwareTest`
+(`:core:proximity` `androidInstrumentedTest`). With both phones attached (Bluetooth on, in range):
+
+```bash
+scripts/ble-proximity-proof.sh   # installs the androidTest APK on both phones and runs them in
+                                  # parallel; each must resolve ProximityResult.Confirmed off the other
+```
+
+This is how a real bug was caught that no JVM test could see: the advertisement exceeded the 31‑byte
+legacy limit (a 128‑bit service‑UUID field *plus* 128‑bit service‑data), so `startAdvertising` failed
+with `ADVERTISE_FAILED_DATA_TOO_LARGE` — silently, because the confirmer ignored `onStartFailure`. The
+fix advertises service‑data only, filters the scan on it, and surfaces advertise failures.
 
 **Compose accessibility tests** run on the JVM via **Robolectric** (no emulator) in
 `:core:designsystem` — `AccessibilityTest` (chip/tab role, selected state, touch target) and
@@ -606,7 +625,7 @@ which `A11yContractTest` also verifies on iOS native.
 | Discovery (feed + detail)  | ✅ Implemented  | Needs/Offers toggle, filters, claim, report/block, cache.   |
 | Post (request / offer)     | ✅ Implemented  | Category picker, urgency vs availability window.            |
 | Activity                   | ✅ Implemented  | Claims (Helping) + my posts; deliver/confirm/withdraw.      |
-| Proximity handoff (BLE)    | 🚧 Android impl | Client‑side (Tier 0) BLE advertise + scan gates *Mark delivered*; never blocks (manual fallback). **Unproven on hardware** (no radio in emulator/tests). iOS is a stub; server attestation deferred. |
+| Proximity handoff (BLE)    | ✅ Android (HW‑proven) | Client‑side (Tier 0) BLE advertise + scan gates *Mark delivered*; never blocks (manual fallback). **Proven on two physical phones** (`scripts/ble-proximity-proof.sh`); mutual confirm is timing‑sensitive on low‑end radios. iOS is a stub; server attestation deferred. |
 | Messages + Chat            | ✅ Implemented  | Conversation list + realtime Ktor WebSocket chat.           |
 | Profile / Trust / Safety   | ✅ Implemented  | Trust score, ratings, verification, language, settings.     |
 | Image picker               | ✅ Implemented  | Android `GetContent` + iOS `PHPickerViewController` actuals. |
