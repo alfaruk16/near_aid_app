@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.nearaid.feature.activity"
 }
+
+dependencies {
+    implementation(project(":core:proximity"))
+}
