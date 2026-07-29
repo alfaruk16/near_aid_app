@@ -20,6 +20,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
             }
+
+            configureJacoco()
         }
     }
 }

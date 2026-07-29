@@ -28,6 +28,14 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.nearaid.app/v1/\"")
             buildConfigField("String", "WS_URL", "\"wss://api.nearaid.app/ws\"")
         }
+        // Non-debuggable, profileable variant the :benchmark module drives for startup macrobenchmarks.
+        // Inherits debug's config (BuildConfig fields, debug signing) so it installs without release keys.
+        create("benchmark") {
+            initWith(getByName("debug"))
+            isDebuggable = false
+            isMinifyEnabled = false
+            matchingFallbacks += listOf("debug")
+        }
     }
 
     buildFeatures {
