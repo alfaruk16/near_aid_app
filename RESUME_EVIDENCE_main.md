@@ -93,7 +93,7 @@ Effort concentration (commits touching each module): `feature:activity` 7 · `fe
 
 ---
 
-## 5. Hard evidence for metrics (measured on this checkout)
+## 5. Hard evidence for metrics (measured on this branch)
 
 | Metric | Value | Evidence / caveat |
 |---|---|---|
@@ -101,9 +101,9 @@ Effort concentration (commits touching each module): `feature:activity` 7 · `fe
 | **Coverage — core logic** | **84.0% line** (1,322 / 1,573); branch 69.6% | **JaCoCo 0.8.12** with a **logic filter** (`./gradlew jacocoTestReport`) — excludes what isn't unit-testable: Compose UI (screens/theme/components), generated Hilt/Dagger + Room `*_Impl` + serializer stubs, DI wiring, wire DTOs, nav markers, entities/DAOs, `R`/`BuildConfig`, Android framework entry points. Reflects the testable logic surface: ViewModels, repositories, use cases, mappers, interceptors, utilities. |
 | **Coverage — by module** (logic-filtered line) | features **98–100%** · `app` **100%** · `core:domain` **90.6%** · `core:data` **90.3%** · `feature:activity` **73.3%** · `core:common` **61.8%** · `core:network` **48.1%** · `core:proximity` **14.5%** | The two BLE-related dips are honest: `core:proximity` (14.5%) is mostly the `BluetoothLeAdvertiser`/`Scanner` radio flow, which **needs two real phones** (the pure `isHandoffMatch` predicate + token derivation are unit-tested); `feature:activity` (73.3%) has the receiver advertise-loop branches uncovered. `core:network`'s remainder is the WebSocket `ChatSocket`. |
 | **Coverage — whole-repository** | **much lower (~29%), not the headline** | Including Compose UI screens (which need instrumented/Compose tests, not JVM unit tests) the whole-repo line figure is ~29%. The 84% figure is explicitly the **core-logic** slice — state the exclusion basis when citing. |
-| **Startup — cold (physical device)** | **~1.63 s** median TTID (min 1.61, max 2.02, 5 iters) | **AndroidX Macrobenchmark** `StartupTimingMetric`, `:benchmark` module, on a **physical Nokia 2.4 (API 31, armeabi-v7a — an entry-level device)**, `CompilationMode.None()` (no baseline profile). Real-device number; a low-end handset without a baseline profile, so this is a conservative worst-case. |
-| **Startup — warm (physical device)** | **~400 ms** median TTID (min 385, max 461, 5 iters) | Same device/run as above. |
-| **Startup — cold (emulator ref.)** | **~376 ms** median TTID | Same benchmark on an API-37 emulator (`sdk_gphone16k_arm64`) — faster host CPU; shown only as a comparison point, not the headline. |
+| **Startup — cold (physical device)** | **~1.59 s** median TTID (min 1.54, max 1.70, 5 iters) | **AndroidX Macrobenchmark** `StartupTimingMetric`, `:benchmark` module, measured on this checkout on a **physical Nokia 2.4 (API 31, entry-level)**, `CompilationMode.None()` (no baseline profile, animations disabled). Real-device number; a low-end handset with no baseline profile, so a conservative worst-case. |
+| **Startup — warm (physical device)** | **~370 ms** median TTID (min 364, max 396, 5 iters) | Same device/run as above. |
+| **Startup — emulator reference** | **~302 ms cold / ~112 ms warm** | Same benchmark on an API-37 emulator (`sdk_gphone16k_arm64`) — faster host CPU; a comparison point, not the headline. |
 | **Build-time — cold** | **~16 s** `:app:assembleDebug` | `./gradlew clean` then `:app:assembleDebug --no-build-cache --profile`; profile HTML under `build/reports/profile/`. |
 | **Build-time — incremental** | **~1 s** (no-op, all up-to-date) | Re-run of `:app:assembleDebug` with no changes. |
 
@@ -111,11 +111,10 @@ Effort concentration (commits touching each module): `feature:activity` 7 · `fe
 > filter — Compose UI, generated code, DI, DTOs, and Android framework entry points excluded);
 > whole-repository line coverage including UI is ~29%. Always cite it as "core logic" with the
 > exclusion basis. The BLE radio flow (`:core:proximity`) is not unit-tested — it needs two phones;
-> only its pure match predicate is. Startup was measured on a **real
-> device** (Nokia 2.4, API 31) — an **entry-level handset with no baseline profile**, so ~1.63 s
-> cold is a conservative low-end figure; a mid/high-end device or a baseline profile would be
-> materially faster (the API-37 emulator hit ~0.38 s). Build-time is a local single-run
-> measurement, not a CI average.
+> only its pure match predicate is. Startup was measured on this checkout on a **physical Nokia 2.4
+> (API 31, entry-level)** — **~1.59 s cold / ~0.37 s warm**, `CompilationMode.None` (no baseline
+> profile); a conservative low-end figure (the API-37 emulator hit ~0.30 s cold). Cite with the
+> device + no-baseline-profile caveat. Build-time is a local single-run measurement, not a CI average.
 
 ---
 
@@ -139,9 +138,9 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
   filter — **84% line coverage of core logic** (ViewModels, repositories, use cases, mappers,
   OkHttp interceptors, the proximity match predicate; 1,322/1,573), covering every `core:data`
   repository and `core:domain` use case; ~29% whole-repo including Compose UI.
-- Stood up **AndroidX Macrobenchmark** startup measurement on a **physical device** — **~1.6 s cold
-  / ~0.4 s warm** time-to-initial-display on an entry-level Nokia 2.4 (API 31, no baseline profile;
-  a conservative low-end figure).
+- Stood up **AndroidX Macrobenchmark** cold/warm startup measurement on a **physical device** —
+  **~1.6 s cold / ~0.37 s warm** time-to-initial-display on an entry-level Nokia 2.4 (API 31, no
+  baseline profile — a conservative low-end figure; ~0.30 s cold on an API-37 emulator).
 - Kept builds fast in an 18-module setup — **~16 s cold** `assembleDebug`, ~1 s incremental
   (Gradle configuration-cache + convention plugins).
 - Built an **accessibility contract** into the design system (TalkBack roles/labels/headings, 48 dp
@@ -153,7 +152,7 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
 ## Appendix — how each number was produced (reproduce)
 
 - **Coverage:** `./gradlew jacocoTestReport` → per-module `build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml` (logic-filtered via `configureJacoco()`); summed the LINE counters = **1,322/1,573 = 84.0%** core logic.
-- **Startup:** `ANDROID_SERIAL=<device> ./gradlew :benchmark:connectedBenchmarkAndroidTest` → `benchmark/build/outputs/connected_android_test_additional_output/benchmark/connected/<device>/com.nearaid.benchmark-benchmarkData.json` (ran on the physical Nokia 2.4; `ANDROID_SERIAL` targets it when an emulator is also attached).
+- **Startup:** `ANDROID_SERIAL=<device> ./gradlew :benchmark:connectedBenchmarkAndroidTest` → `benchmark/build/outputs/connected_android_test_additional_output/.../com.nearaid.benchmark-benchmarkData.json` (this checkout: physical Nokia 2.4, API 31, animations disabled; `ANDROID_SERIAL` targets a specific device when several are attached).
 - **Build-time:** `./gradlew clean && ./gradlew :app:assembleDebug --no-build-cache --profile` → `build/reports/profile/profile-*.html`.
 - **BLE:** `:core:proximity` unit tests (`HandoffTokenTest` — token derivation + the `isHandoffMatch` predicate) via `./gradlew :core:proximity:testDebugUnitTest`; the deliver-gate ViewModel branches via `:feature:activity:testDebugUnitTest`. The `BluetoothLeAdvertiser`/`Scanner` radio flow needs two real devices, so it sits outside the JVM unit-test suite (verified on-device).
 - **Not evidenced in this repo:** CI/CD (no GitHub Actions workflows) and an iOS build.
