@@ -14,6 +14,8 @@ import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingCard
 import com.nearaid.core.model.ListingStatus
 import com.nearaid.core.model.ListingType
+import com.nearaid.core.proximity.ProximityConfirmer
+import com.nearaid.core.proximity.ProximityResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -38,12 +40,15 @@ class ActivityViewModelTest {
     private val markDelivered = mockk<MarkDeliveredUseCase>()
     private val confirmReceipt = mockk<ConfirmReceiptUseCase>()
     private val withdrawClaim = mockk<WithdrawClaimUseCase>()
+    private val proximityConfirmer = mockk<ProximityConfirmer>()
 
     @Before
     fun setUp() {
         // Sensible empty-success defaults so construction (which triggers loadAll) never throws.
         coEvery { getMyClaims(any()) } returns DataResult.Success(emptyList())
         coEvery { getMyListings(any(), any()) } returns DataResult.Success(emptyList())
+        // Default: BLE unavailable → the proximity check proceeds to deliver silently (never blocks).
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Unavailable
     }
 
     private fun viewModel() = ActivityViewModel(
@@ -52,6 +57,7 @@ class ActivityViewModelTest {
         markDelivered = markDelivered,
         confirmReceipt = confirmReceipt,
         withdrawClaim = withdrawClaim,
+        proximityConfirmer = proximityConfirmer,
     )
 
     // --- initial load --------------------------------------------------------
@@ -182,6 +188,45 @@ class ActivityViewModelTest {
         coVerify(exactly = 1) { markDelivered("c1") }
         coVerify(exactly = 2) { getMyClaims(any()) } // init + reload after the action
         assertFalse(viewModel.state.value.actionLoading)
+    }
+
+    @Test
+    fun `MarkDelivered delivers when proximity confirms`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Confirmed(-55)
+        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
+
+        coVerify(exactly = 1) { markDelivered("c1") }
+        assertNull(viewModel.state.value.handoffFallback)
+    }
+
+    @Test
+    fun `MarkDelivered offers a manual fallback and does not deliver when proximity times out`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Timeout
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
+
+        // Proximity couldn't confirm → do NOT deliver; surface the manual-confirm fallback instead.
+        coVerify(exactly = 0) { markDelivered(any()) }
+        assertEquals("c1", viewModel.state.value.handoffFallback?.claimId)
+        assertEquals(HandoffFailureReason.NotNearby, viewModel.state.value.handoffFallback?.reason)
+        assertNull(viewModel.state.value.proximityClaimId)
+    }
+
+    @Test
+    fun `MarkDeliveredManually bypasses the proximity check and delivers`() {
+        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDeliveredManually("c1"))
+
+        coVerify(exactly = 1) { markDelivered("c1") }
+        // The manual path never consults the radio.
+        coVerify(exactly = 0) { proximityConfirmer.confirmNearby(any(), any()) }
+        assertNull(viewModel.state.value.handoffFallback)
     }
 
     @Test
