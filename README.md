@@ -493,6 +493,22 @@ Reference run on a physical **Nokia 2.4 (API 31, entry‑level)** with `Compilat
 (no baseline profile): **~1.6 s cold / ~0.4 s warm** median time‑to‑initial‑display — a
 conservative low‑end figure; a mid/high‑end device or a baseline profile is materially faster.
 
+### Continuous integration (CI/CD)
+
+**GitHub Actions** pipelines under `.github/workflows/` (JDK 17 runner) — full details in
+[`docs/ci-cd.md`](docs/ci-cd.md):
+
+- **`ci.yml`** — on every push/PR to `main`/`develop`: build (`assembleDebug`), unit tests
+  (`testDebugUnitTest`), coverage (`jacocoTestReport`) and Android `lint`, uploading APK,
+  test, coverage and lint reports as artifacts.
+- **`release.yml`** — on a `v*` tag: `assembleRelease` and publish a GitHub Release with the APK.
+
+Instrumented / BLE‑hardware / Macrobenchmark suites are **not** run in CI (they need real
+devices) — run them locally per `docs/ci-cd.md`.
+
+> **Status:** the initial run needed an Android‑SDK provisioning step added to the workflow; once
+> that lands, the run should be green — check the repo's **Actions** tab for the current result.
+
 ---
 
 ## Implementation status

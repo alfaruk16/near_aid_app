@@ -32,6 +32,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Installs the Android SDK/build-tools/platform and accepts licenses.
+      # setup-java/setup-gradle do not provision the SDK, so without this the
+      # Gradle build fails at configuration on a clean runner.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       # Configures Gradle, restores/saves the dependency + build cache, and
       # validates the Gradle wrapper checksum.
       - name: Set up Gradle
@@ -83,6 +89,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
