@@ -27,6 +27,10 @@ sealed interface ActivityIntent : UiIntent {
     data class ClaimClicked(val claimId: String, val threadId: String, val title: String) : ActivityIntent
     data class MarkDelivered(val claimId: String) : ActivityIntent
     data class ConfirmReceipt(val claimId: String) : ActivityIntent
+    /** Author-side handoff from "My posts": giver marks an offer delivered. */
+    data class OwnerMarkDelivered(val claimId: String) : ActivityIntent
+    /** Author-side handoff from "My posts": seeker confirms receipt on a delivered request. */
+    data class OwnerConfirmReceipt(val claimId: String) : ActivityIntent
     data class Withdraw(val claimId: String) : ActivityIntent
     data object DismissActionError : ActivityIntent
 }

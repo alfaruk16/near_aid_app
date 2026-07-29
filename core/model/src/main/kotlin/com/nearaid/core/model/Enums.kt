@@ -8,7 +8,7 @@ enum class Urgency { LOW, MEDIUM, HIGH, CRITICAL }
 /** The shared lifecycle state machine for both requests and offers — §14. */
 enum class ListingStatus { OPEN, CLAIMED, DELIVERED, COMPLETED, CANCELLED, EXPIRED }
 
-enum class ClaimStatus { ACTIVE, WITHDRAWN, COMPLETED, CANCELLED }
+enum class ClaimStatus { ACTIVE, DELIVERED, WITHDRAWN, COMPLETED, CANCELLED }
 
 enum class AppLanguage(val code: String) {
     BN("bn"),
