@@ -14,6 +14,8 @@ import com.nearaid.core.model.ClaimStatus
 import com.nearaid.core.model.ListingCard
 import com.nearaid.core.model.ListingStatus
 import com.nearaid.core.model.ListingType
+import com.nearaid.core.proximity.ProximityConfirmer
+import com.nearaid.core.proximity.ProximityResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -38,12 +40,15 @@ class ActivityViewModelTest {
     private val markDelivered = mockk<MarkDeliveredUseCase>()
     private val confirmReceipt = mockk<ConfirmReceiptUseCase>()
     private val withdrawClaim = mockk<WithdrawClaimUseCase>()
+    private val proximityConfirmer = mockk<ProximityConfirmer>()
 
     @Before
     fun setUp() {
         // Sensible empty-success defaults so construction (which triggers loadAll) never throws.
         coEvery { getMyClaims(any()) } returns DataResult.Success(emptyList())
         coEvery { getMyListings(any(), any()) } returns DataResult.Success(emptyList())
+        // BLE unavailable by default -> the proximity gate proceeds to deliver (never blocks).
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Unavailable
     }
 
     private fun viewModel() = ActivityViewModel(
@@ -52,6 +57,7 @@ class ActivityViewModelTest {
         markDelivered = markDelivered,
         confirmReceipt = confirmReceipt,
         withdrawClaim = withdrawClaim,
+        proximityConfirmer = proximityConfirmer,
     )
 
     // --- initial load --------------------------------------------------------

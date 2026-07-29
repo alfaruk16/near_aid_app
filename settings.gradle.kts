@@ -37,6 +37,7 @@ include(":core:network")
 include(":core:database")
 include(":core:domain")
 include(":core:data")
+include(":core:proximity")
 
 // Feature modules
 include(":feature:auth")
@@ -45,3 +46,6 @@ include(":feature:post")
 include(":feature:activity")
 include(":feature:messages")
 include(":feature:profile")
+
+// Performance
+include(":benchmark")

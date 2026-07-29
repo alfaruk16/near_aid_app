@@ -187,6 +187,8 @@ canonical example.
 | Accessibility        | Compose semantics (roles, headings, live regions) + a11y lint rules |
 | Build                | Gradle Kotlin DSL + version catalog + **convention plugins**      |
 | Testing              | JUnit4, MockK, Turbine, kotlinx‑coroutines‑test, **Robolectric** (Compose a11y) |
+| Coverage             | **JaCoCo** (`jacocoTestReport`) — logic‑filtered, **~90% of core logic** |
+| Performance          | **AndroidX Macrobenchmark** — cold/warm startup (`:benchmark` module)  |
 
 Versions are centralized in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
@@ -422,8 +424,9 @@ helpers are intentionally still inline (see *Implementation status*).
 ## Testing
 
 Fast **JVM unit tests** (no device/emulator) cover the presentation and non‑UI layers:
-every ViewModel and the pure logic in `:core`. They run as `testDebugUnitTest` — ~150 tests
-across the modules below.
+every ViewModel, and the logic in `:core` (mappers, all repositories, all use cases, the
+OkHttp interceptors, the MVI base). They run as `testDebugUnitTest` — **~240 tests** across
+the modules below.
 
 - **Frameworks:** JUnit4, **MockK** (use‑case doubles), **Turbine** (effect/flow assertions),
   **kotlinx‑coroutines‑test**. These come wired to every module through the convention plugins,
@@ -438,9 +441,10 @@ across the modules below.
 |-------------------|--------------------------------------------------------------------------------|
 | `:app`            | `MainViewModel` (login‑state → start destination), `TopLevelDestination` tabs  |
 | `:core:designsystem` | Compose **accessibility** tests (Robolectric): roles, selected state, labels, 48 dp targets |
-| `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time) |
-| `:core:domain`    | `PhoneNumber` (Bangladesh → E.164 normalization & display formatting)          |
-| `:core:network`   | `safeApiCall` + `HttpException` → `AppError` mapping (status codes + error envelope) |
+| `:core:common`    | `DataResult` (`map`/`onSuccess`/`onFailure`/`getOrNull`), `TimeFormat` (ISO parse + relative time), `MviViewModel` base (state reduction + one‑shot effects) |
+| `:core:domain`    | `PhoneNumber` (BD → E.164) **and every use case** — delegation, comment/email/phone/body trimming, and the `ObserveSession` state machine |
+| `:core:data`      | **Every mapper** (DTO→domain incl. the claim‑handoff/`delivered_at` logic) and **all 9 repositories** (mocked Retrofit APIs + test dispatcher, success + transport‑failure paths, cache fallback) |
+| `:core:network`   | `safeApiCall` + `HttpException` → `AppError` mapping; `AuthInterceptor` (bearer attach / auth‑endpoint skip) and `TokenAuthenticator` (401 refresh → retry → clear) |
 | `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
 | `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
 | `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |
@@ -458,8 +462,36 @@ across the modules below.
 `AccessibilityChecksTest` (scans the whole semantics tree; fails if any clickable node is
 unlabeled or under 48 dp). Run them with `./gradlew :core:designsystem:testDebugUnitTest`.
 
-> DI wiring, Room DAOs and repository implementations are not yet unit‑tested, and full‑screen
-> Compose UI tests remain minimal — those need broader instrumented / Robolectric setup.
+> Still not unit‑tested: the WebSocket `ChatSocket` (a `callbackFlow` that needs an integration
+> test), DI wiring, Room DAOs, and full‑screen Compose UI (needs instrumented / Compose‑UI tests).
+
+### Coverage (JaCoCo)
+
+A `configureJacoco()` convention plugin gives every module a `jacocoTestReport` task. The
+aggregated figure is **~90% line coverage of core logic** (ViewModels, repositories, use cases,
+mappers, interceptors, utilities). The report is **logic‑filtered**: it excludes code that isn't
+meaningfully unit‑testable — Compose UI (screens/theme/components), generated Hilt/Room/serializer
+code, DI wiring, wire DTOs, Room entities/DAOs, navigation markers, and Android framework entry
+points (Activities, Application, the FCM service). Including Compose UI, whole‑repository line
+coverage is ~29%.
+
+```bash
+./gradlew jacocoTestReport          # per‑module reports → build/reports/jacoco/…/*.xml + HTML
+```
+
+### Startup performance (Macrobenchmark)
+
+The `:benchmark` module (AndroidX **Macrobenchmark**) measures cold/warm startup
+(`timeToInitialDisplay`) against the app's non‑debuggable, profileable `benchmark` build type.
+Needs a connected device/emulator:
+
+```bash
+./gradlew :benchmark:connectedBenchmarkAndroidTest
+```
+
+Reference run on a physical **Nokia 2.4 (API 31, entry‑level)** with `CompilationMode.None()`
+(no baseline profile): **~1.6 s cold / ~0.4 s warm** median time‑to‑initial‑display — a
+conservative low‑end figure; a mid/high‑end device or a baseline profile is materially faster.
 
 ---
 
