@@ -18,15 +18,19 @@
     <string name="action_retry">Retry</string>
     <string name="action_mark_delivered">Mark delivered</string>
     <string name="action_open_chat">Open chat</string>
+    <string name="action_confirm_receipt">Confirm receipt</string>
 
     <!-- Claim status labels -->
     <string name="claim_status_active">You\'re helping</string>
+    <string name="claim_status_delivered">Delivered</string>
     <string name="claim_status_completed">You helped</string>
     <string name="claim_status_withdrawn">Withdrawn</string>
     <string name="claim_status_cancelled">Cancelled</string>
 
     <!-- Misc -->
     <string name="claim_completed">Completed</string>
+    <string name="claim_awaiting_confirmation">Waiting for the other person to confirm receipt</string>
+    <string name="claim_awaiting_delivery">Waiting for the other person to hand off the item</string>
     <string name="claim_since">Since %1$s</string>
     <string name="status_loading">Loading</string>
 </resources>

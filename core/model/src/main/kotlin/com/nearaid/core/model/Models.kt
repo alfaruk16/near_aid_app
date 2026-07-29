@@ -35,6 +35,8 @@ data class ListingCard(
     val author: Author,
     val status: ListingStatus,
     val createdAt: String,
+    /** Owner-only: id of the active claim on this listing (drives the author's handoff action). */
+    val activeClaimId: String? = null,
 )
 
 data class ListingImage(

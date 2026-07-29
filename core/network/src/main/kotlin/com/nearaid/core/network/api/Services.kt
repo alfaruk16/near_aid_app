@@ -4,7 +4,6 @@ import com.nearaid.core.network.dto.AuthResponse
 import com.nearaid.core.network.dto.CancelBody
 import com.nearaid.core.network.dto.CategoriesResponse
 import com.nearaid.core.network.dto.ClaimDto
-import com.nearaid.core.network.dto.ClaimsResponse
 import com.nearaid.core.network.dto.ConversationsResponse
 import com.nearaid.core.network.dto.CreateListingBody
 import com.nearaid.core.network.dto.DeviceBody
@@ -12,6 +11,7 @@ import com.nearaid.core.network.dto.ListingDetailDto
 import com.nearaid.core.network.dto.MeDto
 import com.nearaid.core.network.dto.MessageDto
 import com.nearaid.core.network.dto.MessagesResponse
+import com.nearaid.core.network.dto.MyClaimsResponse
 import com.nearaid.core.network.dto.MyListingsResponse
 import com.nearaid.core.network.dto.NearbyResponse
 import com.nearaid.core.network.dto.NotificationsResponse
@@ -126,7 +126,7 @@ interface ClaimApi {
     suspend fun rate(@Path("id") id: String, @Body body: RatingBody)
 
     @GET("me/claims")
-    suspend fun getMyClaims(@Query("status") status: String?): ClaimsResponse
+    suspend fun getMyClaims(@Query("status") status: String?): MyClaimsResponse
 
     @GET("claims/{id}/messages")
     suspend fun getMessages(@Path("id") id: String, @Query("cursor") cursor: String?): MessagesResponse
