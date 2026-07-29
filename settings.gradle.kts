@@ -37,6 +37,7 @@ include(":core:network")
 include(":core:database")
 include(":core:domain")
 include(":core:data")
+include(":core:proximity")
 
 // Feature modules
 include(":feature:auth")
