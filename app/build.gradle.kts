@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.nearaid.android.application)
     alias(libs.plugins.nearaid.android.application.compose)
     alias(libs.plugins.nearaid.android.hilt)
+    alias(libs.plugins.google.services)
 }
 
 android {
