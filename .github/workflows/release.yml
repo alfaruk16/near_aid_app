@@ -20,6 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Drop the local macOS JBR pin from gradle.properties (absent on runner).
+      - name: Neutralize local JDK pin for CI
+        run: sed -i '/^org\.gradle\.java\.home=/d' gradle.properties
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:

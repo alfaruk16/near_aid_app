@@ -26,6 +26,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # gradle.properties pins org.gradle.java.home to a local macOS Android
+      # Studio JBR path that does not exist on the runner; drop it so Gradle
+      # uses the JDK from setup-java (JAVA_HOME).
+      - name: Neutralize local JDK pin for CI
+        run: sed -i '/^org\.gradle\.java\.home=/d' gradle.properties
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -83,6 +89,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Neutralize local JDK pin for CI
+        run: sed -i '/^org\.gradle\.java\.home=/d' gradle.properties
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
