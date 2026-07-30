@@ -1,13 +1,8 @@
 package com.nearaid.core.ai
 
-import android.content.Context
-import com.google.mediapipe.tasks.components.containers.Embedding
-import com.google.mediapipe.tasks.core.BaseOptions
-import com.google.mediapipe.tasks.text.textembedder.TextEmbedder as MpTextEmbedder
 import com.nearaid.core.common.dispatcher.Dispatcher
 import com.nearaid.core.common.dispatcher.NearAidDispatcher
 import com.nearaid.core.domain.ai.TextEmbedder
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,60 +11,62 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * On-device [TextEmbedder] backed by MediaPipe Tasks. Loads a bundled TFLite model from
- * assets ([MODEL_ASSET]) lazily on first use and reuses it for the app's lifetime.
+ * A loaded native embedding model. [embed] may throw; callers guard it. Implemented in the
+ * `di` package by the MediaPipe-backed engine (excluded from coverage as native glue).
+ */
+fun interface EmbeddingSession {
+    fun embed(text: String): FloatArray?
+}
+
+/**
+ * Loads an [EmbeddingSession], or returns `null` when the model is unavailable (asset
+ * missing / init failed). This is the single seam over native MediaPipe/TFLite calls, so
+ * the surrounding lifecycle logic in [MediaPipeTextEmbedder] is unit-testable with a fake.
+ */
+fun interface EmbeddingSessionFactory {
+    fun create(): EmbeddingSession?
+}
+
+/**
+ * On-device [TextEmbedder] backed by a native embedding model. Loads the model lazily and
+ * thread-safely on first use ([EmbeddingSessionFactory.create]) and reuses it for the app's
+ * lifetime. If the model is unavailable — the TFLite asset isn't bundled yet, or init/embed
+ * fails — [embed] returns `null` so callers fall back to distance ordering.
  *
- * We use the **multilingual** Universal Sentence Encoder so English and Bengali listing
- * text embed into the same space (a bn query can match an en offer, and vice-versa).
+ * The multilingual Universal Sentence Encoder embeds English and Bengali into one space, so
+ * a bn query can match an en listing and vice-versa.
  *
- * ⚠️ Setup: drop `universal_sentence_encoder.tflite` (multilingual variant) into
- * `core/ai/src/main/assets/`. Download from MediaPipe's model catalog. Until the asset is
- * present, [embed] returns `null` and callers fall back to distance ordering — the feed
- * still works, it just isn't semantically re-ranked.
+ * ⚠️ Setup: drop `universal_sentence_encoder.tflite` (multilingual) into
+ * `core/ai/src/main/assets/` to enable semantic (vs lexical) matching.
  */
 @Singleton
 class MediaPipeTextEmbedder @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val sessionFactory: EmbeddingSessionFactory,
     @Dispatcher(NearAidDispatcher.Default) private val dispatcher: CoroutineDispatcher,
 ) : TextEmbedder {
 
     private val initMutex = Mutex()
 
     @Volatile
-    private var delegate: MpTextEmbedder? = null
+    private var session: EmbeddingSession? = null
 
     @Volatile
     private var initFailed = false
 
     override suspend fun embed(text: String): FloatArray? = withContext(dispatcher) {
-        val embedder = ensureEmbedder() ?: return@withContext null
-        runCatching {
-            val result = embedder.embed(text)
-            result.embeddingResult().embeddings().firstOrNull()?.toFloatArray()
-        }.getOrNull()
+        val active = ensureSession() ?: return@withContext null
+        runCatching { active.embed(text) }.getOrNull()
     }
 
-    private suspend fun ensureEmbedder(): MpTextEmbedder? {
-        delegate?.let { return it }
+    private suspend fun ensureSession(): EmbeddingSession? {
+        session?.let { return it }
         if (initFailed) return null
         return initMutex.withLock {
-            delegate?.let { return it }
+            session?.let { return it }
             if (initFailed) return null
-            runCatching {
-                val options = MpTextEmbedder.TextEmbedderOptions.builder()
-                    .setBaseOptions(BaseOptions.builder().setModelAssetPath(MODEL_ASSET).build())
-                    .setL2Normalize(true)
-                    .build()
-                MpTextEmbedder.createFromOptions(context, options)
-            }.onSuccess { delegate = it }
-                .onFailure { initFailed = true }
-                .getOrNull()
+            val created = runCatching { sessionFactory.create() }.getOrNull()
+            if (created == null) initFailed = true else session = created
+            created
         }
-    }
-
-    private fun Embedding.toFloatArray(): FloatArray = floatEmbedding()
-
-    private companion object {
-        const val MODEL_ASSET = "universal_sentence_encoder.tflite"
     }
 }
