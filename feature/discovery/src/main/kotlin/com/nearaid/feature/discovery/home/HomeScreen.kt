@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +38,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import com.nearaid.feature.discovery.R
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
@@ -59,13 +61,7 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-
-    // On a new search, scroll back to the top so the best re-ranked match is visible
-    // without the user scrolling manually. Keyed on the query (not the list) so paging —
-    // which appends to the bottom — never yanks the feed upward.
-    LaunchedEffect(state.searchQuery) {
-        if (state.listings.isNotEmpty()) listState.animateScrollToItem(0)
-    }
+    val scope = rememberCoroutineScope()
 
     // Load the next page when the user nears the end of the loaded items.
     val shouldLoadMore by remember {
@@ -82,6 +78,9 @@ fun HomeScreen(
         when (effect) {
             is HomeEffect.OpenListing -> onListingClick(effect.id)
             HomeEffect.OpenNotifications -> onOpenNotifications()
+            // Re-rank has already published; the new top item now exists, so scrolling
+            // reveals it (this is why it's an effect, not a state-keyed LaunchedEffect).
+            HomeEffect.ScrollToTop -> scope.launch { listState.animateScrollToItem(0) }
         }
     }
 

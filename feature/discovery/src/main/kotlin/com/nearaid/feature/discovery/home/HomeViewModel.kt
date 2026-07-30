@@ -73,7 +73,7 @@ class HomeViewModel @Inject constructor(
             }
             is HomeIntent.SearchChanged -> {
                 setState { copy(searchQuery = intent.query) }
-                applyRanking(debounce = true)
+                applyRanking(debounce = true, scrollToTop = true)
             }
             is HomeIntent.ListingClicked -> sendEffect(HomeEffect.OpenListing(intent.id))
             HomeIntent.OpenNotificationsClicked -> sendEffect(HomeEffect.OpenNotifications)
@@ -134,13 +134,17 @@ class HomeViewModel @Inject constructor(
      *
      * @param debounce when true (typing), waits [SEARCH_DEBOUNCE_MS] and supersedes any
      * in-flight re-rank; when false (fresh fetch), re-ranks immediately.
+     * @param scrollToTop when true, emits [HomeEffect.ScrollToTop] once the reordered list is
+     * published, so the UI reveals the new best match. Only set for search re-ranks — not for
+     * pagination, which appends to the bottom.
      */
-    private fun applyRanking(debounce: Boolean = false) {
+    private fun applyRanking(debounce: Boolean = false, scrollToTop: Boolean = false) {
         rankJob?.cancel()
         rankJob = viewModelScope.launch {
             if (debounce) delay(SEARCH_DEBOUNCE_MS)
             val ranked = rankBySimilarity(currentState.searchQuery, sourceListings)
             setState { copy(listings = ranked) }
+            if (scrollToTop) sendEffect(HomeEffect.ScrollToTop)
         }
     }
 }

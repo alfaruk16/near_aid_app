@@ -36,4 +36,6 @@ sealed interface HomeIntent : UiIntent {
 sealed interface HomeEffect : UiEffect {
     data class OpenListing(val id: String) : HomeEffect
     data object OpenNotifications : HomeEffect
+    /** Emitted after a search re-rank publishes, so the feed can scroll to the new best match. */
+    data object ScrollToTop : HomeEffect
 }
