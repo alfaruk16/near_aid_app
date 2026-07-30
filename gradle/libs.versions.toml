@@ -37,6 +37,7 @@ coil = "2.7.0"
 
 # Firebase / push
 firebaseBom = "33.7.0"
+googleServices = "4.4.2"
 
 # Debug tooling
 leakcanary = "2.14"
@@ -137,6 +138,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 
 # Convention plugins (defined in build-logic)
 nearaid-android-application = { id = "nearaid.android.application" }

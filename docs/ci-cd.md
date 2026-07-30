@@ -42,5 +42,12 @@ notes and the APK attached.
   runners don't provide. Run them locally per `scripts/ble-proximity-proof.sh`.
 - **Macrobenchmark** (`:benchmark`) — needs a physical device / configured
   emulator; run locally.
-- **Firebase** — the `google-services` Gradle plugin is not applied, so no
-  `google-services.json` secret is required to build.
+- **Firebase** — the `google-services` plugin is applied, so `app/google-services.json`
+  is required at build time. It is git-ignored, so CI injects it from a base64
+  repository secret named **`GOOGLE_SERVICES_JSON`**. Create/update it with:
+
+  ```bash
+  base64 -i app/google-services.json | pbcopy   # then paste into the secret
+  ```
+
+  Missing/empty secret → the build fails at `processDebugGoogleServices`.
