@@ -1,9 +1,14 @@
 name: Release
 
-# Cut a GitHub Release with the release APK whenever a semver tag is pushed:
+# Cut a GitHub Release (signed APK) and optionally publish to Google Play whenever a
+# semver tag is pushed:
 #   git tag v1.0.0 && git push origin v1.0.0
-# The APK is unsigned (no signing config in the repo). To ship a signed build,
-# add a signingConfig fed by repository secrets and switch the upload path.
+#
+# Signing: set repository secrets KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD.
+#   If KEYSTORE_BASE64 is absent the build still runs and produces an *unsigned* APK.
+# Play publishing (optional): set PLAY_SERVICE_ACCOUNT_JSON (a Play Console service-account
+#   key with "release apps" permission). The AAB is pushed to the `internal` track. If the
+#   secret is absent the Play step is skipped.
 on:
   push:
     tags: ['v*']
@@ -13,7 +18,7 @@ permissions:
 
 jobs:
   release:
-    name: Build + publish release APK
+    name: Build + publish release
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -41,14 +46,36 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
-      - name: Assemble release APK
-        run: ./gradlew assembleRelease --stacktrace
+      # Decode the upload keystore only when the secret is present; expose its path via a
+      # step output so the build step can point KEYSTORE_FILE at it (empty → unsigned build).
+      - name: Decode upload keystore
+        id: keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+            echo "path=$RUNNER_TEMP/upload.jks" >> "$GITHUB_OUTPUT"
+            echo "Keystore decoded."
+          else
+            echo "::warning::KEYSTORE_BASE64 not set — building an UNSIGNED release."
+          fi
 
-      - name: Upload release APK artifact
+      - name: Build release (APK + AAB)
+        env:
+          KEYSTORE_FILE: ${{ steps.keystore.outputs.path }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease bundleRelease --stacktrace
+
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: app-release
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -56,3 +83,18 @@ jobs:
         with:
           generate_release_notes: true
           files: app/build/outputs/apk/release/*.apk
+
+      # Publish the AAB to Play's internal track. Skipped unless the service-account secret
+      # exists; requires the app to already be created in the Play Console.
+      - name: Publish to Google Play (internal track)
+        if: ${{ env.PLAY_SA != '' }}
+        env:
+          PLAY_SA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.nearaid
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          track: internal
+          status: completed
