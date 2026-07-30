@@ -506,8 +506,7 @@ conservative low‑end figure; a mid/high‑end device or a baseline profile is 
 Instrumented / BLE‑hardware / Macrobenchmark suites are **not** run in CI (they need real
 devices) — run them locally per `docs/ci-cd.md`.
 
-> **Status:** the initial run needed an Android‑SDK provisioning step added to the workflow; once
-> that lands, the run should be green — check the repo's **Actions** tab for the current result.
+CI is **green on `main`** — see the repo's **Actions** tab for the latest run.
 
 ---
 

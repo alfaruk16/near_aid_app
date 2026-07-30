@@ -44,7 +44,7 @@ through custom Gradle **convention plugins**.
 | **Proximity / BLE** | **`android.bluetooth.le`** `BluetoothLeAdvertiser` + `BluetoothLeScanner` (`:core:proximity`) for in-person handoff confirmation |
 | **Coverage** | **JaCoCo 0.8.12** — `configureJacoco()` convention with a logic filter, per-module `jacocoTestReport`; **84% core-logic line coverage** |
 | **Performance** | **AndroidX Macrobenchmark 1.3.3** + UiAutomator 2.3.0 — `:benchmark` startup module |
-| **CI/CD** | **GitHub Actions** — `.github/workflows/ci.yml` (build → `testDebugUnitTest` → `jacocoTestReport` + Android `lint`, on every push/PR to `main`/`develop`) and `release.yml` (tagged-release APK). JDK 17 runner. Merged to `main` in PR #6. **Status caveat: first run is not yet green** — the initial workflow was missing the Android-SDK provisioning step; that fix is applied but a passing run is still to be verified. Do not cite as "passing CI" until the Actions tab is green. |
+| **CI/CD** | **GitHub Actions** (green on `main`) — `.github/workflows/ci.yml` runs build (`assembleDebug`) → `testDebugUnitTest` → `jacocoTestReport` + Android `lint` on every push/PR to `main`/`develop`; `release.yml` publishes a tagged-release APK. JDK 17 runner, Android SDK provisioned via `android-actions/setup-android`. |
 
 ---
 
@@ -146,8 +146,7 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
 - Built an **accessibility contract** into the design system (TalkBack roles/labels/headings, 48 dp
   targets, live-region announcements) enforced by an automated Compose test.
 - Set up **GitHub Actions CI/CD** — build, unit tests, JaCoCo coverage and Android lint on every
-  push/PR, plus a tagged-release APK pipeline. _(Only cite once the Actions run is green — see the
-  status caveat in §2; first run failed on a missing Android-SDK step, fix applied but unverified.)_
+  push/PR (green on `main`), plus a tagged-release APK pipeline.
 - Shipped the app **solo** — every commit single-authored.
 
 ---
@@ -158,8 +157,9 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
 - **Startup:** `ANDROID_SERIAL=<device> ./gradlew :benchmark:connectedBenchmarkAndroidTest` → `benchmark/build/outputs/connected_android_test_additional_output/.../com.nearaid.benchmark-benchmarkData.json` (this checkout: physical Nokia 2.4, API 31, animations disabled; `ANDROID_SERIAL` targets a specific device when several are attached).
 - **Build-time:** `./gradlew clean && ./gradlew :app:assembleDebug --no-build-cache --profile` → `build/reports/profile/profile-*.html`.
 - **BLE:** `:core:proximity` unit tests (`HandoffTokenTest` — token derivation + the `isHandoffMatch` predicate) via `./gradlew :core:proximity:testDebugUnitTest`; the deliver-gate ViewModel branches via `:feature:activity:testDebugUnitTest`. The `BluetoothLeAdvertiser`/`Scanner` radio flow needs two real devices, so it sits outside the JVM unit-test suite (verified on-device).
-- **CI/CD:** GitHub Actions on `main` — `.github/workflows/ci.yml` + `release.yml` (see `docs/ci-cd.md`).
-  Trigger a run by pushing to `main`/`develop` or opening a PR; check the **Actions** tab for the
-  conclusion. First run (PR #6 merge) failed — the workflow lacked an Android-SDK provisioning step
-  (`android-actions/setup-android`); fix applied, green run still to be confirmed.
+- **CI/CD:** GitHub Actions on `main`, passing — `.github/workflows/ci.yml` + `release.yml` (see
+  `docs/ci-cd.md`). Runs on every push/PR to `main`/`develop`; check the **Actions** tab for the
+  latest conclusion. (Two runner-only fixes were needed after the initial merge: provisioning the
+  Android SDK via `android-actions/setup-android`, and stripping the local macOS `org.gradle.java.home`
+  pin from `gradle.properties` on the runner.)
 - **Not evidenced in this repo:** an iOS build.
