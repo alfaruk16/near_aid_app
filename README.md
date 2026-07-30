@@ -13,10 +13,14 @@ location and banded distance (a dedicated map view is deferred to a later releas
 
 > Built with **MVI + Clean Architecture**, a **multi‑module** Gradle setup, Jetpack Compose,
 > type‑safe Navigation, Hilt, Room, DataStore, Retrofit, Coroutines/Flow, an OkHttp
-> WebSocket for realtime chat, and Firebase Cloud Messaging for push.
+> WebSocket for realtime chat, **on‑device semantic search** (MediaPipe/TFLite), and
+> Firebase Cloud Messaging for push.
 
 UI follows `near_aid_documents/nearaid_ui.html`; behaviour and data follow the
 **NearAid Technical Documentation v1.1** and the OpenAPI spec (`NearAid API.yaml`).
+
+📚 **Technical docs** live under [`docs/`](docs/README.md) — architecture, data/networking,
+navigation, design system & accessibility, testing, CI/CD, and the AI semantic search.
 
 ---
 
@@ -153,9 +157,9 @@ canonical example.
    :core:domain ─ :core:model ─ :core:common ─ :core:designsystem ─ :core:navigation
                       ▲
                       │ implemented by
-                 :core:data
-                      │
-        ┌─────────────┼──────────────┐
+                 :core:data                      specialized core:
+                      │                             :core:ai        (on-device semantic search)
+        ┌─────────────┼──────────────┐             :core:proximity (BLE handoff confirmation)
         ▼             ▼              ▼
   :core:network  :core:database  :core:datastore
 ```
@@ -164,6 +168,9 @@ canonical example.
   to each other through the central type‑safe routes in `:core:navigation`.
 - **`:core:data`** is the only module that knows `:core:network`, `:core:database` and
   `:core:datastore` at once; it stitches them into repositories.
+- **`:core:ai`** implements the domain's `TextEmbedder` interface (MediaPipe/TFLite + a lexical
+  fallback); **`:core:proximity`** implements the BLE handoff `ProximityConfirmer`. Both keep
+  their vendor SDKs behind a `:core:domain` interface, so features stay vendor‑agnostic.
 - **`:app`** is the composition root: it depends on every feature + core module so Hilt can
   assemble the graph, owns the navigation host, and provides `@BaseUrl`/`@WsUrl` from `BuildConfig`.
 
@@ -180,6 +187,7 @@ canonical example.
 | Async                | Coroutines + Flow                                                  |
 | Networking           | Retrofit + OkHttp + kotlinx.serialization                         |
 | Realtime             | OkHttp **WebSocket** (1:1 chat, §10)                              |
+| On‑device ML         | **MediaPipe Tasks** `tasks-text` (multilingual USE, TFLite) — semantic feed re‑ranking, lexical fallback |
 | Push                 | Firebase Cloud Messaging                                          |
 | Local DB             | Room (offline cache for feed + conversations)                     |
 | Key‑value storage    | DataStore Preferences (JWT tokens + language/radius)              |
@@ -189,7 +197,7 @@ canonical example.
 | Accessibility        | Compose semantics (roles, headings, live regions) + a11y lint rules |
 | Build                | Gradle Kotlin DSL + version catalog + **convention plugins**      |
 | Testing              | JUnit4, MockK, Turbine, kotlinx‑coroutines‑test, **Robolectric** (Compose a11y) |
-| Coverage             | **JaCoCo** (`jacocoTestReport`) — logic‑filtered, **~90% of core logic** |
+| Coverage             | **JaCoCo** (`jacocoTestReport`) — logic‑filtered, **84.7% of core logic** |
 | Performance          | **AndroidX Macrobenchmark** — cold/warm startup (`:benchmark` module)  |
 
 Versions are centralized in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
@@ -232,8 +240,10 @@ near_aid_app/
 │   ├── network/       # Retrofit APIs, DTOs, AuthInterceptor, TokenAuthenticator,
 │   │                  #   safeApiCall (error envelope), ChatSocket (WebSocket), NetworkModule
 │   ├── database/      # Room database, cache entities, DAOs
-│   ├── domain/        # Repository interfaces (one per file) + UseCases (one per action)
-│   └── data/          # Repository implementations + DTO/Entity↔Model mappers + DataModule
+│   ├── domain/        # Repository interfaces (one per file) + UseCases + TextEmbedder/ProximityConfirmer
+│   ├── data/          # Repository implementations + DTO/Entity↔Model mappers + DataModule
+│   ├── ai/            # On-device semantic search: MediaPipe/TFLite + lexical embedders
+│   └── proximity/     # BLE handoff confirmation (advertiser/scanner, handoff token)
 │
 └── feature/
     ├── auth/          # Splash · Welcome · Phone · OTP · Profile setup
@@ -427,7 +437,7 @@ helpers are intentionally still inline (see *Implementation status*).
 
 Fast **JVM unit tests** (no device/emulator) cover the presentation and non‑UI layers:
 every ViewModel, and the logic in `:core` (mappers, all repositories, all use cases, the
-OkHttp interceptors, the MVI base). They run as `testDebugUnitTest` — **~240 tests** across
+OkHttp interceptors, the MVI base). They run as `testDebugUnitTest` — **273 tests** across
 the modules below.
 
 - **Frameworks:** JUnit4, **MockK** (use‑case doubles), **Turbine** (effect/flow assertions),
@@ -447,8 +457,9 @@ the modules below.
 | `:core:domain`    | `PhoneNumber` (BD → E.164) **and every use case** — delegation, comment/email/phone/body trimming, and the `ObserveSession` state machine |
 | `:core:data`      | **Every mapper** (DTO→domain incl. the claim‑handoff/`delivered_at` logic) and **all 9 repositories** (mocked Retrofit APIs + test dispatcher, success + transport‑failure paths, cache fallback) |
 | `:core:network`   | `safeApiCall` + `HttpException` → `AppError` mapping; `AuthInterceptor` (bearer attach / auth‑endpoint skip) and `TokenAuthenticator` (401 refresh → retry → clear) |
+| `:core:ai`        | The lexical, semantic and composite embedders + the similarity re‑rank use case — keyword overlap, EN↔BN, semantic‑vs‑lexical fallback, lazy‑load/error handling (**100%** line) |
 | `:feature:auth`   | Phone, OTP and profile‑setup ViewModels (validation, send/verify, navigation)  |
-| `:feature:discovery` | Home feed, listing detail (claim/report/block) and notifications ViewModels  |
+| `:feature:discovery` | Home feed (search re‑rank + **paging**), listing detail (claim/report/block) and notifications ViewModels |
 | `:feature:post`   | Create‑listing ViewModel (field reducers, `canSubmit` gating, request vs offer) |
 | `:feature:activity` | Activity ViewModel (claims/listings load, sorting, deliver/confirm/withdraw)  |
 | `:feature:messages` | Conversations + realtime Chat ViewModels (history, streamed messages, send)   |
@@ -470,8 +481,9 @@ unlabeled or under 48 dp). Run them with `./gradlew :core:designsystem:testDebug
 ### Coverage (JaCoCo)
 
 A `configureJacoco()` convention plugin gives every module a `jacocoTestReport` task. The
-aggregated figure is **~90% line coverage of core logic** (ViewModels, repositories, use cases,
-mappers, interceptors, utilities). The report is **logic‑filtered**: it excludes code that isn't
+aggregated figure is **84.7% line coverage of core logic** (1,410/1,665 — ViewModels,
+repositories, use cases, mappers, interceptors, embedders, utilities). The report is
+**logic‑filtered**: it excludes code that isn't
 meaningfully unit‑testable — Compose UI (screens/theme/components), generated Hilt/Room/serializer
 code, DI wiring, wire DTOs, Room entities/DAOs, navigation markers, and Android framework entry
 points (Activities, Application, the FCM service). Including Compose UI, whole‑repository line
@@ -518,7 +530,10 @@ CI is **green on `main`** — see the repo's **Actions** tab for the latest run.
 | Area                       | State          | Notes                                                       |
 |----------------------------|----------------|-------------------------------------------------------------|
 | Auth (OTP + profile setup) | ✅ Implemented  | JWT persisted; transparent token refresh.                   |
-| Discovery (feed + detail)  | ✅ Implemented  | Needs/Offers toggle, filters, claim, report/block, cache.   |
+| Discovery (feed + detail)  | ✅ Implemented  | Needs/Offers toggle, filters, claim, report/block, cache, cursor paging. |
+| Semantic search (on‑device)| ✅ Implemented  | Lexical re‑rank now; drop the `.tflite` asset to enable the MediaPipe model. |
+| BLE proximity handoff      | ✅ Implemented  | RSSI‑gated confirm; two‑phone flow proven on hardware.      |
+| CI/CD                      | ✅ Implemented  | Actions build/test/coverage/lint; signed‑release + optional Play publish. |
 | Post (request / offer)     | ✅ Implemented  | Category picker, urgency vs availability window.            |
 | Activity                   | ✅ Implemented  | Claims (Helping) + my posts; deliver/confirm/withdraw.      |
 | Messages + Chat            | ✅ Implemented  | Conversation list + realtime WebSocket chat.                |

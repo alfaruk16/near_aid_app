@@ -1,23 +1,24 @@
 # NearAid — Résumé Evidence Report
 
-_Generated on 2026-07-30. Every figure is drawn from the codebase and was **measured on this
-checkout**. Caveats are stated inline so each claim survives scrutiny._
+_Generated 2026-07-30, updated 2026-07-31 (on-device semantic search + signed-release/Play CD,
+merged to `main` via PRs #8–#10). Every figure is drawn from the codebase and was **measured on
+this `main` checkout**. Caveats are stated inline so each claim survives scrutiny._
 
 **NearAid** is a **Kotlin-native Android** app (Hilt, Retrofit/OkHttp, Room, Jetpack Compose)
 following **MVI + Clean Architecture**, with a **BLE proximity-handoff** feature
-(`:core:proximity`), a `:benchmark` Macrobenchmark module, JaCoCo coverage, and a broad
-core-module test suite.
+(`:core:proximity`), **on-device semantic search** (`:core:ai`, MediaPipe/TFLite), a
+`:benchmark` Macrobenchmark module, JaCoCo coverage, and a broad core-module test suite.
 
 ---
 
 ## 1. Module count + multi-module structure
 
-**18 Gradle project modules** (`settings.gradle.kts`) **+ a `build-logic` composite build**.
+**19 Gradle project modules** (`settings.gradle.kts`) **+ a `build-logic` composite build**.
 
 | Layer | Modules |
 |---|---|
 | App | `:app` |
-| Core (10) | `:core:common` · `:core:model` · `:core:designsystem` · `:core:navigation` · `:core:datastore` · `:core:network` · `:core:database` · `:core:domain` · `:core:data` · **`:core:proximity`** (BLE) |
+| Core (11) | `:core:common` · `:core:model` · `:core:designsystem` · `:core:navigation` · `:core:datastore` · `:core:network` · `:core:database` · `:core:domain` · `:core:data` · **`:core:proximity`** (BLE) · **`:core:ai`** (on-device semantic search) |
 | Feature (6) | `:feature:auth` · `:feature:discovery` · `:feature:post` · `:feature:activity` · `:feature:messages` · `:feature:profile` |
 | Performance | `:benchmark` (com.android.test — Macrobenchmark) |
 | Build logic | `build-logic/convention` — `nearaid.android.application(.compose)`, `.library(.compose)`, `.feature`, `.hilt`, `.room`, `jvm.library` |
@@ -38,13 +39,14 @@ through custom Gradle **convention plugins**.
 | **Networking** | **Retrofit 2.11.0** + **OkHttp 4.12.0** (+ logging), kotlinx.serialization JSON 1.7.3; **OkHttp WebSocket** for realtime chat |
 | **Async** | **Kotlin Coroutines 1.9.0** + Flow |
 | **Database / storage** | **Room 2.6.1** (KSP), **DataStore Preferences 1.1.1** |
+| **On-device ML** | **MediaPipe Tasks** `tasks-text` **0.10.26.1** (multilingual Universal Sentence Encoder, TFLite) — semantic re-ranking of the discovery feed; native `.so` is **16 KB page-aligned** (Play requirement) |
 | **Push** | **Firebase** BOM 33.7.0 (Cloud Messaging / FCM) |
 | **Debug tooling** | **LeakCanary 2.14** |
 | **Testing** | JUnit4 4.13.2, **MockK 1.13.13**, **Turbine 1.2.0**, coroutines-test 1.9.0, **Robolectric 4.14.1**, Compose UI test |
 | **Proximity / BLE** | **`android.bluetooth.le`** `BluetoothLeAdvertiser` + `BluetoothLeScanner` (`:core:proximity`) for in-person handoff confirmation |
-| **Coverage** | **JaCoCo 0.8.12** — `configureJacoco()` convention with a logic filter, per-module `jacocoTestReport`; **84% core-logic line coverage** |
+| **Coverage** | **JaCoCo 0.8.12** — `configureJacoco()` convention with a logic filter, per-module `jacocoTestReport`; **84.7% core-logic line coverage** |
 | **Performance** | **AndroidX Macrobenchmark 1.3.3** + UiAutomator 2.3.0 — `:benchmark` startup module |
-| **CI/CD** | **GitHub Actions** (green on `main`) — `.github/workflows/ci.yml` runs build (`assembleDebug`) → `testDebugUnitTest` → `jacocoTestReport` + Android `lint` on every push/PR to `main`/`develop`; `release.yml` publishes a tagged-release APK. JDK 17 runner, Android SDK provisioned via `android-actions/setup-android`. |
+| **CI/CD** | **GitHub Actions** (green on `main`) — `ci.yml` runs build (`assembleDebug`) → `testDebugUnitTest` → `jacocoTestReport` + Android `lint` on every push/PR to `main`/`develop`; `release.yml` on a `v*` tag builds a **signed APK + AAB**, publishes a GitHub Release, and (when a Play service account is configured) pushes the AAB to Play's internal track. JDK 17 runner, Android SDK provisioned via `android-actions/setup-android`. |
 
 ---
 
@@ -69,9 +71,18 @@ can't confirm → manual-confirm fallback). The receiving party can advertise ("
 Includes the hardware fix: service-data-only advertisement under the 31-byte legacy limit + a
 fail-fast on the advertise-start callback.
 
+**On-device semantic search (`:core:ai`):** the discovery feed re-ranks by *meaning* — a search
+for "baby formula" surfaces an offer titled "surplus infant milk powder" — computed entirely
+on-device (nothing leaves the phone). Text is embedded and ranked by cosine similarity; a
+`CompositeTextEmbedder` prefers the MediaPipe multilingual model (EN↔BN) and falls back to a
+dependency-free lexical embedder, so search works with zero setup and auto-upgrades when the
+`.tflite` asset is bundled. The feed also gained cursor-based paging, a 250 ms search debounce,
+and an effect-driven scroll-to-top. (Docs: `docs/ai-semantic-search.md`.)
+
 **Cross-cutting:** FCM push, accessibility contract (TalkBack roles/labels/headings, 48 dp targets,
 live-region announcements, automated Compose a11y test), light/dark semantic theming,
-localization-ready `strings.xml` (incl. Bangla).
+localization-ready `strings.xml` (incl. Bangla). Full technical docs live under `docs/`
+(architecture, data/networking, navigation, design system, testing, CI/CD, AI).
 
 **Deferred:** a dedicated map view (list-based discovery in v1). Backend is external
 (Django + OpenAPI); this repo is the client.
@@ -97,17 +108,17 @@ Effort concentration (commits touching each module): `feature:activity` 7 · `fe
 
 | Metric | Value | Evidence / caveat |
 |---|---|---|
-| **Test suite** | **249 `@Test` across 46 files** | JUnit4 + MockK + Turbine + Robolectric + Compose UI test. Covers all 6 feature ViewModels + every `core:data` repository & mapper + every `core:domain` use case + `core:common` MVI base + `core:network` interceptors/authenticator + `core:proximity` token/match predicate + the BLE deliver-gate + `app` MainViewModel + `core:designsystem` a11y. |
-| **Coverage — core logic** | **84.0% line** (1,322 / 1,573); branch 69.6% | **JaCoCo 0.8.12** with a **logic filter** (`./gradlew jacocoTestReport`) — excludes what isn't unit-testable: Compose UI (screens/theme/components), generated Hilt/Dagger + Room `*_Impl` + serializer stubs, DI wiring, wire DTOs, nav markers, entities/DAOs, `R`/`BuildConfig`, Android framework entry points. Reflects the testable logic surface: ViewModels, repositories, use cases, mappers, interceptors, utilities. |
-| **Coverage — by module** (logic-filtered line) | features **98–100%** · `app` **100%** · `core:domain` **90.6%** · `core:data` **90.3%** · `feature:activity` **73.3%** · `core:common` **61.8%** · `core:network` **48.1%** · `core:proximity` **14.5%** | The two BLE-related dips are honest: `core:proximity` (14.5%) is mostly the `BluetoothLeAdvertiser`/`Scanner` radio flow, which **needs two real phones** (the pure `isHandoffMatch` predicate + token derivation are unit-tested); `feature:activity` (73.3%) has the receiver advertise-loop branches uncovered. `core:network`'s remainder is the WebSocket `ChatSocket`. |
-| **Coverage — whole-repository** | **much lower (~29%), not the headline** | Including Compose UI screens (which need instrumented/Compose tests, not JVM unit tests) the whole-repo line figure is ~29%. The 84% figure is explicitly the **core-logic** slice — state the exclusion basis when citing. |
+| **Test suite** | **273 `@Test` across 43 files** | JUnit4 + MockK + Turbine + Robolectric + Compose UI test. Covers all 6 feature ViewModels + every `core:data` repository & mapper + every `core:domain` use case + `core:common` MVI base + `core:network` interceptors/authenticator + `core:proximity` token/match predicate + the BLE deliver-gate + `app` MainViewModel + `core:designsystem` a11y + **`core:ai` embedders (semantic/lexical/composite) + the similarity re-rank use case + discovery paging**. |
+| **Coverage — core logic** | **84.7% line** (1,410 / 1,665); branch 70.0% | **JaCoCo 0.8.12** with a **logic filter** (`./gradlew jacocoTestReport`) — excludes what isn't unit-testable: Compose UI (screens/theme/components), generated Hilt/Dagger + Room `*_Impl` + serializer stubs, DI wiring, wire DTOs, nav markers, entities/DAOs, `R`/`BuildConfig`, Android framework entry points. Reflects the testable logic surface: ViewModels, repositories, use cases, mappers, interceptors, utilities. |
+| **Coverage — by module** (logic-filtered line) | `app`/`core:ai`/`feature:{auth,messages,post,profile}` **100%** · `feature:discovery` **98.0%** · `core:domain` **91.8%** · `core:data` **90.3%** · `feature:activity` **73.3%** · `core:common` **61.8%** · `core:network` **48.1%** · `core:proximity` **14.5%** | `:core:ai` is **100%** (34/34) — the native MediaPipe glue is isolated behind an `EmbeddingSession` seam under `di/` (excluded), so all embedder/fallback logic is unit-tested. The two BLE-related dips are honest: `core:proximity` (14.5%) is mostly the `BluetoothLeAdvertiser`/`Scanner` radio flow, which **needs two real phones** (the pure `isHandoffMatch` predicate + token derivation are unit-tested); `feature:activity` (73.3%) has the receiver advertise-loop branches uncovered. `core:network`'s remainder is the WebSocket `ChatSocket`. |
+| **Coverage — whole-repository** | **much lower (~29%), not the headline** | Including Compose UI screens (which need instrumented/Compose tests, not JVM unit tests) the whole-repo line figure is ~29%. The 84.7% figure is explicitly the **core-logic** slice — state the exclusion basis when citing. |
 | **Startup — cold (physical device)** | **~1.59 s** median TTID (min 1.54, max 1.70, 5 iters) | **AndroidX Macrobenchmark** `StartupTimingMetric`, `:benchmark` module, measured on this checkout on a **physical Nokia 2.4 (API 31, entry-level)**, `CompilationMode.None()` (no baseline profile, animations disabled). Real-device number; a low-end handset with no baseline profile, so a conservative worst-case. |
 | **Startup — warm (physical device)** | **~370 ms** median TTID (min 364, max 396, 5 iters) | Same device/run as above. |
 | **Startup — emulator reference** | **~302 ms cold / ~112 ms warm** | Same benchmark on an API-37 emulator (`sdk_gphone16k_arm64`) — faster host CPU; a comparison point, not the headline. |
 | **Build-time — cold** | **~16 s** `:app:assembleDebug` | `./gradlew clean` then `:app:assembleDebug --no-build-cache --profile`; profile HTML under `build/reports/profile/`. |
 | **Build-time — incremental** | **~1 s** (no-op, all up-to-date) | Re-run of `:app:assembleDebug` with no changes. |
 
-> Honesty guardrails: the **84%** coverage headline is the **core-logic** slice (JaCoCo logic
+> Honesty guardrails: the **84.7%** coverage headline is the **core-logic** slice (JaCoCo logic
 > filter — Compose UI, generated code, DI, DTOs, and Android framework entry points excluded);
 > whole-repository line coverage including UI is ~29%. Always cite it as "core logic" with the
 > exclusion basis. The BLE radio flow (`:core:proximity`) is not unit-tested — it needs two phones;
@@ -126,34 +137,40 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
 
 ## Ready-to-paste résumé bullets (all measured above)
 
-- Built **NearAid**, a hyperlocal mutual-aid Android app, as an **18-module** Gradle project
+- Built **NearAid**, a hyperlocal mutual-aid Android app, as a **19-module** Gradle project
   (**MVI + Clean Architecture**) with **Jetpack Compose**, **Hilt**, **Retrofit/OkHttp**, **Room**,
   **DataStore**, and **Coroutines/Flow**, wired through custom Gradle **convention plugins**.
 - Delivered six feature modules end to end — phone-OTP auth, two-sided discovery, post, a full
   claim → **deliver → confirm** → rate flow, **realtime WebSocket chat**, and profile/trust.
+- Added **on-device semantic search** (`:core:ai`) — a **MediaPipe/TFLite** multilingual (EN↔BN)
+  embedder re-ranks the feed by meaning with a dependency-free lexical fallback, behind a
+  vendor-neutral interface; kept the module at **100% line coverage** by isolating native glue
+  behind a testable seam, and ensured the native library is **16 KB page-aligned** for Play.
 - Engineered a **BLE proximity-confirmed in-person handoff** (`BluetoothLeAdvertiser`/`Scanner`,
   RSSI-gated, foreground-only) so a delivery is confirmed only when both devices are physically
   together — degrading gracefully to manual confirm when Bluetooth is unavailable.
-- Wrote **249 unit tests** (JUnit4/MockK/Turbine/Robolectric) and set up **JaCoCo** with a logic
-  filter — **84% line coverage of core logic** (ViewModels, repositories, use cases, mappers,
-  OkHttp interceptors, the proximity match predicate; 1,322/1,573), covering every `core:data`
-  repository and `core:domain` use case; ~29% whole-repo including Compose UI.
+- Wrote **273 unit tests** (JUnit4/MockK/Turbine/Robolectric) and set up **JaCoCo** with a logic
+  filter — **84.7% line coverage of core logic** (ViewModels, repositories, use cases, mappers,
+  OkHttp interceptors, the proximity match predicate, the AI embedders; 1,410/1,665), covering
+  every `core:data` repository and `core:domain` use case; ~29% whole-repo including Compose UI.
 - Stood up **AndroidX Macrobenchmark** cold/warm startup measurement on a **physical device** —
   **~1.6 s cold / ~0.37 s warm** time-to-initial-display on an entry-level Nokia 2.4 (API 31, no
   baseline profile — a conservative low-end figure; ~0.30 s cold on an API-37 emulator).
-- Kept builds fast in an 18-module setup — **~16 s cold** `assembleDebug`, ~1 s incremental
+- Kept builds fast in a 19-module setup — **~16 s cold** `assembleDebug`, ~1 s incremental
   (Gradle configuration-cache + convention plugins).
 - Built an **accessibility contract** into the design system (TalkBack roles/labels/headings, 48 dp
   targets, live-region announcements) enforced by an automated Compose test.
 - Set up **GitHub Actions CI/CD** — build, unit tests, JaCoCo coverage and Android lint on every
-  push/PR (green on `main`), plus a tagged-release APK pipeline.
+  push/PR (green on `main`), plus a tagged-release pipeline that builds a **signed APK + AAB**,
+  cuts a GitHub Release, and optionally **publishes to Google Play**'s internal track.
 - Shipped the app **solo** — every commit single-authored.
 
 ---
 
 ## Appendix — how each number was produced (reproduce)
 
-- **Coverage:** `./gradlew jacocoTestReport` → per-module `build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml` (logic-filtered via `configureJacoco()`); summed the LINE counters = **1,322/1,573 = 84.0%** core logic.
+- **Coverage:** `./gradlew jacocoTestReport` → per-module `build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml` (logic-filtered via `configureJacoco()`); summed the LINE counters = **1,410/1,665 = 84.7%** core logic.
+- **On-device AI (`:core:ai`):** `./gradlew :core:ai:jacocoTestReport` → **34/34 = 100%** line. Tests: `HashingTextEmbedderTest` (lexical overlap, case/punctuation/word-order invariance, Bengali/unicode, blank→zero), `CompositeTextEmbedderTest` (semantic-vs-lexical fallback), `MediaPipeTextEmbedderTest` (lazy load once, no-retry-after-fail, error→null via a fake `EmbeddingSessionFactory`), and `RankListingsBySimilarityUseCaseTest` in `:core:domain`. The MediaPipe `.so` 16 KB alignment was verified with `llvm-readelf -l` (LOAD segments at `0x4000`) and `zipalign -c -P 16` on the release APK.
 - **Startup:** `ANDROID_SERIAL=<device> ./gradlew :benchmark:connectedBenchmarkAndroidTest` → `benchmark/build/outputs/connected_android_test_additional_output/.../com.nearaid.benchmark-benchmarkData.json` (this checkout: physical Nokia 2.4, API 31, animations disabled; `ANDROID_SERIAL` targets a specific device when several are attached).
 - **Build-time:** `./gradlew clean && ./gradlew :app:assembleDebug --no-build-cache --profile` → `build/reports/profile/profile-*.html`.
 - **BLE:** `:core:proximity` unit tests (`HandoffTokenTest` — token derivation + the `isHandoffMatch` predicate) via `./gradlew :core:proximity:testDebugUnitTest`; the deliver-gate ViewModel branches via `:feature:activity:testDebugUnitTest`. The `BluetoothLeAdvertiser`/`Scanner` radio flow needs two real devices, so it sits outside the JVM unit-test suite — **proven on hardware**: two physical phones (Redmi 23053RN02A + Nokia 2.4) each resolved `ProximityResult.Confirmed` off the other over real BLE. The on-device harness (`BleProximityHardwareTest` + `scripts/ble-proximity-proof.sh`, which installs the androidTest APK on both phones and runs `am instrument` in parallel) lives on the `feature/ble-proximity-handoff` branch, not `main`. (Note: every scanning phone needs system **Location** on, or Android silently drops BLE scan results.)
@@ -161,5 +178,9 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
   `docs/ci-cd.md`). Runs on every push/PR to `main`/`develop`; check the **Actions** tab for the
   latest conclusion. (Two runner-only fixes were needed after the initial merge: provisioning the
   Android SDK via `android-actions/setup-android`, and stripping the local macOS `org.gradle.java.home`
-  pin from `gradle.properties` on the runner.)
+  pin from `gradle.properties` on the runner.) `release.yml` now signs the build from a keystore
+  secret (unsigned fallback when absent) and optionally uploads the AAB to Play; the signing wiring
+  was verified locally with `:app:signingReport` (release variant resolves to the keystore with
+  env set; `Config: null` without) — the live GitHub Actions release run and Play upload require
+  the repository secrets, so they're validated by config + local proof, not an executed release.
 - **Not evidenced in this repo:** an iOS build.
