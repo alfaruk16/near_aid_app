@@ -13,6 +13,8 @@ data class HomeState(
     val selectedCategoryKey: String? = null, // null means "All"
     val listings: List<ListingCard> = emptyList(),
     val loading: Boolean = false,
+    val loadingMore: Boolean = false,
+    val hasMore: Boolean = false,
     val error: String? = null,
     val radiusKm: Double = 5.0,
     val searchQuery: String = "",
@@ -28,6 +30,7 @@ sealed interface HomeIntent : UiIntent {
     data class ListingClicked(val id: String) : HomeIntent
     data object OpenNotificationsClicked : HomeIntent
     data object Refresh : HomeIntent
+    data object LoadMore : HomeIntent
 }
 
 sealed interface HomeEffect : UiEffect {

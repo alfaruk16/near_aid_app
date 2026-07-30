@@ -26,7 +26,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,6 +47,9 @@ import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
+/** Prefetch the next page when the user is within this many items of the end. */
+private const val LOAD_MORE_PREFETCH = 3
+
 @Composable
 fun HomeScreen(
     onListingClick: (id: String) -> Unit,
@@ -55,11 +60,22 @@ fun HomeScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
-    // When a search re-ranks the feed and a new listing lands at the top, scroll up to it
-    // so the best match is visible without the user scrolling manually.
-    val topId = state.listings.firstOrNull()?.id
-    LaunchedEffect(topId) {
-        if (topId != null) listState.animateScrollToItem(0)
+    // On a new search, scroll back to the top so the best re-ranked match is visible
+    // without the user scrolling manually. Keyed on the query (not the list) so paging —
+    // which appends to the bottom — never yanks the feed upward.
+    LaunchedEffect(state.searchQuery) {
+        if (state.listings.isNotEmpty()) listState.animateScrollToItem(0)
+    }
+
+    // Load the next page when the user nears the end of the loaded items.
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@derivedStateOf false
+            last >= state.listings.size - LOAD_MORE_PREFETCH
+        }
+    }
+    LaunchedEffect(shouldLoadMore, state.hasMore) {
+        if (shouldLoadMore && state.hasMore) viewModel.onIntent(HomeIntent.LoadMore)
     }
 
     CollectEffect(viewModel.effect) { effect ->
@@ -194,6 +210,23 @@ fun HomeScreen(
                             card = card,
                             onClick = { viewModel.onIntent(HomeIntent.ListingClicked(card.id)) },
                         )
+                    }
+                    if (state.loadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(
+                                    color = NearAidTheme.colors.marigold,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .statusSemantics(stringResource(R.string.loading)),
+                                )
+                            }
+                        }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }

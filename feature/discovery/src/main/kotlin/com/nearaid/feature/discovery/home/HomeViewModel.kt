@@ -33,8 +33,11 @@ class HomeViewModel @Inject constructor(
     private val rankBySimilarity: RankListingsBySimilarityUseCase,
 ) : MviViewModel<HomeState, HomeIntent, HomeEffect>() {
 
-    /** Server-ordered listings as fetched, before on-device semantic re-ranking. */
+    /** Server-ordered listings accumulated across pages, before on-device re-ranking. */
     private var sourceListings: List<ListingCard> = emptyList()
+
+    /** Cursor for the next page, or null when there are no more pages to fetch. */
+    private var nextCursor: String? = null
 
     /** Latest re-rank coroutine; cancelled on each keystroke so only the last one runs. */
     private var rankJob: Job? = null
@@ -75,31 +78,54 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.ListingClicked -> sendEffect(HomeEffect.OpenListing(intent.id))
             HomeIntent.OpenNotificationsClicked -> sendEffect(HomeEffect.OpenNotifications)
             HomeIntent.Refresh -> loadListings()
+            HomeIntent.LoadMore -> loadMore()
         }
     }
 
+    /** Loads the first page, replacing the current feed and resetting the paging cursor. */
     private fun loadListings() {
         viewModelScope.launch {
-            val radius = observeSearchRadius().first()
-            val categoryFilter = listOfNotNull(currentState.selectedCategoryKey)
-            val query = DiscoveryQuery(
-                type = currentState.selectedType,
-                lat = DHAKA_LAT,
-                lng = DHAKA_LNG,
-                radiusKm = radius,
-                categories = categoryFilter,
-            )
             setState { copy(loading = true, error = null) }
-            when (val result = getNearbyListings(query)) {
+            when (val result = getNearbyListings(buildQuery())) {
                 is DataResult.Success -> {
                     sourceListings = result.data.items
-                    setState { copy(loading = false) }
+                    nextCursor = result.data.nextCursor
+                    setState { copy(loading = false, hasMore = result.data.hasMore) }
                     applyRanking()
                 }
                 is DataResult.Failure -> setState { copy(loading = false, error = result.error.message) }
             }
         }
     }
+
+    /**
+     * Fetches the next page (if any) and appends it to [sourceListings], then re-ranks the
+     * whole accumulated set. Guarded so overlapping scroll events can't double-fetch.
+     */
+    private fun loadMore() {
+        val cursor = nextCursor ?: return
+        if (currentState.loading || currentState.loadingMore) return
+        viewModelScope.launch {
+            setState { copy(loadingMore = true) }
+            when (val result = getNearbyListings(buildQuery(), cursor)) {
+                is DataResult.Success -> {
+                    sourceListings = sourceListings + result.data.items
+                    nextCursor = result.data.nextCursor
+                    setState { copy(loadingMore = false, hasMore = result.data.hasMore) }
+                    applyRanking()
+                }
+                is DataResult.Failure -> setState { copy(loadingMore = false, error = result.error.message) }
+            }
+        }
+    }
+
+    private suspend fun buildQuery(): DiscoveryQuery = DiscoveryQuery(
+        type = currentState.selectedType,
+        lat = DHAKA_LAT,
+        lng = DHAKA_LNG,
+        radiusKm = observeSearchRadius().first(),
+        categories = listOfNotNull(currentState.selectedCategoryKey),
+    )
 
     /**
      * Re-orders [sourceListings] by on-device semantic similarity to the current search
