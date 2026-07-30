@@ -2,12 +2,14 @@ package com.nearaid.core.designsystem.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,12 +27,16 @@ fun NearAidTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     isError: Boolean = false,
     supportingText: String? = null,
+    leadingIcon: ImageVector? = null,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
         placeholder = placeholder?.let { { Text(it, color = NearAidTheme.colors.ink3) } },
+        leadingIcon = leadingIcon?.let {
+            { Icon(imageVector = it, contentDescription = null, tint = NearAidTheme.colors.ink3) }
+        },
         modifier = if (isError && supportingText != null) {
             modifier.semantics { error(supportingText) }
         } else {

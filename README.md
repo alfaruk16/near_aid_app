@@ -68,7 +68,9 @@ two dependency stacks:
 
 - **Phone‑first auth** — OTP sign‑in (E.164), profile setup, optional ID‑verification badge.
 - **Two‑sided discovery** — a Needs/Offers toggle, category & urgency filters, distance‑sorted
-  list of nearby listings (privacy‑fuzzed location, banded distance).
+  list of nearby listings (privacy‑fuzzed location, banded distance), with cursor‑based paging.
+- **On‑device semantic search** — a search box re‑ranks the feed by *meaning* (EN↔BN), fully
+  on‑device with a keyword fallback; see [`docs/ai-semantic-search.md`](docs/ai-semantic-search.md).
 - **Post** — a center `+` chooser ("I need help" vs "I have something to give") → create a
   request (with urgency) or an offer (with an availability window).
 - **Claim & fulfil** — claim an open listing → a private chat opens → fulfilling party marks

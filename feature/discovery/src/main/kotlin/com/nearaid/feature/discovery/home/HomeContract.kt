@@ -13,8 +13,11 @@ data class HomeState(
     val selectedCategoryKey: String? = null, // null means "All"
     val listings: List<ListingCard> = emptyList(),
     val loading: Boolean = false,
+    val loadingMore: Boolean = false,
+    val hasMore: Boolean = false,
     val error: String? = null,
     val radiusKm: Double = 5.0,
+    val searchQuery: String = "",
 ) : UiState
 
 internal val HomeState.selectedType: ListingType
@@ -23,12 +26,16 @@ internal val HomeState.selectedType: ListingType
 sealed interface HomeIntent : UiIntent {
     data class SelectTab(val index: Int) : HomeIntent
     data class SelectCategory(val key: String?) : HomeIntent
+    data class SearchChanged(val query: String) : HomeIntent
     data class ListingClicked(val id: String) : HomeIntent
     data object OpenNotificationsClicked : HomeIntent
     data object Refresh : HomeIntent
+    data object LoadMore : HomeIntent
 }
 
 sealed interface HomeEffect : UiEffect {
     data class OpenListing(val id: String) : HomeEffect
     data object OpenNotifications : HomeEffect
+    /** Emitted after a search re-rank publishes, so the feed can scroll to the new best match. */
+    data object ScrollToTop : HomeEffect
 }

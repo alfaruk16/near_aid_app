@@ -14,16 +14,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,14 +38,19 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import com.nearaid.feature.discovery.R
 import com.nearaid.core.designsystem.component.CollectEffect
 import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidSegmentedTabs
+import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
+
+/** Prefetch the next page when the user is within this many items of the end. */
+private const val LOAD_MORE_PREFETCH = 3
 
 @Composable
 fun HomeScreen(
@@ -49,11 +60,27 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    // Load the next page when the user nears the end of the loaded items.
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@derivedStateOf false
+            last >= state.listings.size - LOAD_MORE_PREFETCH
+        }
+    }
+    LaunchedEffect(shouldLoadMore, state.hasMore) {
+        if (shouldLoadMore && state.hasMore) viewModel.onIntent(HomeIntent.LoadMore)
+    }
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
             is HomeEffect.OpenListing -> onListingClick(effect.id)
             HomeEffect.OpenNotifications -> onOpenNotifications()
+            // Re-rank has already published; the new top item now exists, so scrolling
+            // reveals it (this is why it's an effect, not a state-keyed LaunchedEffect).
+            HomeEffect.ScrollToTop -> scope.launch { listState.animateScrollToItem(0) }
         }
     }
 
@@ -93,6 +120,20 @@ fun HomeScreen(
                 )
             }
         }
+
+        // Semantic search — re-ranks the feed on-device by meaning (see RankListingsBySimilarityUseCase)
+        NearAidTextField(
+            value = state.searchQuery,
+            onValueChange = { viewModel.onIntent(HomeIntent.SearchChanged(it)) },
+            label = stringResource(R.string.home_search_label),
+            placeholder = stringResource(R.string.home_search_hint),
+            leadingIcon = Icons.Filled.Search,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        )
+
+        Spacer(Modifier.height(10.dp))
 
         // Needs / Offers toggle
         NearAidSegmentedTabs(
@@ -159,6 +200,7 @@ fun HomeScreen(
 
             else -> {
                 LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
@@ -167,6 +209,23 @@ fun HomeScreen(
                             card = card,
                             onClick = { viewModel.onIntent(HomeIntent.ListingClicked(card.id)) },
                         )
+                    }
+                    if (state.loadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(
+                                    color = NearAidTheme.colors.marigold,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .statusSemantics(stringResource(R.string.loading)),
+                                )
+                            }
+                        }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }

@@ -55,6 +55,7 @@ robolectric = "4.14.1"
 benchmarkMacro = "1.3.3"
 uiautomator = "2.3.0"
 testRunner = "1.6.2"
+mediapipeText = "0.10.26.1"
 
 [libraries]
 # AndroidX core
@@ -122,6 +123,9 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacro" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
+
+# On-device ML — MediaPipe Tasks (text embedding for semantic matching)
+mediapipe-tasks-text = { group = "com.google.mediapipe", name = "tasks-text", version.ref = "mediapipeText" }
 
 # Build-logic dependencies (for convention plugins)
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }

@@ -4,9 +4,11 @@ import com.nearaid.feature.discovery.MainDispatcherRule
 import app.cash.turbine.test
 import com.nearaid.core.common.result.AppError
 import com.nearaid.core.common.result.DataResult
+import com.nearaid.core.domain.ai.TextEmbedder
 import com.nearaid.core.domain.usecase.GetNearbyListingsUseCase
 import com.nearaid.core.domain.usecase.ObserveCategoriesUseCase
 import com.nearaid.core.domain.usecase.ObserveSearchRadiusUseCase
+import com.nearaid.core.domain.usecase.RankListingsBySimilarityUseCase
 import com.nearaid.core.domain.usecase.RefreshCategoriesUseCase
 import com.nearaid.core.model.Author
 import com.nearaid.core.model.Category
@@ -48,11 +50,19 @@ class HomeViewModelTest {
         coEvery { getNearbyListings(any(), any()) } returns DataResult.Success(emptyPage())
     }
 
+    // Real ranking use case with a no-op embedder: a blank query (the default) short-circuits
+    // to the original order, so paging/reload assertions see the server order untouched.
+    private val noopEmbedder = object : TextEmbedder {
+        override suspend fun embed(text: String): FloatArray? = null
+    }
+    private val rankBySimilarity = RankListingsBySimilarityUseCase(noopEmbedder)
+
     private fun viewModel() = HomeViewModel(
         getNearbyListings = getNearbyListings,
         observeCategories = observeCategories,
         refreshCategories = refreshCategories,
         observeSearchRadius = observeSearchRadius,
+        rankBySimilarity = rankBySimilarity,
     )
 
     // --- initial load --------------------------------------------------------
@@ -127,6 +137,39 @@ class HomeViewModelTest {
         coVerify(exactly = 2) { getNearbyListings(any(), any()) }
     }
 
+    // --- paging --------------------------------------------------------------
+
+    @Test
+    fun `LoadMore appends the next page and requests it with the cursor`() {
+        every { observeSearchRadius() } returns flowOf(5.0)
+        coEvery { getNearbyListings(any(), null) } returns
+            DataResult.Success(page(listOf(listing("l1")), nextCursor = "c1", hasMore = true))
+        coEvery { getNearbyListings(any(), "c1") } returns
+            DataResult.Success(page(listOf(listing("l2")), nextCursor = null, hasMore = false))
+
+        val viewModel = viewModel()
+        assertEquals(listOf("l1"), viewModel.state.value.listings.map { it.id })
+
+        viewModel.onIntent(HomeIntent.LoadMore)
+
+        val state = viewModel.state.value
+        assertEquals(listOf("l1", "l2"), state.listings.map { it.id })
+        assertFalse(state.hasMore)
+        assertFalse(state.loadingMore)
+        coVerify { getNearbyListings(any(), "c1") }
+    }
+
+    @Test
+    fun `LoadMore is a no-op when there is no next page`() {
+        // emptyPage() has nextCursor = null, so there is nothing more to fetch.
+        val viewModel = viewModel()
+
+        viewModel.onIntent(HomeIntent.LoadMore)
+
+        // Only the init load happened; no cursored fetch.
+        coVerify(exactly = 1) { getNearbyListings(any(), any()) }
+    }
+
     // --- effects -------------------------------------------------------------
 
     @Test
@@ -155,7 +198,11 @@ class HomeViewModelTest {
 
     private fun emptyPage() = page(emptyList())
 
-    private fun page(items: List<ListingCard>) = Page(items = items, nextCursor = null, hasMore = false)
+    private fun page(
+        items: List<ListingCard>,
+        nextCursor: String? = null,
+        hasMore: Boolean = false,
+    ) = Page(items = items, nextCursor = nextCursor, hasMore = hasMore)
 
     private fun category(key: String) = Category(
         id = key.hashCode(),
