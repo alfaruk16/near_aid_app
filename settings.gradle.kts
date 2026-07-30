@@ -46,3 +46,6 @@ include(":feature:post")
 include(":feature:activity")
 include(":feature:messages")
 include(":feature:profile")
+
+// Performance
+include(":benchmark")

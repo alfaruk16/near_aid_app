@@ -19,6 +19,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
 
+            configureJacoco()
+
             dependencies {
                 add("testImplementation", libs.findLibrary("junit").get())
                 add("testImplementation", libs.findLibrary("kotlinx-coroutines-test").get())

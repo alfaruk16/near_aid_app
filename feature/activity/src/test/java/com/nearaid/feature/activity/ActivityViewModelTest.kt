@@ -47,7 +47,7 @@ class ActivityViewModelTest {
         // Sensible empty-success defaults so construction (which triggers loadAll) never throws.
         coEvery { getMyClaims(any()) } returns DataResult.Success(emptyList())
         coEvery { getMyListings(any(), any()) } returns DataResult.Success(emptyList())
-        // Default: BLE unavailable → the proximity check proceeds to deliver silently (never blocks).
+        // BLE unavailable by default -> the proximity gate proceeds to deliver (never blocks).
         coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Unavailable
     }
 
@@ -191,45 +191,6 @@ class ActivityViewModelTest {
     }
 
     @Test
-    fun `MarkDelivered delivers when proximity confirms`() {
-        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Confirmed(-55)
-        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
-        val viewModel = viewModel()
-
-        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
-
-        coVerify(exactly = 1) { markDelivered("c1") }
-        assertNull(viewModel.state.value.handoffFallback)
-    }
-
-    @Test
-    fun `MarkDelivered offers a manual fallback and does not deliver when proximity times out`() {
-        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Timeout
-        val viewModel = viewModel()
-
-        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
-
-        // Proximity couldn't confirm → do NOT deliver; surface the manual-confirm fallback instead.
-        coVerify(exactly = 0) { markDelivered(any()) }
-        assertEquals("c1", viewModel.state.value.handoffFallback?.claimId)
-        assertEquals(HandoffFailureReason.NotNearby, viewModel.state.value.handoffFallback?.reason)
-        assertNull(viewModel.state.value.proximityClaimId)
-    }
-
-    @Test
-    fun `MarkDeliveredManually bypasses the proximity check and delivers`() {
-        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
-        val viewModel = viewModel()
-
-        viewModel.onIntent(ActivityIntent.MarkDeliveredManually("c1"))
-
-        coVerify(exactly = 1) { markDelivered("c1") }
-        // The manual path never consults the radio.
-        coVerify(exactly = 0) { proximityConfirmer.confirmNearby(any(), any()) }
-        assertNull(viewModel.state.value.handoffFallback)
-    }
-
-    @Test
     fun `ConfirmReceipt delegates to the confirm-receipt use case`() {
         coEvery { confirmReceipt("c1") } returns DataResult.Success(Unit)
         val viewModel = viewModel()
@@ -260,6 +221,68 @@ class ActivityViewModelTest {
 
         viewModel.onIntent(ActivityIntent.DismissActionError)
         assertNull(viewModel.state.value.actionError)
+    }
+
+    // --- BLE proximity handoff gate ------------------------------------------
+
+    @Test
+    fun `MarkDelivered delivers when proximity confirms`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Confirmed(-55)
+        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
+
+        coVerify(exactly = 1) { markDelivered("c1") }
+        assertNull(viewModel.state.value.handoffFallback)
+        assertNull(viewModel.state.value.proximityClaimId)
+    }
+
+    @Test
+    fun `MarkDelivered offers a manual fallback and does not deliver on timeout`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Timeout
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
+
+        coVerify(exactly = 0) { markDelivered(any()) }
+        assertEquals("c1", viewModel.state.value.handoffFallback?.claimId)
+        assertEquals(HandoffFailureReason.NotNearby, viewModel.state.value.handoffFallback?.reason)
+    }
+
+    @Test
+    fun `MarkDelivered maps permission-denied to the permission-off fallback`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.PermissionDenied
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDelivered("c1"))
+
+        assertEquals(HandoffFailureReason.PermissionOff, viewModel.state.value.handoffFallback?.reason)
+    }
+
+    @Test
+    fun `MarkDeliveredManually bypasses the proximity check and delivers`() {
+        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.MarkDeliveredManually("c1"))
+
+        coVerify(exactly = 1) { markDelivered("c1") }
+        coVerify(exactly = 0) { proximityConfirmer.confirmNearby(any(), any()) }
+        assertNull(viewModel.state.value.handoffFallback)
+    }
+
+    @Test
+    fun `OwnerMarkDelivered is proximity-gated and reloads listings on success`() {
+        coEvery { proximityConfirmer.confirmNearby(any(), any()) } returns ProximityResult.Confirmed(-50)
+        coEvery { markDelivered("c1") } returns DataResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.onIntent(ActivityIntent.OwnerMarkDelivered("c1"))
+
+        coVerify(exactly = 1) { markDelivered("c1") }
+        // init loads listings once; the successful owner action reloads them again.
+        coVerify(exactly = 2) { getMyListings(ListingType.REQUEST, any()) }
     }
 
     // --- fixtures ------------------------------------------------------------
