@@ -503,7 +503,8 @@ conservative low‑end figure; a mid/high‑end device or a baseline profile is 
 - **`ci.yml`** — on every push/PR to `main`/`develop`: build (`assembleDebug`), unit tests
   (`testDebugUnitTest`), coverage (`jacocoTestReport`) and Android `lint`, uploading APK,
   test, coverage and lint reports as artifacts.
-- **`release.yml`** — on a `v*` tag: `assembleRelease` and publish a GitHub Release with the APK.
+- **`release.yml`** — on a `v*` tag: build a **signed** APK + AAB, publish a GitHub Release with
+  the APK, and (when a Play service account is configured) push the AAB to Play's internal track.
 
 Instrumented / BLE‑hardware / Macrobenchmark suites are **not** run in CI (they need real
 devices) — run them locally per `docs/ci-cd.md`.

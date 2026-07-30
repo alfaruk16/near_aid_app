@@ -12,6 +12,27 @@ android {
         applicationId = "com.nearaid"
     }
 
+    // Release signing is driven by env vars so no secrets live in the repo. CI decodes the
+    // upload keystore from the KEYSTORE_BASE64 secret and points KEYSTORE_FILE at it (see
+    // .github/workflows/release.yml). When the env is absent (local dev, PR CI), no release
+    // signing config is created and `assembleRelease` produces an unsigned APK — the build
+    // still succeeds.
+    val releaseKeystore = System.getenv("KEYSTORE_FILE")
+        ?.takeIf { it.isNotBlank() }
+        ?.let { file(it) }
+        ?.takeIf { it.exists() && it.length() > 0L }
+
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             // Android emulator -> host machine loopback. Change the port if your
@@ -20,6 +41,8 @@ android {
             buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8000/ws\"")
         }
         release {
+            // Null when no keystore env is provided → unsigned release (build still works).
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

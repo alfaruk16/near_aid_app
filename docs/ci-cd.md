@@ -25,14 +25,44 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Builds `assembleRelease` and publishes a GitHub Release with auto-generated
-notes and the APK attached.
+The job builds a **signed** `assembleRelease` (APK) + `bundleRelease` (AAB), publishes a
+GitHub Release with auto-generated notes and the APK, and — when a Play service account is
+configured — pushes the AAB to Google Play's `internal` track.
 
-> The release APK is **unsigned** — there is no signing config in the repo. To
-> ship a signed build, add a `signingConfig` in `app/build.gradle.kts` fed by
-> repository secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
-> `KEY_PASSWORD`), decode the keystore in a workflow step, and upload
-> `app-release.apk` instead of `app-release-unsigned.apk`.
+### Signing
+
+`app/build.gradle.kts` creates a `release` signing config **only when a keystore is provided
+via env vars**; otherwise the release build is unsigned but still succeeds (local dev, PR CI).
+The workflow decodes the keystore from a secret and passes the env through to Gradle:
+
+| Secret | Purpose |
+|---|---|
+| `KEYSTORE_BASE64` | base64 of the upload keystore (`.jks`) |
+| `KEYSTORE_PASSWORD` | keystore password |
+| `KEY_ALIAS` | key alias |
+| `KEY_PASSWORD` | key password |
+
+```bash
+base64 -i upload.jks | pbcopy        # → paste into the KEYSTORE_BASE64 secret
+```
+
+Env → Gradle mapping: `KEYSTORE_FILE` (path to the decoded keystore), `KEYSTORE_PASSWORD`,
+`KEY_ALIAS`, `KEY_PASSWORD`. If `KEYSTORE_BASE64` is unset the workflow logs a warning and
+produces `app-release-unsigned.apk`.
+
+### Play publishing (optional)
+
+The **Publish to Google Play** step (`r0adkll/upload-google-play`) uploads the AAB to the
+`internal` track. It is **skipped unless** `PLAY_SERVICE_ACCOUNT_JSON` is set, and requires the
+app to already exist in the Play Console.
+
+| Secret | Purpose |
+|---|---|
+| `PLAY_SERVICE_ACCOUNT_JSON` | Play Console service-account JSON key with the "release apps" permission |
+
+Change `track: internal` to `alpha`/`beta`/`production` (and add a rollout `userFraction`) to
+promote further. The `mapping.txt` is uploaded alongside for crash deobfuscation (R8 is on for
+release builds).
 
 ## Not run in CI
 
