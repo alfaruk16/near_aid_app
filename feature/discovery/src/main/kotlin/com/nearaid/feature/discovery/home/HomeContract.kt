@@ -15,6 +15,7 @@ data class HomeState(
     val loading: Boolean = false,
     val error: String? = null,
     val radiusKm: Double = 5.0,
+    val searchQuery: String = "",
 ) : UiState
 
 internal val HomeState.selectedType: ListingType
@@ -23,6 +24,7 @@ internal val HomeState.selectedType: ListingType
 sealed interface HomeIntent : UiIntent {
     data class SelectTab(val index: Int) : HomeIntent
     data class SelectCategory(val key: String?) : HomeIntent
+    data class SearchChanged(val query: String) : HomeIntent
     data class ListingClicked(val id: String) : HomeIntent
     data object OpenNotificationsClicked : HomeIntent
     data object Refresh : HomeIntent

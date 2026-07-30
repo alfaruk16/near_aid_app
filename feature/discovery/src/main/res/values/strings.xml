@@ -8,6 +8,8 @@
     <string name="home_tab_needs">Needs</string>
     <string name="home_tab_offers">Offers</string>
     <string name="home_category_all">All</string>
+    <string name="home_search_label">Search</string>
+    <string name="home_search_hint">Try "baby formula" or "warm blanket"</string>
     <string name="home_empty_title">All quiet nearby</string>
     <string name="home_empty_message">No listings within %1$d km right now. Try widening your radius or check back soon.</string>
 

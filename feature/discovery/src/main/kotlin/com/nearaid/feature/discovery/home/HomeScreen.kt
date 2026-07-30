@@ -14,15 +14,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +41,7 @@ import com.nearaid.core.designsystem.component.EmptyState
 import com.nearaid.core.designsystem.component.ListingCardView
 import com.nearaid.core.designsystem.component.NearAidChip
 import com.nearaid.core.designsystem.component.NearAidSegmentedTabs
+import com.nearaid.core.designsystem.component.NearAidTextField
 import com.nearaid.core.designsystem.component.statusSemantics
 import com.nearaid.core.designsystem.theme.NearAidTheme
 
@@ -49,6 +53,14 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+
+    // When a search re-ranks the feed and a new listing lands at the top, scroll up to it
+    // so the best match is visible without the user scrolling manually.
+    val topId = state.listings.firstOrNull()?.id
+    LaunchedEffect(topId) {
+        if (topId != null) listState.animateScrollToItem(0)
+    }
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
@@ -93,6 +105,20 @@ fun HomeScreen(
                 )
             }
         }
+
+        // Semantic search — re-ranks the feed on-device by meaning (see RankListingsBySimilarityUseCase)
+        NearAidTextField(
+            value = state.searchQuery,
+            onValueChange = { viewModel.onIntent(HomeIntent.SearchChanged(it)) },
+            label = stringResource(R.string.home_search_label),
+            placeholder = stringResource(R.string.home_search_hint),
+            leadingIcon = Icons.Filled.Search,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        )
+
+        Spacer(Modifier.height(10.dp))
 
         // Needs / Offers toggle
         NearAidSegmentedTabs(
@@ -159,6 +185,7 @@ fun HomeScreen(
 
             else -> {
                 LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {

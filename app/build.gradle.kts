@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
+    implementation(project(":core:ai"))
 
     // Features
     implementation(project(":feature:auth"))
