@@ -82,7 +82,9 @@ and an effect-driven scroll-to-top. (Docs: `docs/ai-semantic-search.md`.)
 **Cross-cutting:** FCM push, accessibility contract (TalkBack roles/labels/headings, 48 dp targets,
 live-region announcements, automated Compose a11y test), light/dark semantic theming,
 localization-ready `strings.xml` (incl. Bangla). Full technical docs live under `docs/`
-(architecture, data/networking, navigation, design system, testing, CI/CD, AI).
+(system design, architecture, data/networking, navigation, design system, testing, CI/CD, AI) —
+`docs/system-design.md` is the top-down view (system context, component view, and the end-to-end
+flows as sequence/state diagrams).
 
 **Deferred:** a dedicated map view (list-based discovery in v1). Backend is external
 (Django + OpenAPI); this repo is the client.
