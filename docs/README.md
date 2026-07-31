@@ -5,7 +5,7 @@ product overview; these go one level deeper into how each part is built.
 
 | Doc | Covers |
 |---|---|
-| [System design](near_aid_app_system-design.md) | Top-down view — system context, component view, the request lifecycle, and end-to-end flows (auth/OTP, discovery + semantic search, claim→deliver→confirm→rate with BLE, realtime chat, FCM) as sequence/state diagrams, plus storage tiers, cross-cutting qualities, and deployment topology |
+| [System design](system-design.md) | Top-down view — system context, component view, the request lifecycle, and end-to-end flows (auth/OTP, discovery + semantic search, claim→deliver→confirm→rate with BLE, realtime chat, FCM) as sequence/state diagrams, plus storage tiers, cross-cutting qualities, and deployment topology |
 | [Architecture](architecture.md) | Clean Architecture + MVI, the module graph, `DataResult`/`AppError`, dispatchers, Hilt DI, and the `build-logic` convention plugins |
 | [Data, networking, auth & realtime](data-and-networking.md) | Retrofit/OkHttp, API services & DTOs, `safeApiCall`, token attach/refresh, repositories & mappers, the chat WebSocket, Room/DataStore caching, FCM |
 | [Navigation](navigation.md) | Type-safe Navigation Compose — the `Routes.kt` registry, the two-level host, bottom nav, and per-feature graphs |
