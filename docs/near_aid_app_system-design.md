@@ -258,17 +258,17 @@ sequenceDiagram
 
     rect rgb(235,245,255)
     Note over C,O: In-person handoff, gated on BLE proximity
-    O->>Prox: advertise("I'm here to receive")
+    O->>Prox: advertise, I am here to receive
     C->>Prox: scan for claim token
     Prox->>Prox: derive 4-byte token from claimId (FNV-1a)
     Prox-->>C: ProximityResult.Confirmed (RSSI near enough)
     end
 
     C->>API: POST /claims/{id}/deliver
-    Note right of API: status stays "active";<br/>delivered_at is set
+    Note right of API: server status stays active,<br/>delivered_at is set
     O->>API: POST /claims/{id}/confirm (receipt)
-    C->>API: rate(...)
-    O->>API: rate(...)
+    C->>API: rate
+    O->>API: rate
 ```
 
 **Claim status is derived, not a raw field.** The backend keeps `claim.status = active` even
@@ -282,7 +282,7 @@ REST transitions are `POST /claims/{id}/{deliver|confirm|withdraw|rating}`.
 ```mermaid
 stateDiagram-v2
     [*] --> ACTIVE: POST /listings/{id}/claim
-    ACTIVE --> DELIVERED: POST /claims/{id}/deliver<br/>(sets delivered_at; server status stays "active")
+    ACTIVE --> DELIVERED: POST /claims/{id}/deliver<br/>sets delivered_at (server status stays active)
     DELIVERED --> COMPLETED: POST /claims/{id}/confirm + both rate
     COMPLETED --> [*]
     ACTIVE --> WITHDRAWN: claimer withdraws
@@ -323,11 +323,11 @@ sequenceDiagram
     Repo->>REST: GET messages (source of truth)
     REST-->>UI: message history
     Repo->>WS: observe(threadId)
-    WS->>API: connect wss://…/ws?token=<access>
-    WS->>API: {"event":"subscribe","thread_id":…}
-    API-->>WS: {"event":"message.new", …}
+    WS->>API: connect wss://…/ws?token=access
+    WS->>API: subscribe frame (event=subscribe, thread_id)
+    API-->>WS: event=message.new frame
     WS-->>UI: emit ChatMessage (filtered to this thread)
-    UI->>REST: sendMessage(...) (writes go over REST)
+    UI->>REST: sendMessage (writes go over REST)
 ```
 
 - **REST is the source of truth**; the socket is **best-effort with no reconnection**. A dropped
@@ -353,7 +353,7 @@ sequenceDiagram
     UC->>API: POST /me/devices (DeviceBody)
     Note over Svc: onMessageReceived
     Svc->>Act: PendingIntent + EXTRA_DEEPLINK
-    Svc->>Svc: post notification (channel "nearaid_alerts")
+    Svc->>Svc: post notification (channel nearaid_alerts)
     Act->>Act: route to deep-linked screen on tap
 ```
 
