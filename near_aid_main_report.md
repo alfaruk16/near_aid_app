@@ -184,3 +184,36 @@ No CODEOWNERS, no CONTRIBUTORS; `git shortlog -sne HEAD` = **1 person**. **Team 
   env set; `Config: null` without) — the live GitHub Actions release run and Play upload require
   the repository secrets, so they're validated by config + local proof, not an executed release.
 - **Not evidenced in this repo:** an iOS build.
+
+---
+
+## Appendix B — NearAid KMP variant (short report, `KMP` branch)
+
+_A parallel **Kotlin Multiplatform** line of the same app lives on the `KMP` branch — one shared
+Kotlin + **Compose Multiplatform** codebase runs on **both Android and iOS**. Figures below are
+from that branch's own evidence report (generated 2026-07-20, updated 2026-07-24); coverage and
+startup are measured there, nothing inferred._
+
+| Metric | Value |
+|---|---|
+| Gradle modules | **18** (NIA-style + `build-logic` convention plugins) |
+| Commits (all branches) | **48**, **100% solo** (`alfarukemail@gmail.com`) |
+| Unit tests | **315** across 46 files |
+| Coverage — core logic (Kover) | **86%** line (1,679/1,943); ~**31%** whole-repo incl. UI |
+| Cold start (emulator) | **585 ms** median (warm ~116 ms) |
+
+**Key stack differences vs. `main`:** Kotlin **2.1.20** Multiplatform + Compose Multiplatform 1.7.3
+(shared UI on Android + iOS) · **Koin** DI (migrated off Hilt) · **Ktor** 3.0.3 client + WebSockets
+(migrated off Retrofit) · **Room-KMP** 2.7.1 + DataStore-KMP · **SKIE** for iOS interop · **Kover**
+for coverage (vs. JaCoCo). Same product surface (two-sided discovery, claim→chat→deliver→confirm→rate,
+realtime chat, dark theme, a11y, Bangla/EN).
+
+**Migration arc (largest on that branch):** Phase 0 skeleton → Hilt→Koin → pure core to
+`commonMain` → Retrofit→Ktor + DataStore-KMP → Room-KMP + `:core:data` → ViewModels to `commonMain`
+→ iOS drives shared ViewModels (SKIE) → shared Compose UI → platform edges (Coil, iOS picker,
+secure tokens, shared a11y).
+
+**Honesty guardrails (per that report):** pair **86%** with its "core logic" basis (excludes Compose
+UI + generated code); whole-repo is ~31%. Startup is an **emulator** baseline (API 37), not a
+physical device. No single build-time figure is quotable (measurements too noisy). iOS release CD
+is deferred (pending Apple Developer account). Source: `NearAid_Repo_Report.md` on branch `KMP`.
