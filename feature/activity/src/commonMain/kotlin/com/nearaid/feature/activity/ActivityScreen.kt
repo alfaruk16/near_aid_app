@@ -24,7 +24,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -82,18 +81,6 @@ fun ActivityScreen(
         }
     }
 
-    // Proximity couldn't confirm the handoff: inform the user; the row keeps a manual-confirm button.
-    val fallback = state.handoffFallback
-    if (fallback != null) {
-        val message = when (fallback.reason) {
-            HandoffFailureReason.NotNearby -> stringResource(Res.string.proximity_not_nearby)
-            HandoffFailureReason.PermissionOff -> stringResource(Res.string.proximity_permission_off)
-            HandoffFailureReason.Error -> stringResource(Res.string.proximity_error)
-            HandoffFailureReason.Unavailable -> stringResource(Res.string.proximity_unavailable)
-        }
-        LaunchedEffect(fallback) { snackbarHostState.showSnackbar(message) }
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             NearAidTopBar(title = stringResource(Res.string.activity_title))
@@ -115,20 +102,14 @@ fun ActivityScreen(
                         viewModel.onIntent(ActivityIntent.ClaimClicked(claimId, threadId, title))
                     },
                     onMarkDelivered = { viewModel.onIntent(ActivityIntent.MarkDelivered(it)) },
-                    onMarkDeliveredManually = { viewModel.onIntent(ActivityIntent.MarkDeliveredManually(it)) },
                     onConfirmReceipt = { viewModel.onIntent(ActivityIntent.ConfirmReceipt(it)) },
-                    onStartReceiver = { viewModel.onIntent(ActivityIntent.StartReceiverProximity(it)) },
-                    onStopReceiver = { viewModel.onIntent(ActivityIntent.StopReceiverProximity) },
                     onRefresh = { viewModel.onIntent(ActivityIntent.Refresh) },
                 )
                 1 -> MyPostsTab(
                     state = state,
                     onListingClick = { viewModel.onIntent(ActivityIntent.ListingClicked(it)) },
                     onMarkDelivered = { viewModel.onIntent(ActivityIntent.OwnerMarkDelivered(it)) },
-                    onMarkDeliveredManually = { viewModel.onIntent(ActivityIntent.OwnerMarkDeliveredManually(it)) },
                     onConfirmReceipt = { viewModel.onIntent(ActivityIntent.OwnerConfirmReceipt(it)) },
-                    onStartReceiver = { viewModel.onIntent(ActivityIntent.StartReceiverProximity(it)) },
-                    onStopReceiver = { viewModel.onIntent(ActivityIntent.StopReceiverProximity) },
                     onRefresh = { viewModel.onIntent(ActivityIntent.Refresh) },
                 )
             }
@@ -148,10 +129,7 @@ private fun HelpingTab(
     state: ActivityState,
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
-    onMarkDeliveredManually: (claimId: String) -> Unit,
     onConfirmReceipt: (claimId: String) -> Unit,
-    onStartReceiver: (claimId: String) -> Unit,
-    onStopReceiver: () -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -190,15 +168,9 @@ private fun HelpingTab(
                     ClaimRow(
                         claim = claim,
                         actionLoading = state.actionLoading,
-                        proximityChecking = state.proximityClaimId == claim.id,
-                        showManualFallback = state.handoffFallback?.claimId == claim.id,
-                        receiverListening = state.receiverListeningClaimId == claim.id,
                         onOpenChat = onOpenChat,
                         onMarkDelivered = onMarkDelivered,
-                        onMarkDeliveredManually = onMarkDeliveredManually,
                         onConfirmReceipt = onConfirmReceipt,
-                        onStartReceiver = onStartReceiver,
-                        onStopReceiver = onStopReceiver,
                     )
                 }
             }
@@ -210,15 +182,9 @@ private fun HelpingTab(
 private fun ClaimRow(
     claim: Claim,
     actionLoading: Boolean,
-    proximityChecking: Boolean,
-    showManualFallback: Boolean,
-    receiverListening: Boolean,
     onOpenChat: (claimId: String, threadId: String, title: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
-    onMarkDeliveredManually: (claimId: String) -> Unit,
     onConfirmReceipt: (claimId: String) -> Unit,
-    onStartReceiver: (claimId: String) -> Unit,
-    onStopReceiver: () -> Unit,
 ) {
     val mappedStatus = claim.status.toListingStatus()
     // On a REQUEST the claimant is the fulfilling party (marks delivered); on an OFFER the claimant
@@ -277,28 +243,15 @@ private fun ClaimRow(
 
         when (claim.status) {
             ClaimStatus.ACTIVE -> if (isFulfiller) {
-                // Fulfilling party (helper on a request). The proximity-gated deliver runs the BLE
-                // handoff and degrades gracefully so the handoff is never blocked.
-                DeliverHandoffButton(
+                // Fulfilling party (helper on a request): mark the in-person handoff delivered.
+                DeliverButton(
                     claimId = claim.id,
                     actionLoading = actionLoading,
-                    proximityChecking = proximityChecking,
-                    showManualFallback = showManualFallback,
                     onDeliver = onMarkDelivered,
-                    onDeliverManually = onMarkDeliveredManually,
                 )
             } else {
-                // Receiving party (recipient on an offer). Can't deliver, but can advertise over BLE
-                // so the giver's "Mark delivered" proximity check confirms you're together.
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AwaitingChip(text = stringResource(Res.string.claim_awaiting_delivery))
-                    ReadyToReceiveButton(
-                        claimId = claim.id,
-                        listening = receiverListening,
-                        onStart = onStartReceiver,
-                        onStop = onStopReceiver,
-                    )
-                }
+                // Receiving party (recipient on an offer): waiting on the giver to hand off.
+                AwaitingChip(text = stringResource(Res.string.claim_awaiting_delivery))
             }
             ClaimStatus.DELIVERED -> if (isFulfiller) {
                 // Fulfilling party already delivered; waiting on the recipient's receipt confirmation.
@@ -342,10 +295,7 @@ private fun MyPostsTab(
     state: ActivityState,
     onListingClick: (id: String) -> Unit,
     onMarkDelivered: (claimId: String) -> Unit,
-    onMarkDeliveredManually: (claimId: String) -> Unit,
     onConfirmReceipt: (claimId: String) -> Unit,
-    onStartReceiver: (claimId: String) -> Unit,
-    onStopReceiver: () -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -393,14 +343,11 @@ private fun MyPostsTab(
                         if (claimId != null) {
                             when {
                                 card.type == ListingType.OFFER && card.status == ListingStatus.CLAIMED ->
-                                    // Giver's side of the handoff: same BLE proximity check as the helper.
-                                    DeliverHandoffButton(
+                                    // Giver's side of the handoff: mark the offer delivered.
+                                    DeliverButton(
                                         claimId = claimId,
                                         actionLoading = state.actionLoading,
-                                        proximityChecking = state.proximityClaimId == claimId,
-                                        showManualFallback = state.handoffFallback?.claimId == claimId,
                                         onDeliver = onMarkDelivered,
-                                        onDeliverManually = onMarkDeliveredManually,
                                     )
                                 card.type == ListingType.REQUEST && card.status == ListingStatus.DELIVERED ->
                                     NearAidButton(
@@ -411,15 +358,6 @@ private fun MyPostsTab(
                                         variant = NearAidButtonVariant.Teal,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
-                                // Seeker awaiting the helper's delivery: advertise so their proximity
-                                // check confirms you're together.
-                                card.type == ListingType.REQUEST && card.status == ListingStatus.CLAIMED ->
-                                    ReadyToReceiveButton(
-                                        claimId = claimId,
-                                        listening = state.receiverListeningClaimId == claimId,
-                                        onStart = onStartReceiver,
-                                        onStop = onStopReceiver,
-                                    )
                             }
                         }
                     }
@@ -429,100 +367,21 @@ private fun MyPostsTab(
     }
 }
 
-/**
- * Proximity-gated "Mark delivered" button for the fulfilling party (request helper or offer giver).
- * Tapping first prompts for BLE permission (Android), then runs the proximity check; if it can't
- * confirm, a manual-confirm fallback appears so a legitimate handoff is never trapped.
- */
+/** "Mark delivered" button for the fulfilling party (request helper or offer giver). */
 @Composable
-private fun DeliverHandoffButton(
+private fun DeliverButton(
     claimId: String,
     actionLoading: Boolean,
-    proximityChecking: Boolean,
-    showManualFallback: Boolean,
     onDeliver: (claimId: String) -> Unit,
-    onDeliverManually: (claimId: String) -> Unit,
 ) {
-    val launchHandoff = rememberHandoffPermissionGate(onReady = { onDeliver(claimId) })
-    val busy = actionLoading || proximityChecking
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        NearAidButton(
-            text = if (proximityChecking) {
-                stringResource(Res.string.proximity_checking)
-            } else {
-                stringResource(Res.string.action_mark_delivered)
-            },
-            onClick = launchHandoff,
-            enabled = !busy,
-            loading = busy,
-            variant = NearAidButtonVariant.Teal,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        if (showManualFallback) {
-            NearAidButton(
-                text = stringResource(Res.string.action_confirm_manually),
-                onClick = { onDeliverManually(claimId) },
-                enabled = !actionLoading,
-                variant = NearAidButtonVariant.Ghost,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    }
-}
-
-/**
- * The receiving party's side of the proximity handoff: advertise/scan over BLE while awaiting the
- * other device's "Mark delivered", so its proximity check can confirm you're together. Toggles on
- * tap (permission-gated) and auto-stops when the row leaves the screen.
- */
-@Composable
-private fun ReadyToReceiveButton(
-    claimId: String,
-    listening: Boolean,
-    onStart: (claimId: String) -> Unit,
-    onStop: () -> Unit,
-) {
-    val launch = rememberHandoffPermissionGate(onReady = { onStart(claimId) })
-    // Stop advertising when this row leaves composition (tab switch / navigation away).
-    DisposableEffect(claimId) { onDispose { onStop() } }
-    if (listening) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(NearAidTheme.colors.tealTint)
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-            ) {
-                CircularProgressIndicator(
-                    color = NearAidTheme.colors.teal,
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.size(16.dp),
-                )
-                Text(
-                    text = stringResource(Res.string.proximity_listening),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = NearAidTheme.colors.teal,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            NearAidButton(
-                text = stringResource(Res.string.action_stop),
-                onClick = onStop,
-                variant = NearAidButtonVariant.Ghost,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    } else {
-        NearAidButton(
-            text = stringResource(Res.string.action_ready_to_receive),
-            onClick = launch,
-            variant = NearAidButtonVariant.Teal,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    NearAidButton(
+        text = stringResource(Res.string.action_mark_delivered),
+        onClick = { onDeliver(claimId) },
+        enabled = !actionLoading,
+        loading = actionLoading,
+        variant = NearAidButtonVariant.Teal,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 /** Neutral "waiting on the other party" pill shown when the claimant has no action to take yet. */

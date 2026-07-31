@@ -48,7 +48,6 @@ kotlin {
             implementation(project(":core:datastore"))
             implementation(project(":core:database"))
             implementation(project(":core:designsystem"))
-            implementation(project(":core:proximity"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)

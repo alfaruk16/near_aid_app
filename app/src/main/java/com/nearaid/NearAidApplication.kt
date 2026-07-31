@@ -10,7 +10,6 @@ import com.nearaid.core.database.di.databaseModule
 import com.nearaid.core.datastore.di.dataStoreModule
 import com.nearaid.core.domain.di.domainModule
 import com.nearaid.core.network.di.networkModule
-import com.nearaid.core.proximity.di.proximityModule
 import com.nearaid.di.appModule
 import com.nearaid.feature.activity.di.activityModule
 import com.nearaid.feature.auth.di.authModule
@@ -36,7 +35,6 @@ class NearAidApplication : Application() {
                 databaseModule,
                 dataModule,
                 domainModule,
-                proximityModule,
                 appModule,
                 authModule,
                 discoveryModule,
