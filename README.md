@@ -29,7 +29,7 @@ navigation, design system & accessibility, testing, CI/CD, and the AI semantic s
 This app has been **fully migrated to Kotlin Multiplatform + Compose Multiplatform**
 (Android + iOS from shared code) on the [**`KMP` branch**](https://github.com/alfaruk16/near_aid_app/tree/KMP):
 
-- **16 modules with `commonMain`** — including the Compose UI screens themselves, shared across platforms
+- **18 Gradle modules, 16 sharing a `commonMain`** — including the Compose UI screens themselves, shared across platforms
 - **Room (KMP)**, **Ktor 3**, **Koin**, and `expect`/`actual` platform APIs (DataStore, database, image picker)
 - A native **iOS app** (`iosApp/`, Xcode project) linking against a shared umbrella framework
 
@@ -437,8 +437,8 @@ helpers are intentionally still inline (see *Implementation status*).
 
 Fast **JVM unit tests** (no device/emulator) cover the presentation and non‑UI layers:
 every ViewModel, and the logic in `:core` (mappers, all repositories, all use cases, the
-OkHttp interceptors, the MVI base). They run as `testDebugUnitTest` — **273 tests** across
-the modules below.
+OkHttp interceptors, the MVI base). They run as `testDebugUnitTest` — **275 tests** across
+44 test files, in the modules below.
 
 - **Frameworks:** JUnit4, **MockK** (use‑case doubles), **Turbine** (effect/flow assertions),
   **kotlinx‑coroutines‑test**. These come wired to every module through the convention plugins,
