@@ -216,4 +216,4 @@ secure tokens, shared a11y).
 **Honesty guardrails (per that report):** pair **86%** with its "core logic" basis (excludes Compose
 UI + generated code); whole-repo is ~31%. Startup is an **emulator** baseline (API 37), not a
 physical device. No single build-time figure is quotable (measurements too noisy). iOS release CD
-is deferred (pending Apple Developer account). Source: `NearAid_Repo_Report.md` on branch `KMP`.
+is deferred (pending Apple Developer account). Source: `NearAid_KMP_Report.md` on branch `KMP`.
